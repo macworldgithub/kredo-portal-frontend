@@ -92,12 +92,20 @@ export const MasterPipelineView: React.FC = () => {
   const [stageFilter, setStageFilter] = useState("All stages");
   const [dropdownOpen, setDropdownOpen] = useState(false);
 
-  const stages = ["All stages", "In assessment", "Approved", "Docs / settlement", "Settled", "Application received", "Declined / withdrawn"];
-
+  const stages = [
+    "All stages",
+    "New enquiry",
+    "Application received",
+    "In assessment",
+    "Approved",
+    "Docs / settlement",
+    "Settled",
+    "Declined / withdrawn",
+  ];
   const filtered = MASTER_PIPELINE_DEALS.filter(d => {
-    const matchesSearch = d.name.toLowerCase().includes(searchTerm.toLowerCase()) || 
-                          d.partner.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                          d.id.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesSearch = d.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      d.partner.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      d.id.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesStage = stageFilter === "All stages" || d.stage === stageFilter;
     return matchesSearch && matchesStage;
   });
@@ -139,7 +147,7 @@ export const MasterPipelineView: React.FC = () => {
           <div className="w-12 h-0.5 bg-amber-600 mt-5"></div>
         </div>
 
-        <button 
+        <button
           onClick={() => alert("Exporting Master Pipeline CSV...")}
           className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-white border border-slate-200 text-slate-700 hover:bg-slate-50 font-bold text-xs shadow-2xs transition-colors self-start sm:self-auto cursor-pointer"
         >
@@ -181,9 +189,8 @@ export const MasterPipelineView: React.FC = () => {
                       setStageFilter(st);
                       setDropdownOpen(false);
                     }}
-                    className={`w-full text-left px-3.5 py-1.5 text-xs font-medium hover:bg-slate-50 transition-colors ${
-                      stageFilter === st ? "text-sky-600 font-bold bg-sky-50" : "text-slate-700"
-                    }`}
+                    className={`w-full text-left px-3.5 py-1.5 text-xs font-medium hover:bg-slate-50 transition-colors ${stageFilter === st ? "text-sky-600 font-bold bg-sky-50" : "text-slate-700"
+                      }`}
                   >
                     {st}
                   </button>

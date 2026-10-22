@@ -13,10 +13,19 @@ export const DealsView: React.FC<DealsViewProps> = ({ onSelectDeal }) => {
   const [selectedStage, setSelectedStage] = useState("All stages");
   const [dropdownOpen, setDropdownOpen] = useState(false);
 
-  const stages = ["All stages", "In assessment", "Approved", "Docs / settlement", "Settled"];
+  const stages = [
+    "All stages",
+    "New enquiry",
+    "Application received",
+    "In assessment",
+    "Approved",
+    "Docs / settlement",
+    "Settled",
+    "Declined / withdrawn",
+  ];
 
   const filteredDeals = PARTNER_DEALS.filter((deal) => {
-    const matchesSearch = 
+    const matchesSearch =
       deal.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
       deal.id.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesStage = selectedStage === "All stages" || deal.stage === selectedStage;
@@ -87,9 +96,8 @@ export const DealsView: React.FC<DealsViewProps> = ({ onSelectDeal }) => {
                     setSelectedStage(stage);
                     setDropdownOpen(false);
                   }}
-                  className={`w-full text-left px-3.5 py-1.5 text-xs font-medium hover:bg-slate-50 transition-colors ${
-                    selectedStage === stage ? "text-sky-600 font-bold bg-sky-50" : "text-slate-700"
-                  }`}
+                  className={`w-full text-left px-3.5 py-1.5 text-xs font-medium hover:bg-slate-50 transition-colors ${selectedStage === stage ? "text-sky-600 font-bold bg-sky-50" : "text-slate-700"
+                    }`}
                 >
                   {stage}
                 </button>
