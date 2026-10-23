@@ -65,6 +65,18 @@ You can check out [the Next.js GitHub repository](https://github.com/vercel/next
 
 ## Deploy on Vercel
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+Deploy this Next.js project as a Vercel project with `kredo-platform` as its
+project root. Vercel detects Next.js automatically. Set `NEXT_PUBLIC_API_URL`
+in the Vercel project's Production (and Preview, if needed) environment
+variables to the deployed backend URL, including `/api`, for example:
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+```env
+NEXT_PUBLIC_API_URL=https://your-kredo-backend.vercel.app/api
+```
+
+Deploy `kredo-portal-backend` as a separate Vercel project with that directory
+as its project root. Configure MongoDB Atlas, SMTP, master account, and CORS
+environment variables as described in the backend README. Never commit `.env`.
+
+After both deployments finish, test sign-in, portal API requests, signup, and
+password recovery on the HTTPS frontend.
