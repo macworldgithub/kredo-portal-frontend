@@ -2,9 +2,11 @@
 
 import React, { useEffect, useState } from "react";
 import Link from "next/link";
-import { apiRequest, PASSWORD_PATTERN } from "@/lib/api";
+import { useRouter } from "next/navigation";
+import { apiRequest, clearAccessToken, PASSWORD_PATTERN } from "@/lib/api";
 
 export const ResetPasswordView: React.FC = () => {
+  const router = useRouter();
   const [token, setToken] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -13,9 +15,19 @@ export const ResetPasswordView: React.FC = () => {
   const [submitting, setSubmitting] = useState(false);
 
   useEffect(() => {
+    if (!complete) return;
+    const redirectTimer = window.setTimeout(() => router.replace("/"), 1200);
+    return () => window.clearTimeout(redirectTimer);
+  }, [complete, router]);
+
+  useEffect(() => {
     let active = true;
     void Promise.resolve().then(() => {
-      if (active) setToken(new URLSearchParams(window.location.search).get("token") || "");
+      if (active) {
+        const resetToken = window.sessionStorage.getItem("kredo.passwordResetToken") || "";
+        window.sessionStorage.removeItem("kredo.passwordResetToken");
+        setToken(resetToken);
+      }
     });
     return () => {
       active = false;
@@ -26,7 +38,7 @@ export const ResetPasswordView: React.FC = () => {
     event.preventDefault();
     setError("");
     if (!token) {
-      setError("This reset link is missing its token.");
+      setError("The verified reset session is missing or expired. Request a new code.");
       return;
     }
     if (password !== confirmPassword) {
@@ -43,6 +55,7 @@ export const ResetPasswordView: React.FC = () => {
         method: "POST",
         body: JSON.stringify({ token, newPassword: password }),
       }, false);
+      clearAccessToken();
       setComplete(true);
     } catch (resetError) {
       setError(resetError instanceof Error ? resetError.message : "Could not reset password.");
@@ -58,7 +71,7 @@ export const ResetPasswordView: React.FC = () => {
         <p className="text-sm text-slate-500 mt-1 mb-6">Choose a password using exactly 6 letters and/or digits, with no symbols or spaces.</p>
         {complete ? (
           <div>
-            <p role="status" className="rounded-xl bg-emerald-50 p-4 text-sm text-emerald-800">Password reset. You can now sign in.</p>
+            <p role="status" className="rounded-xl bg-emerald-50 p-4 text-sm text-emerald-800">Password reset. Redirecting you to sign in...</p>
             <Link href="/" className="mt-5 block text-center text-xs font-semibold text-sky-800 hover:underline">Go to sign in</Link>
           </div>
         ) : (

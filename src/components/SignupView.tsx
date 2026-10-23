@@ -4,7 +4,7 @@ import React, { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { UserPlus } from "lucide-react";
-import { apiRequest, AuthUser, PASSWORD_PATTERN, setAccessToken, setCurrentUser } from "@/lib/api";
+import { apiRequest, clearAccessToken, PASSWORD_PATTERN } from "@/lib/api";
 
 export const SignupView: React.FC = () => {
   const router = useRouter();
@@ -29,13 +29,12 @@ export const SignupView: React.FC = () => {
     }
     setSubmitting(true);
     try {
-      const result = await apiRequest<{ accessToken: string; user: AuthUser }>("/auth/signup", {
+      await apiRequest<{ message: string }>("/auth/signup", {
         method: "POST",
         body: JSON.stringify({ name, email, partnerCode, password }),
       }, false);
-      setAccessToken(result.accessToken);
-      setCurrentUser(result.user);
-      router.push("/");
+      clearAccessToken();
+      router.replace("/");
     } catch (signupError) {
       setError(signupError instanceof Error ? signupError.message : "Could not create account.");
     } finally {
