@@ -4,4 +4,4 @@ export const API_BASE_URL = configuredApiUrl
   ? configuredApiUrl.replace(/\/+$/, "")
   : process.env.NODE_ENV === "production"
     ? null
-    : "http://localhost:5000/api";
+    : "https://kredo-portal-backend.vercel.app/api";
