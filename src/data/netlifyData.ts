@@ -2,7 +2,7 @@ export interface PartnerDeal {
   id: string;
   name: string;
   submitted: string;
-  stage: 'In assessment' | 'Approved' | 'Docs / settlement' | 'Settled';
+  stage: 'Application received' | 'In assessment' | 'Approved' | 'Docs / settlement' | 'Settled' | 'Declined' | 'Declined / withdrawn';
   amountBand: string;
   commission: string;
   commissionStatus: 'est.' | 'confirmed' | 'paid';

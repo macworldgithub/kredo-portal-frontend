@@ -16,18 +16,20 @@ import {
 interface HeroPageProps {
   onBackToDemo: () => void;
   onApplyNow: () => void;
+  referralCode: string;
 }
 
 export const HeroPage: React.FC<HeroPageProps> = ({
   onBackToDemo,
   onApplyNow,
+  referralCode,
 }) => {
   return (
     <div className="min-h-screen bg-white text-[#0a1926] flex flex-col font-sans">
       {/* Top Banner Notice */}
       <div className="bg-[#f0f4f8] py-1.5 px-4 text-center border-b border-slate-200">
         <span className="text-[10px] font-bold text-slate-500 tracking-wider uppercase">
-          KREDO REFERRAL PARTNER EDITION · SPUD ATTRIBUTION SECURED
+          KREDO REFERRAL PARTNER EDITION · {referralCode} ATTRIBUTION SECURED
         </span>
       </div>
 
@@ -140,7 +142,7 @@ export const HeroPage: React.FC<HeroPageProps> = ({
                     REFERRAL CODE APPLIED
                   </div>
                   <div className="font-mono text-xl font-black text-[#0a1926] tracking-wider mt-0.5">
-                    SPUD
+                    {referralCode}
                   </div>
                 </div>
               </div>
@@ -181,7 +183,7 @@ export const HeroPage: React.FC<HeroPageProps> = ({
             </h2>
 
             <p className="text-slate-600 text-sm leading-relaxed max-w-lg">
-              Apply using the SPUD link. When an eligible facility settles, Kredo will arrange the illustrated signed-book partner offer.
+              Apply using the {referralCode} link. When an eligible facility settles, Kredo will arrange the illustrated signed-book partner offer.
             </p>
 
             <div className="p-3.5 bg-amber-50/70 border-l-2 border-amber-500 rounded-r-xl text-[11px] text-slate-600 max-w-md">
@@ -197,7 +199,7 @@ export const HeroPage: React.FC<HeroPageProps> = ({
             <div>
               <h3 className="text-xl font-extrabold text-white">One link. Clear attribution.</h3>
               <p className="text-xs text-slate-300 mt-2 leading-relaxed">
-                Your SPUD code is already attached. It follows the application from this page to Kredo&apos;s internal deal record and partner ledger.
+                Your {referralCode} code is already attached. It follows the application from this page to Kredo&apos;s internal deal record and partner ledger.
               </p>
             </div>
 
@@ -205,7 +207,7 @@ export const HeroPage: React.FC<HeroPageProps> = ({
               onClick={onApplyNow}
               className="w-full flex items-center justify-between p-3.5 px-5 rounded-2xl bg-white text-[#0a1926] font-bold text-xs hover:bg-slate-100 transition-colors cursor-pointer"
             >
-              <span>Start with SPUD applied</span>
+              <span>Start with {referralCode} applied</span>
               <CheckCircle className="w-4 h-4 text-sky-600" />
             </button>
           </div>

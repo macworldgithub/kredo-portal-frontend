@@ -1,10 +1,42 @@
 "use client";
 
 import React, { useState } from "react";
-import { Download, Bell, ExternalLink } from "lucide-react";
+import { Download, Bell } from "lucide-react";
+import { MasterPreferences, MasterReportData } from "@/lib/api";
 
-export const MasterReportsView: React.FC = () => {
-  const [weeklyAlert, setWeeklyAlert] = useState(false);
+export const MasterReportsView: React.FC<{
+  data: MasterReportData;
+  preferences: MasterPreferences;
+  onToggleWeeklyReports: (enabled: boolean) => Promise<void>;
+}> = ({ data, preferences, onToggleWeeklyReports }) => {
+  const [savingPreference, setSavingPreference] = useState(false);
+  const [preferenceError, setPreferenceError] = useState("");
+  const sourceTotal = data.sourceMix.reduce((total, item) => total + item.value, 0);
+  const circumference = 2 * Math.PI * 38;
+  const exportReport = () => {
+    const rows = [
+      "REPORT,NAME,VALUE",
+      ...data.sourceMix.map((item) => `"Source mix","${item.label}","${item.value}%"`),
+      ...data.partnerPerformance.map((item) => `"Partner performance","${item.name}","${item.volume}"`),
+    ];
+    const url = URL.createObjectURL(new Blob([rows.join("\n")], { type: "text/csv;charset=utf-8;" }));
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = "kredo-master-report.csv";
+    link.click();
+    URL.revokeObjectURL(url);
+  };
+  const toggleWeeklyReports = async () => {
+    setSavingPreference(true);
+    setPreferenceError("");
+    try {
+      await onToggleWeeklyReports(!preferences.weeklyReportsEnabled);
+    } catch (error) {
+      setPreferenceError(error instanceof Error ? error.message : "Could not update report preference.");
+    } finally {
+      setSavingPreference(false);
+    }
+  };
 
   return (
     <div className="space-y-6">
@@ -25,7 +57,7 @@ export const MasterReportsView: React.FC = () => {
         </div>
 
         <button 
-          onClick={() => alert("Downloading master intelligence report...")}
+          onClick={exportReport}
           className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-[#0a1926] hover:bg-[#14293d] text-white font-bold text-xs shadow-md transition-colors self-start sm:self-auto cursor-pointer"
         >
           <Download className="w-4 h-4 text-sky-400" />
@@ -45,71 +77,43 @@ export const MasterReportsView: React.FC = () => {
               {/* Donut Chart SVG */}
               <div className="relative w-40 h-40 flex items-center justify-center">
                 <svg className="w-full h-full transform -rotate-90" viewBox="0 0 100 100">
-                  {/* Tracked link: 46% stroke */}
-                  <circle
-                    cx="50"
-                    cy="50"
-                    r="38"
-                    stroke="#1e4868"
-                    strokeWidth="15"
-                    fill="transparent"
-                    strokeDasharray="110 240"
-                    strokeDashoffset="0"
-                  />
-                  {/* Typed code: 32% stroke */}
-                  <circle
-                    cx="50"
-                    cy="50"
-                    r="38"
-                    stroke="#c79744"
-                    strokeWidth="15"
-                    fill="transparent"
-                    strokeDasharray="76 240"
-                    strokeDashoffset="-110"
-                  />
-                  {/* Hero page: 22% stroke */}
-                  <circle
-                    cx="50"
-                    cy="50"
-                    r="38"
-                    stroke="#7dc5eb"
-                    strokeWidth="15"
-                    fill="transparent"
-                    strokeDasharray="54 240"
-                    strokeDashoffset="-186"
-                  />
+                  {data.sourceMix.map((source, index) => {
+                    const segment = sourceTotal ? (source.value / sourceTotal) * circumference : 0;
+                    const offset = data.sourceMix
+                      .slice(0, index)
+                      .reduce((total, previous) => total + (sourceTotal ? (previous.value / sourceTotal) * circumference : 0), 0);
+                    return (
+                      <circle
+                        key={source.label}
+                        cx="50"
+                        cy="50"
+                        r="38"
+                        stroke={source.color}
+                        strokeWidth="15"
+                        fill="transparent"
+                        strokeDasharray={`${segment} ${circumference}`}
+                        strokeDashoffset={-offset}
+                      />
+                    );
+                  })}
                 </svg>
                 <div className="absolute inset-0 flex flex-col items-center justify-center text-center">
-                  <span className="text-2xl font-black text-[#0a1926] leading-none">62</span>
-                  <span className="text-[9px] uppercase font-bold text-slate-400 tracking-wider mt-1">REFERRALS</span>
+                  <span className="text-2xl font-black text-[#0a1926] leading-none">{sourceTotal}%</span>
+                  <span className="text-[9px] uppercase font-bold text-slate-400 tracking-wider mt-1">ATTRIBUTION</span>
                 </div>
               </div>
 
               {/* Legend matching screenshot */}
               <div className="space-y-3 text-xs">
-                <div className="flex items-center justify-between gap-4">
-                  <div className="flex items-center gap-2">
-                    <span className="w-2.5 h-2.5 rounded-full bg-[#1e4868]"></span>
-                    <span className="text-slate-600 font-medium">Tracked link</span>
+                {data.sourceMix.map((source) => (
+                  <div key={source.label} className="flex items-center justify-between gap-4">
+                    <div className="flex items-center gap-2">
+                      <span className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: source.color }}></span>
+                      <span className="text-slate-600 font-medium">{source.label}</span>
+                    </div>
+                    <strong className="text-slate-900 font-bold">{source.value}%</strong>
                   </div>
-                  <strong className="text-slate-900 font-bold">46%</strong>
-                </div>
-
-                <div className="flex items-center justify-between gap-4">
-                  <div className="flex items-center gap-2">
-                    <span className="w-2.5 h-2.5 rounded-full bg-[#c79744]"></span>
-                    <span className="text-slate-600 font-medium">Typed code</span>
-                  </div>
-                  <strong className="text-slate-900 font-bold">32%</strong>
-                </div>
-
-                <div className="flex items-center justify-between gap-4">
-                  <div className="flex items-center gap-2">
-                    <span className="w-2.5 h-2.5 rounded-full bg-[#7dc5eb]"></span>
-                    <span className="text-slate-600 font-medium">Hero page</span>
-                  </div>
-                  <strong className="text-slate-900 font-bold">22%</strong>
-                </div>
+                ))}
               </div>
             </div>
           </div>
@@ -129,49 +133,20 @@ export const MasterReportsView: React.FC = () => {
             </div>
 
             <div className="space-y-4 pt-2">
-              {/* Row 1: Mark Carroll */}
-              <div>
-                <div className="flex justify-between text-xs font-bold mb-1">
-                  <span className="text-slate-900">Mark Carroll</span>
-                  <span className="text-slate-900">$640k</span>
+              {data.partnerPerformance.map((partner, index) => (
+                <div key={partner.name}>
+                  <div className="flex justify-between text-xs font-bold mb-1">
+                    <span className="text-slate-900">{partner.name}</span>
+                    <span className="text-slate-900">{partner.volume}</span>
+                  </div>
+                  <div className="w-full bg-slate-100 h-2 rounded-full overflow-hidden">
+                    <div
+                      className={`h-full rounded-full ${index === 0 ? "bg-[#b45309]" : "bg-[#1e4868]"}`}
+                      style={{ width: `${Math.max(0, Math.min(100, partner.percent))}%` }}
+                    ></div>
+                  </div>
                 </div>
-                <div className="w-full bg-slate-100 h-2 rounded-full overflow-hidden">
-                  <div className="bg-[#b45309] h-full rounded-full w-[100%]"></div>
-                </div>
-              </div>
-
-              {/* Row 2: Hayes Partners */}
-              <div>
-                <div className="flex justify-between text-xs font-bold mb-1">
-                  <span className="text-slate-900">Hayes Partners</span>
-                  <span className="text-slate-900">$380k</span>
-                </div>
-                <div className="w-full bg-slate-100 h-2 rounded-full overflow-hidden">
-                  <div className="bg-[#1e4868] h-full rounded-full w-[60%]"></div>
-                </div>
-              </div>
-
-              {/* Row 3: North & Kind Advisory */}
-              <div>
-                <div className="flex justify-between text-xs font-bold mb-1">
-                  <span className="text-slate-900">North & Kind Advisory</span>
-                  <span className="text-slate-900">$295k</span>
-                </div>
-                <div className="w-full bg-slate-100 h-2 rounded-full overflow-hidden">
-                  <div className="bg-[#1e4868] h-full rounded-full w-[46%]"></div>
-                </div>
-              </div>
-
-              {/* Row 4: Brightwater Accounting */}
-              <div>
-                <div className="flex justify-between text-xs font-bold mb-1">
-                  <span className="text-slate-900">Brightwater Accounting</span>
-                  <span className="text-slate-900">$110k</span>
-                </div>
-                <div className="w-full bg-slate-100 h-2 rounded-full overflow-hidden">
-                  <div className="bg-[#1e4868] h-full rounded-full w-[18%]"></div>
-                </div>
-              </div>
+              ))}
             </div>
           </div>
         </div>
@@ -192,18 +167,20 @@ export const MasterReportsView: React.FC = () => {
         {/* Toggle switch */}
         <button
           type="button"
-          onClick={() => setWeeklyAlert(!weeklyAlert)}
+          onClick={() => void toggleWeeklyReports()}
+          disabled={savingPreference}
           className={`w-12 h-6 flex items-center rounded-full p-1 cursor-pointer transition-colors duration-200 ease-in-out ${
-            weeklyAlert ? 'bg-[#1e4868]' : 'bg-slate-300'
+            preferences.weeklyReportsEnabled ? 'bg-[#1e4868]' : 'bg-slate-300'
           }`}
         >
           <div
             className={`bg-white w-4 h-4 rounded-full shadow-md transform transition-transform duration-200 ease-in-out ${
-              weeklyAlert ? 'translate-x-6' : 'translate-x-0'
+              preferences.weeklyReportsEnabled ? 'translate-x-6' : 'translate-x-0'
             }`}
           />
         </button>
       </div>
+      {preferenceError && <p role="alert" className="text-xs text-rose-600">{preferenceError}</p>}
     </div>
   );
 };

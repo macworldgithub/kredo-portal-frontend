@@ -2,9 +2,15 @@
 
 import React from "react";
 import { Download, TrendingUp, CheckCircle, FileText } from "lucide-react";
-import { STATEMENT_DEALS } from "../data/netlifyData";
+import { CommissionItem } from "../data/mockData";
 
-export const CommissionsView: React.FC = () => {
+export const CommissionsView: React.FC<{ commissions: CommissionItem[] }> = ({ commissions }) => {
+  const sumByStatus = (status: CommissionItem["status"]) =>
+    commissions
+      .filter((item) => item.status === status)
+      .reduce((total, item) => total + (Number(item.commissionAmount.replace(/[^\d.-]/g, "")) || 0), 0);
+  const formatCurrency = (amount: number) =>
+    amount.toLocaleString("en-AU", { style: "currency", currency: "AUD", maximumFractionDigits: 0 });
   return (
     <div className="space-y-6">
       {/* Title & Export CSV */}
@@ -25,7 +31,14 @@ export const CommissionsView: React.FC = () => {
 
         <button 
           onClick={() => {
-            const csv = "DEAL,RULE,FACILITY,COMMISSION,STATUS\nNorthbank Hospitality,1.55%,$200000,$3100,Confirmed\nPilbara Civil Works,1.50%,$320000,$4800,Estimated";
+            const csv = [
+              "DEAL,CLIENT,SETTLED AMOUNT,RATE,COMMISSION,STATUS",
+              ...commissions.map((item) =>
+                [item.dealName, item.client, item.settledAmount, item.rate, item.commissionAmount, item.status]
+                  .map((value) => `"${String(value).replaceAll('"', '""')}"`)
+                  .join(","),
+              ),
+            ].join("\n");
             const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
             const url = URL.createObjectURL(blob);
             const a = document.createElement("a");
@@ -54,7 +67,7 @@ export const CommissionsView: React.FC = () => {
             </div>
           </div>
           <div className="mt-4">
-            <div className="text-4xl font-extrabold text-[#0a1926] tracking-tight">$8,675</div>
+            <div className="text-4xl font-extrabold text-[#0a1926] tracking-tight">{formatCurrency(sumByStatus("Processing"))}</div>
             <div className="text-xs font-medium text-[#2d5573] mt-2">Current period</div>
           </div>
         </div>
@@ -70,7 +83,7 @@ export const CommissionsView: React.FC = () => {
             </div>
           </div>
           <div className="mt-4">
-            <div className="text-4xl font-extrabold text-[#0a1926] tracking-tight">$3,100</div>
+            <div className="text-4xl font-extrabold text-[#0a1926] tracking-tight">{formatCurrency(sumByStatus("Confirmed"))}</div>
             <div className="text-xs font-medium text-slate-500 mt-2">Awaiting approval</div>
           </div>
         </div>
@@ -86,8 +99,8 @@ export const CommissionsView: React.FC = () => {
             </div>
           </div>
           <div className="mt-4">
-            <div className="text-4xl font-extrabold text-white tracking-tight">$18,620</div>
-            <div className="text-xs font-medium text-slate-300 mt-2">Through 31 August</div>
+            <div className="text-4xl font-extrabold text-white tracking-tight">{formatCurrency(sumByStatus("Paid"))}</div>
+            <div className="text-xs font-medium text-slate-300 mt-2">Total paid commissions</div>
           </div>
         </div>
       </div>
@@ -116,24 +129,24 @@ export const CommissionsView: React.FC = () => {
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100">
-              {STATEMENT_DEALS.map((row) => (
+              {commissions.map((row) => (
                 <tr key={row.id} className="hover:bg-slate-50/60 transition-colors">
                   <td className="py-4 px-6">
-                    <div className="font-bold text-slate-900 text-sm">{row.deal}</div>
-                    <div className="text-[11px] text-slate-400 font-mono mt-0.5">{row.id}</div>
+                    <div className="font-bold text-slate-900 text-sm">{row.dealName}</div>
+                    <div className="text-[11px] text-slate-400 font-mono mt-0.5">{row.dealId}</div>
                   </td>
                   <td className="py-4 px-4 text-center font-bold text-slate-800">
-                    {row.rule}
+                    {row.rate}
                   </td>
                   <td className="py-4 px-4 text-center font-medium text-slate-600">
-                    {row.facility}
+                    {row.settledAmount}
                   </td>
                   <td className="py-4 px-6 text-center font-bold text-slate-900">
-                    {row.commission}
+                    {row.commissionAmount}
                   </td>
                   <td className="py-4 px-6 text-center">
                     <span className={`inline-block px-3 py-0.5 rounded-full text-[11px] font-semibold border ${
-                      row.status === 'Confirmed'
+                      row.status === 'Confirmed' || row.status === 'Paid'
                         ? 'bg-[#effbf3] text-[#15803d] border-[#d3f4de]'
                         : 'bg-[#fef9ee] text-[#b45309] border-[#fdecd0]'
                     }`}>

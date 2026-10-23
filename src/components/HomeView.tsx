@@ -22,6 +22,12 @@ import { Deal } from "../data/mockData";
 
 interface HomeViewProps {
   deals: Deal[];
+  stats: {
+    referredThisMonth: number;
+    inFlight: number;
+    settled: number;
+    estimatedCommission: string;
+  };
   onOpenShareModal: () => void;
   onSelectDeal: (deal: Deal) => void;
   onNavigateToDeals: () => void;
@@ -33,6 +39,7 @@ interface HomeViewProps {
 
 export const HomeView: React.FC<HomeViewProps> = ({
   deals,
+  stats,
   onOpenShareModal,
   onSelectDeal,
   onNavigateToDeals,
@@ -71,7 +78,7 @@ export const HomeView: React.FC<HomeViewProps> = ({
         <div>
           <div className="text-[11px] font-bold text-slate-500 uppercase tracking-widest flex items-center gap-2">
             <span className="w-4 h-0.5 bg-slate-300"></span>
-            <span>TUESDAY, 16 SEPTEMBER</span>
+            <span>{new Date().toLocaleDateString("en-AU", { weekday: "long", day: "numeric", month: "long" }).toUpperCase()}</span>
           </div>
           <h1 className="text-3xl sm:text-4xl font-extrabold text-[#0a1926] tracking-tight mt-1">
             Your referrals, at a glance.
@@ -103,8 +110,8 @@ export const HomeView: React.FC<HomeViewProps> = ({
             </div>
           </div>
           <div className="mt-4">
-            <div className="text-4xl font-extrabold text-[#0a1926] tracking-tight">12</div>
-            <div className="text-xs font-medium text-[#2d5573] mt-2">Up 3 from August</div>
+            <div className="text-4xl font-extrabold text-[#0a1926] tracking-tight">{stats.referredThisMonth}</div>
+            <div className="text-xs font-medium text-[#2d5573] mt-2">Referrals this month</div>
           </div>
         </div>
 
@@ -119,8 +126,8 @@ export const HomeView: React.FC<HomeViewProps> = ({
             </div>
           </div>
           <div className="mt-4">
-            <div className="text-4xl font-extrabold text-[#0a1926] tracking-tight">8</div>
-            <div className="text-xs font-medium text-slate-500 mt-2">3 awaiting assessment</div>
+            <div className="text-4xl font-extrabold text-[#0a1926] tracking-tight">{stats.inFlight}</div>
+            <div className="text-xs font-medium text-slate-500 mt-2">Applications in progress</div>
           </div>
         </div>
 
@@ -135,8 +142,8 @@ export const HomeView: React.FC<HomeViewProps> = ({
             </div>
           </div>
           <div className="mt-4">
-            <div className="text-4xl font-extrabold text-[#0a1926] tracking-tight">3</div>
-            <div className="text-xs font-medium text-slate-500 mt-2">$380k funded this month</div>
+            <div className="text-4xl font-extrabold text-[#0a1926] tracking-tight">{stats.settled}</div>
+            <div className="text-xs font-medium text-slate-500 mt-2">Settled referrals</div>
           </div>
         </div>
 
@@ -151,8 +158,8 @@ export const HomeView: React.FC<HomeViewProps> = ({
             </div>
           </div>
           <div className="mt-4">
-            <div className="text-4xl font-extrabold text-white tracking-tight">$8,675</div>
-            <div className="text-xs font-medium text-slate-300 mt-2">$3,100 now confirmed</div>
+            <div className="text-4xl font-extrabold text-white tracking-tight">{stats.estimatedCommission}</div>
+            <div className="text-xs font-medium text-slate-300 mt-2">Estimated commission</div>
           </div>
         </div>
       </div>

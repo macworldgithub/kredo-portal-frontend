@@ -2,93 +2,14 @@
 
 import React, { useState } from "react";
 import { Search, ChevronDown, SlidersHorizontal, Download, ChevronRight } from "lucide-react";
+import { MasterPipelineDeal } from "@/lib/api";
 
-interface MasterPipelineDeal {
-  id: string;
-  name: string;
-  partner: string;
-  partnerCode: string;
-  submitted: string;
-  stage: 'In assessment' | 'Approved' | 'Docs / settlement' | 'Settled' | 'Application received' | 'Declined / withdrawn';
-  amountBand: string;
-  commission: string;
-}
-
-const MASTER_PIPELINE_DEALS: MasterPipelineDeal[] = [
-  {
-    id: "KRD-2841",
-    name: "Oak & Reed Landscaping",
-    partner: "Hayes Partners",
-    partnerCode: "HAYES01",
-    submitted: "Today, 9:42am",
-    stage: "In assessment",
-    amountBand: "$100k-$250k",
-    commission: "$2,375 est.",
-  },
-  {
-    id: "KRD-2832",
-    name: "Harbour Health Group",
-    partner: "Hayes Partners",
-    partnerCode: "HAYES01",
-    submitted: "15 Sep, 2:18pm",
-    stage: "Approved",
-    amountBand: "$50k-$100k",
-    commission: "$1,500 est.",
-  },
-  {
-    id: "KRD-2819",
-    name: "Pilbara Civil Works",
-    partner: "Hayes Partners",
-    partnerCode: "HAYES01",
-    submitted: "12 Sep, 11:05am",
-    stage: "Docs / settlement",
-    amountBand: "$250k-$500k",
-    commission: "$4,800 est.",
-  },
-  {
-    id: "KRD-2788",
-    name: "Northbank Hospitality",
-    partner: "Hayes Partners",
-    partnerCode: "HAYES01",
-    submitted: "8 Sep, 4:30pm",
-    stage: "Settled",
-    amountBand: "$100k-$250k",
-    commission: "$3,100 confirmed",
-  },
-  {
-    id: "KRD-2764",
-    name: "Wild Coast Joinery",
-    partner: "Mark Carroll",
-    partnerCode: "SPUD",
-    submitted: "4 Sep, 10:16am",
-    stage: "Settled",
-    amountBand: "$50k-$100k",
-    commission: "$1,250 confirmed",
-  },
-  {
-    id: "KRD-2748",
-    name: "Alloy Fleet Services",
-    partner: "North & Kind Advisory",
-    partnerCode: "NORTHK",
-    submitted: "2 Sep, 1:08pm",
-    stage: "Application received",
-    amountBand: "$250k-$500k",
-    commission: "$2,000 est.",
-  },
-  {
-    id: "KRD-2721",
-    name: "Mallee Produce Co.",
-    partner: "Brightwater Accounting",
-    partnerCode: "BRIGHT7",
-    submitted: "29 Aug, 8:51am",
-    stage: "Declined / withdrawn",
-    amountBand: "$25k-$50k",
-    commission: "—",
-  },
-];
-
-export const MasterPipelineView: React.FC = () => {
-  const [searchTerm, setSearchTerm] = useState("");
+export const MasterPipelineView: React.FC<{
+  deals: MasterPipelineDeal[];
+  searchTerm: string;
+  onSearchChange: (value: string) => void;
+  onSelectDeal: (dealId: string) => void;
+}> = ({ deals, searchTerm, onSearchChange, onSelectDeal }) => {
   const [stageFilter, setStageFilter] = useState("All stages");
   const [dropdownOpen, setDropdownOpen] = useState(false);
 
@@ -102,9 +23,10 @@ export const MasterPipelineView: React.FC = () => {
     "Settled",
     "Declined / withdrawn",
   ];
-  const filtered = MASTER_PIPELINE_DEALS.filter(d => {
+  const filtered = deals.filter(d => {
     const matchesSearch = d.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
       d.partner.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      d.partnerCode.toLowerCase().includes(searchTerm.toLowerCase()) ||
       d.id.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesStage = stageFilter === "All stages" || d.stage === stageFilter;
     return matchesSearch && matchesStage;
@@ -129,6 +51,23 @@ export const MasterPipelineView: React.FC = () => {
     }
   };
 
+  const exportCsv = () => {
+    const rows = [
+      "REFERENCE,BUSINESS,PARTNER,PARTNER CODE,SUBMITTED,STAGE,AMOUNT,COMMISSION",
+      ...filtered.map((deal) =>
+        [deal.id, deal.name, deal.partner, deal.partnerCode, deal.submitted, deal.stage, deal.amountBand, deal.commission]
+          .map((value) => `"${String(value).replaceAll('"', '""')}"`)
+          .join(","),
+      ),
+    ];
+    const url = URL.createObjectURL(new Blob([rows.join("\n")], { type: "text/csv;charset=utf-8;" }));
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = "kredo-master-pipeline.csv";
+    link.click();
+    URL.revokeObjectURL(url);
+  };
+
   return (
     <div className="space-y-6">
       {/* Title & Actions strictly matching screenshot */}
@@ -148,7 +87,7 @@ export const MasterPipelineView: React.FC = () => {
         </div>
 
         <button
-          onClick={() => alert("Exporting Master Pipeline CSV...")}
+          onClick={exportCsv}
           className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-white border border-slate-200 text-slate-700 hover:bg-slate-50 font-bold text-xs shadow-2xs transition-colors self-start sm:self-auto cursor-pointer"
         >
           <Download className="w-4 h-4 text-slate-500" />
@@ -163,7 +102,7 @@ export const MasterPipelineView: React.FC = () => {
           <input
             type="text"
             value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
+            onChange={(e) => onSearchChange(e.target.value)}
             placeholder="Search all attributed applications"
             className="w-full text-xs text-slate-800 placeholder:text-slate-400 focus:outline-hidden bg-transparent"
           />
@@ -223,7 +162,7 @@ export const MasterPipelineView: React.FC = () => {
             </thead>
             <tbody className="divide-y divide-slate-100">
               {filtered.map((deal) => (
-                <tr key={deal.id} className="hover:bg-slate-50/60 transition-colors cursor-pointer group">
+                <tr key={deal.id} onClick={() => onSelectDeal(deal.id)} className="hover:bg-slate-50/60 transition-colors cursor-pointer group">
                   <td className="py-4 px-6">
                     <div className="font-bold text-slate-900 group-hover:text-sky-700 transition-colors text-sm">
                       {deal.name}

@@ -2,13 +2,14 @@
 
 import React, { useState } from "react";
 import { Search, ChevronDown, ChevronRight, Briefcase } from "lucide-react";
-import { PARTNER_DEALS, PartnerDeal } from "../data/netlifyData";
+import { PartnerDeal } from "../data/netlifyData";
 
 interface DealsViewProps {
+  deals: PartnerDeal[];
   onSelectDeal: (deal: PartnerDeal) => void;
 }
 
-export const DealsView: React.FC<DealsViewProps> = ({ onSelectDeal }) => {
+export const DealsView: React.FC<DealsViewProps> = ({ deals, onSelectDeal }) => {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedStage, setSelectedStage] = useState("All stages");
   const [dropdownOpen, setDropdownOpen] = useState(false);
@@ -24,7 +25,7 @@ export const DealsView: React.FC<DealsViewProps> = ({ onSelectDeal }) => {
     "Declined / withdrawn",
   ];
 
-  const filteredDeals = PARTNER_DEALS.filter((deal) => {
+  const filteredDeals = deals.filter((deal) => {
     const matchesSearch =
       deal.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
       deal.id.toLowerCase().includes(searchTerm.toLowerCase());

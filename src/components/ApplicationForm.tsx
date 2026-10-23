@@ -17,11 +17,22 @@ import {
 interface ApplicationFormProps {
   onBackToDemo: () => void;
   referralCode?: string;
+  onSubmitApplication: (application: {
+    tradingName: string;
+    abn: string;
+    amount: string;
+    purpose: string;
+    directorName: string;
+    email: string;
+    phone: string;
+    referralCode: string;
+  }) => Promise<void>;
 }
 
 export const ApplicationForm: React.FC<ApplicationFormProps> = ({
   onBackToDemo,
   referralCode = "SPUD",
+  onSubmitApplication,
 }) => {
   const [currentStep, setCurrentStep] = useState<1 | 2 | 3>(1);
 
@@ -38,8 +49,10 @@ export const ApplicationForm: React.FC<ApplicationFormProps> = ({
 
   // Step 3 Completion State
   const [isSubmitted, setIsSubmitted] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState("");
 
-  const handleNextStep = (e: React.FormEvent) => {
+  const handleNextStep = async (e: React.FormEvent) => {
     e.preventDefault();
     if (currentStep === 1) {
       if (!tradingName) return;
@@ -48,7 +61,25 @@ export const ApplicationForm: React.FC<ApplicationFormProps> = ({
       if (!directorName || !email) return;
       setCurrentStep(3);
     } else {
-      setIsSubmitted(true);
+      setIsSubmitting(true);
+      setSubmitError("");
+      try {
+        await onSubmitApplication({
+          tradingName,
+          abn,
+          amount,
+          purpose,
+          directorName,
+          email,
+          phone,
+          referralCode,
+        });
+        setIsSubmitted(true);
+      } catch (error) {
+        setSubmitError(error instanceof Error ? error.message : "Could not submit the application.");
+      } finally {
+        setIsSubmitting(false);
+      }
     }
   };
 
@@ -175,6 +206,7 @@ export const ApplicationForm: React.FC<ApplicationFormProps> = ({
               </div>
             ) : (
               <form onSubmit={handleNextStep} className="space-y-6">
+                {submitError && <p role="alert" className="rounded-lg bg-rose-50 px-3 py-2 text-xs text-rose-700">{submitError}</p>}
                 {/* Step indicator header */}
                 <div className="flex items-center justify-between pb-2">
                   <div>
@@ -371,7 +403,7 @@ export const ApplicationForm: React.FC<ApplicationFormProps> = ({
                   {currentStep > 1 && (
                     <button
                       type="button"
-                      onClick={() => setCurrentStep((prev) => (prev - 1) as any)}
+                      onClick={() => setCurrentStep((prev) => prev === 3 ? 2 : 1)}
                       className="px-4 py-3 rounded-full text-slate-600 font-bold text-xs hover:bg-slate-100 transition-colors"
                     >
                       Back
@@ -380,9 +412,10 @@ export const ApplicationForm: React.FC<ApplicationFormProps> = ({
 
                   <button
                     type="submit"
+                    disabled={isSubmitting}
                     className="flex-1 flex items-center justify-center gap-2 py-3.5 px-6 rounded-full bg-[#0a1926] hover:bg-[#14293d] text-white font-bold text-xs sm:text-sm shadow-md transition-all cursor-pointer"
                   >
-                    <span>{currentStep === 3 ? "Submit application" : "Continue securely"}</span>
+                    <span>{isSubmitting ? "Submitting..." : currentStep === 3 ? "Submit application" : "Continue securely"}</span>
                     <ArrowRight className="w-4 h-4 text-sky-400" />
                   </button>
                 </div>

@@ -9,7 +9,15 @@ interface ShareReferralModalProps {
   onClose: () => void;
   referralCode: string;
   referralLink: string;
-  onAddDeal?: (deal: Deal) => void;
+  onCreateReferral: (referral: {
+    businessName: string;
+    contactName: string;
+    email: string;
+    phone: string;
+    amount: string;
+    facilityType: string;
+    referralCode: string;
+  }) => Promise<Deal>;
 }
 
 export const ShareReferralModal: React.FC<ShareReferralModalProps> = ({
@@ -17,7 +25,7 @@ export const ShareReferralModal: React.FC<ShareReferralModalProps> = ({
   onClose,
   referralCode,
   referralLink,
-  onAddDeal
+  onCreateReferral
 }) => {
   const [activeTab, setActiveTab] = useState<'link' | 'direct'>('link');
   const [copiedLink, setCopiedLink] = useState(false);
@@ -32,6 +40,7 @@ export const ShareReferralModal: React.FC<ShareReferralModalProps> = ({
   const [facilityType, setFacilityType] = useState("Asset & Equipment");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
+  const [submitError, setSubmitError] = useState("");
 
   if (!isOpen) return null;
 
@@ -47,31 +56,22 @@ export const ShareReferralModal: React.FC<ShareReferralModalProps> = ({
     setTimeout(() => setCopiedCode(false), 2000);
   };
 
-  const handleSubmitReferral = (e: React.FormEvent) => {
+  const handleSubmitReferral = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!businessName || !contactName) return;
+    if (!businessName || !contactName || !email || !phone) return;
 
     setIsSubmitting(true);
-    setTimeout(() => {
-      if (onAddDeal) {
-        const parsedAmount = Number(amount.replace(/[^0-9]/g, '')) || 250000;
-        const commAmount = Math.round(parsedAmount * 0.01);
-
-        onAddDeal({
-          id: `KRD-${Math.floor(1000 + Math.random() * 9000)}`,
-          name: businessName,
-          applicant: contactName,
-          amount: `$${parsedAmount.toLocaleString()}`,
-          type: facilityType,
-          status: 'In assessment',
-          lastActivity: 'Just now',
-          commission: `$${commAmount.toLocaleString()}`,
-          commissionStatus: 'Estimated',
-          code: referralCode,
-          submittedDate: 'Today',
-        });
-      }
-      setIsSubmitting(false);
+    setSubmitError("");
+    try {
+      await onCreateReferral({
+        businessName,
+        contactName,
+        email,
+        phone,
+        amount,
+        facilityType,
+        referralCode,
+      });
       setIsSuccess(true);
       setTimeout(() => {
         setIsSuccess(false);
@@ -83,7 +83,11 @@ export const ShareReferralModal: React.FC<ShareReferralModalProps> = ({
         setPhone("");
         setAmount("");
       }, 1500);
-    }, 600);
+    } catch (error) {
+      setSubmitError(error instanceof Error ? error.message : "Could not submit referral.");
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -187,6 +191,7 @@ export const ShareReferralModal: React.FC<ShareReferralModalProps> = ({
             </div>
           ) : (
             <form onSubmit={handleSubmitReferral} className="space-y-3.5">
+              {submitError && <p role="alert" className="rounded-lg bg-rose-50 px-3 py-2 text-xs text-rose-700">{submitError}</p>}
               {isSuccess ? (
                 <div className="py-8 text-center space-y-2 animate-in zoom-in-95 duration-200">
                   <div className="w-12 h-12 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center mx-auto">

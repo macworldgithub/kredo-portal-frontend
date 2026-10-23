@@ -12,7 +12,7 @@ interface AddPartnerModalProps {
     email: string;
     partnerType: string;
     uniqueCode: string;
-  }) => void;
+  }) => Promise<void>;
 }
 
 export const AddPartnerModal: React.FC<AddPartnerModalProps> = ({
@@ -25,6 +25,8 @@ export const AddPartnerModal: React.FC<AddPartnerModalProps> = ({
   const [email, setEmail] = useState("");
   const [partnerType, setPartnerType] = useState("Standard");
   const [uniqueCode, setUniqueCode] = useState("PARTNE2");
+  const [submitting, setSubmitting] = useState(false);
+  const [error, setError] = useState("");
 
   if (!isOpen) return null;
 
@@ -34,21 +36,29 @@ export const AddPartnerModal: React.FC<AddPartnerModalProps> = ({
     setUniqueCode(`${prefix || 'PARTNE'}${num}`);
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!tradingName) return;
 
-    onAddPartner({
-      tradingName,
-      primaryContact,
-      email,
-      partnerType,
-      uniqueCode,
-    });
-    onClose();
-    setTradingName("");
-    setPrimaryContact("");
-    setEmail("");
+    setSubmitting(true);
+    setError("");
+    try {
+      await onAddPartner({
+        tradingName,
+        primaryContact,
+        email,
+        partnerType,
+        uniqueCode,
+      });
+      onClose();
+      setTradingName("");
+      setPrimaryContact("");
+      setEmail("");
+    } catch (submitError) {
+      setError(submitError instanceof Error ? submitError.message : "Could not create partner.");
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   return (
@@ -77,6 +87,7 @@ export const AddPartnerModal: React.FC<AddPartnerModalProps> = ({
 
         {/* Form Body strictly matching user screenshot */}
         <form onSubmit={handleSubmit} className="space-y-4">
+          {error && <p role="alert" className="rounded-lg bg-rose-50 px-3 py-2 text-xs text-rose-700">{error}</p>}
           <div>
             <label className="block text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-1.5">
               TRADING NAME
@@ -178,9 +189,10 @@ export const AddPartnerModal: React.FC<AddPartnerModalProps> = ({
 
             <button
               type="submit"
+              disabled={submitting}
               className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-[#0a1926] hover:bg-[#14293d] text-white text-xs font-bold shadow-sm transition-colors cursor-pointer"
             >
-              <span>Create partner</span>
+              <span>{submitting ? "Creating..." : "Create partner"}</span>
               <ArrowRight className="w-3.5 h-3.5 text-sky-400" />
             </button>
           </div>

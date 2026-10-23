@@ -5,15 +5,37 @@ import { Copy, Check, Download, ExternalLink, Mail, Bell } from "lucide-react";
 
 interface ShareViewProps {
   onOpenHeroDemo: () => void;
+  referralCode: string;
+  referralLink: string;
+  dailyDigest: boolean;
+  onToggleDailyDigest: (enabled: boolean) => Promise<void>;
 }
 
-export const ShareView: React.FC<ShareViewProps> = ({ onOpenHeroDemo }) => {
+export const ShareView: React.FC<ShareViewProps> = ({
+  onOpenHeroDemo,
+  referralCode,
+  referralLink,
+  dailyDigest,
+  onToggleDailyDigest,
+}) => {
   const [copiedLink, setCopiedLink] = useState(false);
   const [copiedMessage, setCopiedMessage] = useState(false);
-  const [dailyDigest, setDailyDigest] = useState(true);
+  const [preferenceError, setPreferenceError] = useState("");
+  const [savingPreference, setSavingPreference] = useState(false);
 
-  const referralLink = "kredo.au/apply?ref=HAYES01";
-  const shareMessage = "Hi — Kredo can help with business funding from $5,000 to $2 million. You can check eligibility and apply here: kredo.au/apply?ref=HAYES01";
+  const toggleDailyDigest = async () => {
+    setSavingPreference(true);
+    setPreferenceError("");
+    try {
+      await onToggleDailyDigest(!dailyDigest);
+    } catch (error) {
+      setPreferenceError(error instanceof Error ? error.message : "Could not update notification preference.");
+    } finally {
+      setSavingPreference(false);
+    }
+  };
+
+  const shareMessage = `Hi — Kredo can help with business funding from $5,000 to $2 million. You can check eligibility and apply here: ${referralLink}`;
 
   const handleCopyLink = () => {
     navigator.clipboard.writeText(`https://${referralLink}`);
@@ -36,7 +58,7 @@ export const ShareView: React.FC<ShareViewProps> = ({ onOpenHeroDemo }) => {
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
-    a.download = `kredo-qr-HAYES01.svg`;
+    a.download = `kredo-qr-${referralCode}.svg`;
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
@@ -55,7 +77,7 @@ export const ShareView: React.FC<ShareViewProps> = ({ onOpenHeroDemo }) => {
           Share & QR
         </h1>
         <p className="text-slate-500 text-sm mt-1">
-          Use one attributed link everywhere. Every valid visit stores HAYES01 for 90 days.
+          Use one attributed link everywhere.           Every valid visit stores {referralCode} for 90 days.
         </p>
         <div className="w-12 h-0.5 bg-amber-600 mt-5"></div>
       </div>
@@ -127,7 +149,7 @@ export const ShareView: React.FC<ShareViewProps> = ({ onOpenHeroDemo }) => {
             </button>
 
             <span className="text-[10px] font-mono font-bold uppercase tracking-widest text-slate-400 mt-3">
-              CODE HAYES01
+              CODE {referralCode}
             </span>
           </div>
         </div>
@@ -149,7 +171,7 @@ export const ShareView: React.FC<ShareViewProps> = ({ onOpenHeroDemo }) => {
             </div>
 
             <div className="p-4 bg-slate-50/80 rounded-xl border border-slate-200/80 text-xs text-slate-700 leading-relaxed font-sans mt-3">
-              Hi — Kredo can help with business funding from $5,000 to $2 million. You can check eligibility and apply here: <strong className="text-slate-900">kredo.au/apply?ref=HAYES01</strong>
+              Hi — Kredo can help with business funding from $5,000 to $2 million. You can check eligibility and apply here: <strong className="text-slate-900">{referralLink}</strong>
             </div>
           </div>
 
@@ -184,7 +206,8 @@ export const ShareView: React.FC<ShareViewProps> = ({ onOpenHeroDemo }) => {
               {/* Toggle switch */}
               <button
                 type="button"
-                onClick={() => setDailyDigest(!dailyDigest)}
+                onClick={() => void toggleDailyDigest()}
+                disabled={savingPreference}
                 className={`w-12 h-6 flex items-center rounded-full p-1 cursor-pointer transition-colors duration-200 ease-in-out ${
                   dailyDigest ? 'bg-[#1e4868]' : 'bg-slate-300'
                 }`}
@@ -196,6 +219,7 @@ export const ShareView: React.FC<ShareViewProps> = ({ onOpenHeroDemo }) => {
                 />
               </button>
             </div>
+            {preferenceError && <p role="alert" className="mt-2 text-xs text-rose-600">{preferenceError}</p>}
           </div>
 
           <button

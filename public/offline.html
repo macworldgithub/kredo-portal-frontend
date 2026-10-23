@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#0a1926">
+    <title>You’re offline | Kredo</title>
+    <style>
+      * { box-sizing: border-box; }
+      body { min-height: 100vh; margin: 0; padding: 24px; display: grid; place-items: center; background: #f7f9fa; color: #0a1926; font: 16px/1.5 system-ui, sans-serif; }
+      main { width: min(100%, 420px); padding: 32px; border: 1px solid #dbe3e9; border-radius: 24px; background: white; text-align: center; box-shadow: 0 16px 36px #0a19261a; }
+      img { width: 64px; height: 64px; }
+      h1 { margin: 20px 0 8px; font-size: 24px; }
+      p { margin: 0; color: #526579; }
+      button { margin-top: 24px; padding: 12px 20px; border: 0; border-radius: 12px; background: #0a1926; color: white; font: inherit; font-weight: 700; cursor: pointer; }
+    </style>
+  </head>
+  <body>
+    <main>
+      <img src="/icons/kredo-icon.svg" alt="">
+      <h1>You’re offline</h1>
+      <p>Kredo needs an internet connection to load your account and live portal data.</p>
+      <button type="button" onclick="location.reload()">Try again</button>
+    </main>
+  </body>
+</html>

@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { Sidebar, PartnerNavTab, MasterNavTab } from "@/components/Sidebar";
 import { Header } from "@/components/Header";
 import { HomeView } from "@/components/HomeView";
@@ -18,107 +18,234 @@ import { MasterReportsView } from "@/components/MasterReportsView";
 import { ShareReferralModal } from "@/components/ShareReferralModal";
 import { DealDetailModal } from "@/components/DealDetailModal";
 import { AddPartnerModal } from "@/components/AddPartnerModal";
-import { Check, X } from "lucide-react";
-import { 
-  INITIAL_DEALS, 
-  INITIAL_PARTNER, 
-  Deal, 
-  PartnerProfile 
-} from "@/data/mockData";
+import { LoginView } from "@/components/LoginView";
+import { BarChart3, Briefcase, Check, Home, Percent, QrCode, Users, GitBranch, X } from "lucide-react";
+import { Deal, PartnerProfile, CommissionItem } from "@/data/mockData";
 import { PartnerDeal } from "@/data/netlifyData";
+import {
+  apiRequest,
+  ApiCommission,
+  AuthUser,
+  clearAccessToken,
+  DashboardData,
+  getAccessToken,
+  getCurrentUser,
+  MasterOverviewData,
+  MasterPreferences,
+  MasterPipelineDeal,
+  MasterReportData,
+  PartnerDirectoryItem,
+} from "@/lib/api";
+
+function settingsPayload(partner: PartnerProfile) {
+  return {
+    name: partner.name,
+    contactEmail: partner.contactEmail,
+    phone: partner.phone,
+    bankAccount: partner.bankAccount,
+    bsb: partner.bsb,
+    abn: partner.abn,
+    notificationsEnabled: partner.notificationsEnabled,
+    settlementAlerts: partner.settlementAlerts,
+    marketingEmails: partner.marketingEmails,
+  };
+}
 
 export default function App() {
-  const [perspective, setPerspective] = useState<'partner' | 'master'>('partner');
-  const [currentPartnerTab, setCurrentPartnerTab] = useState<PartnerNavTab>('home');
-  const [currentMasterTab, setCurrentMasterTab] = useState<MasterNavTab>('overview');
+  const [user, setUser] = useState<AuthUser | null>(null);
+  const [authReady, setAuthReady] = useState(false);
+  const [perspective, setPerspective] = useState<"partner" | "master">("partner");
+  const [currentPartnerTab, setCurrentPartnerTab] = useState<PartnerNavTab>("home");
+  const [currentMasterTab, setCurrentMasterTab] = useState<MasterNavTab>("overview");
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
-
-  // Sub-routes for Hero page & Application form flow
-  const [activeFlow, setActiveFlow] = useState<'dashboard' | 'hero-page' | 'apply-form'>('dashboard');
-
-  // Toast alert state
+  const [activeFlow, setActiveFlow] = useState<"dashboard" | "hero-page" | "apply-form">("dashboard");
   const [toastMessage, setToastMessage] = useState<{ title: string; subtitle: string } | null>(null);
-
-  // Modals state
   const [isShareModalOpen, setIsShareModalOpen] = useState(false);
   const [isAddPartnerOpen, setIsAddPartnerOpen] = useState(false);
   const [selectedDeal, setSelectedDeal] = useState<Deal | null>(null);
+  const [partner, setPartner] = useState<PartnerProfile | null>(null);
+  const [dashboardStats, setDashboardStats] = useState<DashboardData["stats"] | null>(null);
+  const [deals, setDeals] = useState<Deal[]>([]);
+  const [partnerDeals, setPartnerDeals] = useState<PartnerDeal[]>([]);
+  const [commissions, setCommissions] = useState<CommissionItem[]>([]);
+  const [masterCommissions, setMasterCommissions] = useState<ApiCommission[]>([]);
+  const [masterOverview, setMasterOverview] = useState<MasterOverviewData | null>(null);
+  const [masterPipeline, setMasterPipeline] = useState<MasterPipelineDeal[]>([]);
+  const [pipelineSearchTerm, setPipelineSearchTerm] = useState("");
+  const [partners, setPartners] = useState<PartnerDirectoryItem[]>([]);
+  const [masterReports, setMasterReports] = useState<MasterReportData | null>(null);
+  const [masterPreferences, setMasterPreferences] = useState<MasterPreferences | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [apiError, setApiError] = useState("");
 
-  // Core state
-  const [partner, setPartner] = useState<PartnerProfile>(INITIAL_PARTNER);
-  const [deals, setDeals] = useState<Deal[]>(INITIAL_DEALS);
+  const canSwitchPerspective = user?.role === "master";
+
+  useEffect(() => {
+    void Promise.resolve().then(() => {
+      const token = getAccessToken();
+      const savedUser = getCurrentUser();
+      if (token && savedUser) {
+        setUser(savedUser);
+        setPerspective(savedUser.role);
+      } else {
+        clearAccessToken();
+      }
+      setAuthReady(true);
+    });
+  }, []);
+
+  const loadData = useCallback(async () => {
+    if (!user) return;
+    setLoading(true);
+    setApiError("");
+    try {
+      const [dashboard, allDeals, commissionRows] = await Promise.all([
+        apiRequest<DashboardData>("/portal/dashboard"),
+        apiRequest<PartnerDeal[]>("/portal/deals"),
+        apiRequest<ApiCommission[]>("/portal/commissions"),
+      ]);
+      setPartner(dashboard.partner);
+      setDashboardStats(dashboard.stats);
+      setDeals(dashboard.deals);
+      setPartnerDeals(allDeals);
+      setCommissions(commissionRows);
+      if (user.role === "master") {
+        const [overview, pipeline, partnerRows, reports, preferences] = await Promise.all([
+          apiRequest<MasterOverviewData>("/portal/master/overview"),
+          apiRequest<MasterPipelineDeal[]>("/portal/master/pipeline"),
+          apiRequest<PartnerDirectoryItem[]>("/portal/master/partners"),
+          apiRequest<MasterReportData>("/portal/master/reports"),
+          apiRequest<MasterPreferences>("/portal/master/preferences"),
+        ]);
+        setMasterOverview(overview);
+        setMasterPipeline(pipeline);
+        setPartners(partnerRows);
+        setMasterReports(reports);
+        setMasterPreferences(preferences);
+        setMasterCommissions(commissionRows);
+      }
+    } catch (error) {
+      setApiError(error instanceof Error ? error.message : "Could not load portal data.");
+    } finally {
+      setLoading(false);
+    }
+  }, [user]);
+
+  useEffect(() => {
+    if (authReady && user) void Promise.resolve().then(loadData);
+  }, [authReady, user, loadData]);
+
+  const notify = (title: string, subtitle: string) => {
+    setToastMessage({ title, subtitle });
+    window.setTimeout(() => setToastMessage(null), 4000);
+  };
+
+  const logout = () => {
+    clearAccessToken();
+    setUser(null);
+    setPartner(null);
+    setDashboardStats(null);
+    setDeals([]);
+    setPartnerDeals([]);
+    setCommissions([]);
+    setMasterOverview(null);
+    setMasterPipeline([]);
+    setPartners([]);
+    setMasterReports(null);
+    setMasterPreferences(null);
+    setApiError("");
+  };
 
   const togglePerspective = () => {
-    if (perspective === 'partner') {
-      setPerspective('master');
-      setToastMessage({
-        title: "Kredo Master view",
-        subtitle: "You can now see every partner book.",
-      });
-      setTimeout(() => setToastMessage(null), 4000);
-    } else {
-      setPerspective('partner');
-      setToastMessage({
-        title: "Partner Workspace view",
-        subtitle: "Viewing as Hayes Partners.",
-      });
-      setTimeout(() => setToastMessage(null), 4000);
+    if (!canSwitchPerspective) return;
+    const next = perspective === "partner" ? "master" : "partner";
+    setPerspective(next);
+    notify(next === "master" ? "Kredo Master view" : "Partner Workspace view",
+      next === "master" ? "You can now see every partner book." : `Viewing as ${partner?.name || "partner"}.`);
+  };
+
+  const selectDeal = async (dealId: string) => {
+    setApiError("");
+    try {
+      const detail = await apiRequest<Deal>(`/portal/deals/${encodeURIComponent(dealId)}`);
+      setSelectedDeal(detail);
+    } catch (error) {
+      setApiError(error instanceof Error ? error.message : "Could not load deal.");
     }
   };
 
-  const handleAddNewDeal = (newDeal: Deal) => {
-    setDeals([newDeal, ...deals]);
-  };
-
-  const handlePartnerDealSelect = (pDeal: PartnerDeal) => {
-    const matchingDeal = deals.find(d => d.id === pDeal.id) || {
-      id: pDeal.id,
-      name: pDeal.name,
-      applicant: "Client Representative",
-      amount: pDeal.facility || pDeal.amountBand,
-      type: "Commercial Facility",
-      status: pDeal.stage as Deal['status'],
-      lastActivity: pDeal.submitted,
-      commission: pDeal.commission,
-      commissionStatus: 'Confirmed',
-      code: "HAYES01",
-      submittedDate: pDeal.submitted,
-    };
-    setSelectedDeal(matchingDeal);
-  };
-
-  const handleUpdateDealStatus = (dealId: string, newStatus: Deal['status']) => {
-    setDeals((prev) =>
-      prev.map((d) => (d.id === dealId ? { ...d, status: newStatus } : d))
-    );
-    if (selectedDeal && selectedDeal.id === dealId) {
-      setSelectedDeal({ ...selectedDeal, status: newStatus });
+  const handleUpdateDealStatus = async (dealId: string, status: Deal["status"]) => {
+    setApiError("");
+    try {
+      const updated = await apiRequest<Deal>(`/portal/deals/${encodeURIComponent(dealId)}/status`, {
+        method: "PATCH",
+        body: JSON.stringify({ status }),
+      });
+      setDeals((current) => current.map((deal) => deal.id === dealId ? updated : deal));
+      setPartnerDeals((current) => current.map((deal) => deal.id === dealId
+        ? { ...deal, stage: status }
+        : deal));
+      setSelectedDeal(updated);
+      void loadData();
+    } catch (error) {
+      setApiError(error instanceof Error ? error.message : "Could not update deal status.");
     }
   };
 
-  // If user navigated to the client Hero Page
-  if (activeFlow === 'hero-page') {
+  if (!authReady) {
+    return <main className="min-h-screen grid place-items-center text-sm text-slate-500">Loading Kredo...</main>;
+  }
+
+  if (!user) {
+    return <LoginView onLogin={(authenticatedUser) => {
+      setUser(authenticatedUser);
+      setPerspective(authenticatedUser.role);
+    }} />;
+  }
+
+  if (activeFlow === "hero-page") {
     return (
       <HeroPage
-        onBackToDemo={() => setActiveFlow('dashboard')}
-        onApplyNow={() => setActiveFlow('apply-form')}
+        onBackToDemo={() => setActiveFlow("dashboard")}
+        onApplyNow={() => setActiveFlow("apply-form")}
+        referralCode={partner?.code || user.partnerCode || ""}
       />
     );
   }
 
-  // If user navigated to the Apply Now Application Form
-  if (activeFlow === 'apply-form') {
+  if (activeFlow === "apply-form") {
     return (
       <ApplicationForm
-        onBackToDemo={() => setActiveFlow('dashboard')}
-        referralCode="SPUD"
+        onBackToDemo={() => setActiveFlow("dashboard")}
+        referralCode={partner?.code}
+        onSubmitApplication={(application) =>
+          apiRequest("/portal/applications", {
+            method: "POST",
+            body: JSON.stringify(application),
+          }, false)
+        }
       />
+    );
+  }
+
+  if (!partner) {
+    return (
+      <main className="min-h-screen grid place-items-center p-6 text-center">
+        <div>
+          {loading ? <p className="text-sm text-slate-500">Loading your workspace...</p> : (
+            <>
+              <p role="alert" className="text-sm text-rose-700">{apiError || "Partner profile could not be loaded."}</p>
+              <button onClick={() => void loadData()} className="mt-3 rounded-lg bg-[#0a1926] px-4 py-2 text-sm font-semibold text-white">Try again</button>
+            </>
+          )}
+          <button onClick={logout} className="mt-3 block mx-auto text-xs text-slate-500 underline">Sign out</button>
+        </div>
+      </main>
     );
   }
 
   return (
     <div className="min-h-screen bg-[#f7f9fa] flex flex-col font-sans relative">
-      {/* Toast Notification */}
       {toastMessage && (
         <div className="fixed top-4 right-4 z-50 flex items-start gap-3 bg-[#062615] text-white px-4 py-3 rounded-2xl shadow-2xl border border-[#0d4f2c] max-w-sm animate-in slide-in-from-top-2 duration-200">
           <div className="w-5 h-5 rounded-full bg-emerald-500 text-black flex items-center justify-center shrink-0 mt-0.5">
@@ -128,158 +255,241 @@ export default function App() {
             <div className="text-xs font-bold text-white leading-tight">{toastMessage.title}</div>
             <div className="text-[11px] text-emerald-300 mt-0.5">{toastMessage.subtitle}</div>
           </div>
-          <button 
-            onClick={() => setToastMessage(null)}
-            className="text-emerald-400 hover:text-white p-0.5"
-          >
+          <button onClick={() => setToastMessage(null)} className="text-emerald-400 hover:text-white p-0.5">
             <X className="w-3.5 h-3.5" />
           </button>
         </div>
       )}
 
-      {/* Responsive Sidebar */}
       <Sidebar
         perspective={perspective}
         currentPartnerTab={currentPartnerTab}
         currentMasterTab={currentMasterTab}
         onSelectPartnerTab={(tab) => {
-          if (tab === 'hero') {
-            setActiveFlow('hero-page');
-          } else {
-            setCurrentPartnerTab(tab);
-          }
+          if (tab === "hero") setActiveFlow("hero-page");
+          else setCurrentPartnerTab(tab);
         }}
         onSelectMasterTab={(tab) => {
-          if (tab === 'hero') {
-            setActiveFlow('hero-page');
-          } else {
-            setCurrentMasterTab(tab);
-          }
+          if (tab === "hero") setActiveFlow("hero-page");
+          else setCurrentMasterTab(tab);
         }}
         onTogglePerspective={togglePerspective}
         isOpenMobile={mobileSidebarOpen}
         onCloseMobile={() => setMobileSidebarOpen(false)}
+        partnerName={partner.name}
+        partnerCode={partner.code}
+        canSwitchPerspective={canSwitchPerspective}
       />
 
-      {/* Main Layout Area */}
       <div className="lg:pl-64 flex flex-col flex-1 min-h-screen">
-        {/* Top Header */}
         <Header
           partnerName={partner.name}
           perspective={perspective}
           onTogglePerspective={togglePerspective}
           onOpenMobileSidebar={() => setMobileSidebarOpen(true)}
-          unreadCount={2}
+          onLogout={logout}
+          canSwitchPerspective={canSwitchPerspective}
+          unreadCount={0}
         />
+        <main className="flex-1 p-4 sm:p-6 lg:p-8 max-w-7xl w-full mx-auto pb-28 lg:pb-8">
+          {apiError && (
+            <div role="alert" className="mb-5 flex items-center justify-between gap-3 rounded-xl border border-rose-200 bg-rose-50 px-4 py-3 text-xs text-rose-700">
+              <span>{apiError}</span>
+              <button onClick={() => void loadData()} className="font-bold underline">Retry</button>
+            </div>
+          )}
+          {loading && <p className="mb-4 text-xs text-slate-500">Refreshing workspace data...</p>}
 
-        {/* View Switcher Container */}
-        <main className="flex-1 p-4 sm:p-8 max-w-7xl w-full mx-auto pb-16">
-          {/* PARTNER PERSPECTIVE VIEWS */}
-          {perspective === 'partner' && (
+          {perspective === "partner" && (
             <>
-              {currentPartnerTab === 'home' && (
+              {currentPartnerTab === "home" && (
                 <HomeView
                   deals={deals}
-                  onOpenShareModal={() => setCurrentPartnerTab('share')}
-                  onSelectDeal={(deal) => setSelectedDeal(deal)}
-                  onNavigateToDeals={() => setCurrentPartnerTab('deals')}
-                  onNavigateToCommissions={() => setCurrentPartnerTab('commissions')}
-                  onNavigateToShare={() => setCurrentPartnerTab('share')}
+                  stats={dashboardStats || { referredThisMonth: 0, inFlight: 0, settled: 0, estimatedCommission: "$0" }}
+                  onOpenShareModal={() => setIsShareModalOpen(true)}
+                  onSelectDeal={setSelectedDeal}
+                  onNavigateToDeals={() => setCurrentPartnerTab("deals")}
+                  onNavigateToCommissions={() => setCurrentPartnerTab("commissions")}
+                  onNavigateToShare={() => setCurrentPartnerTab("share")}
                   partnerCode={partner.code}
                   referralLink={partner.referralLink}
                 />
               )}
-
-              {currentPartnerTab === 'deals' && (
-                <DealsView
-                  onSelectDeal={handlePartnerDealSelect}
-                />
+              {currentPartnerTab === "deals" && (
+                <DealsView deals={partnerDeals} onSelectDeal={(deal) => void selectDeal(deal.id)} />
               )}
-
-              {currentPartnerTab === 'commissions' && (
-                <CommissionsView />
-              )}
-
-              {currentPartnerTab === 'share' && (
+              {currentPartnerTab === "commissions" && <CommissionsView commissions={commissions} />}
+              {currentPartnerTab === "share" && (
                 <ShareView
-                  onOpenHeroDemo={() => setActiveFlow('hero-page')}
+                  onOpenHeroDemo={() => setActiveFlow("hero-page")}
+                  referralCode={partner.code}
+                  referralLink={partner.referralLink}
+                  dailyDigest={partner.notificationsEnabled}
+                  onToggleDailyDigest={async (enabled) => {
+                    const saved = await apiRequest<PartnerProfile>("/portal/settings", {
+                      method: "PATCH",
+                      body: JSON.stringify(settingsPayload({ ...partner, notificationsEnabled: enabled })),
+                    });
+                    setPartner(saved);
+                  }}
                 />
               )}
-
-              {currentPartnerTab === 'settings' && (
+              {currentPartnerTab === "settings" && (
                 <SettingsView
                   partner={partner}
-                  onUpdatePartner={(updated) => setPartner(updated)}
+                  onUpdatePartner={async (updated) => {
+                    const saved = await apiRequest<PartnerProfile>("/portal/settings", {
+                      method: "PATCH",
+                      body: JSON.stringify(settingsPayload(updated)),
+                    });
+                    setPartner(saved);
+                  }}
+                  onUpdatePassword={async (currentPassword, newPassword) => {
+                    await apiRequest("/auth/update-password", {
+                      method: "POST",
+                      body: JSON.stringify({ currentPassword, newPassword }),
+                    });
+                  }}
                 />
               )}
             </>
           )}
 
-          {/* MASTER PERSPECTIVE VIEWS */}
-          {perspective === 'master' && (
+          {perspective === "master" && (
             <>
-              {currentMasterTab === 'overview' && (
+              {currentMasterTab === "overview" && masterOverview && (
                 <MasterOverviewView
-                  onNavigateToPartners={() => setCurrentMasterTab('partners')}
-                  onNavigateToPipeline={() => setCurrentMasterTab('pipeline')}
+                  data={masterOverview}
+                  onNavigateToPartners={() => setCurrentMasterTab("partners")}
+                  onNavigateToPipeline={() => setCurrentMasterTab("pipeline")}
+                  onNavigateToReports={() => setCurrentMasterTab("reports")}
                 />
               )}
-
-              {currentMasterTab === 'partners' && (
+              {currentMasterTab === "partners" && (
                 <MasterPartnersView
+                  partners={partners}
                   onOpenAddPartner={() => setIsAddPartnerOpen(true)}
+                  onViewPartnerBook={(partnerCode) => {
+                    setPipelineSearchTerm(partnerCode);
+                    setCurrentMasterTab("pipeline");
+                  }}
                 />
               )}
-
-              {currentMasterTab === 'pipeline' && (
-                <MasterPipelineView />
+              {currentMasterTab === "pipeline" && (
+                <MasterPipelineView
+                  deals={masterPipeline}
+                  searchTerm={pipelineSearchTerm}
+                  onSearchChange={setPipelineSearchTerm}
+                  onSelectDeal={(dealId) => void selectDeal(dealId)}
+                />
               )}
-
-              {currentMasterTab === 'commissions' && (
-                <MasterCommissionsView />
+              {currentMasterTab === "commissions" && <MasterCommissionsView commissions={masterCommissions} />}
+              {currentMasterTab === "reports" && masterReports && masterPreferences && (
+                <MasterReportsView
+                  data={masterReports}
+                  preferences={masterPreferences}
+                  onToggleWeeklyReports={async (enabled) => {
+                    const saved = await apiRequest<MasterPreferences>("/portal/master/preferences", {
+                      method: "PATCH",
+                      body: JSON.stringify({ weeklyReportsEnabled: enabled }),
+                    });
+                    setMasterPreferences(saved);
+                  }}
+                />
               )}
-
-              {currentMasterTab === 'reports' && (
-                <MasterReportsView />
-              )}
-
-              {currentMasterTab === 'settings' && (
+              {currentMasterTab === "settings" && (
                 <SettingsView
                   partner={partner}
-                  onUpdatePartner={(updated) => setPartner(updated)}
+                  onUpdatePartner={async (updated) => {
+                    const saved = await apiRequest<PartnerProfile>("/portal/settings", {
+                      method: "PATCH",
+                      body: JSON.stringify(settingsPayload(updated)),
+                    });
+                    setPartner(saved);
+                  }}
+                  onUpdatePassword={async (currentPassword, newPassword) => {
+                    await apiRequest("/auth/update-password", {
+                      method: "POST",
+                      body: JSON.stringify({ currentPassword, newPassword }),
+                    });
+                  }}
                 />
               )}
             </>
           )}
         </main>
-
+        <nav
+          aria-label="Primary navigation"
+          className="mobile-bottom-nav fixed inset-x-3 bottom-3 z-30 grid grid-cols-4 rounded-2xl border border-slate-200/80 bg-white/95 p-1.5 shadow-xl backdrop-blur-lg lg:hidden"
+        >
+          {(perspective === "partner"
+            ? [
+                { label: "Home", icon: Home, active: currentPartnerTab === "home", select: () => setCurrentPartnerTab("home") },
+                { label: "Deals", icon: Briefcase, active: currentPartnerTab === "deals", select: () => setCurrentPartnerTab("deals") },
+                { label: "Commissions", icon: Percent, active: currentPartnerTab === "commissions", select: () => setCurrentPartnerTab("commissions") },
+                { label: "Share", icon: QrCode, active: currentPartnerTab === "share", select: () => setCurrentPartnerTab("share") },
+              ]
+            : [
+                { label: "Overview", icon: Home, active: currentMasterTab === "overview", select: () => setCurrentMasterTab("overview") },
+                { label: "Partners", icon: Users, active: currentMasterTab === "partners", select: () => setCurrentMasterTab("partners") },
+                { label: "Pipeline", icon: GitBranch, active: currentMasterTab === "pipeline", select: () => setCurrentMasterTab("pipeline") },
+                { label: "Reports", icon: BarChart3, active: currentMasterTab === "reports", select: () => setCurrentMasterTab("reports") },
+              ]
+          ).map(({ label, icon: Icon, active, select }) => (
+            <button
+              key={label}
+              type="button"
+              onClick={select}
+              aria-current={active ? "page" : undefined}
+              className={`flex min-h-14 flex-col items-center justify-center gap-1 rounded-xl px-1 py-2 text-[clamp(0.5625rem,2.5vw,0.875rem)] font-semibold transition-colors ${
+                active ? "bg-[#0a1926] text-white" : "text-slate-500 hover:bg-slate-100"
+              }`}
+            >
+              <Icon className="h-4 w-4" aria-hidden="true" />
+              <span>{label}</span>
+            </button>
+          ))}
+        </nav>
       </div>
 
-      {/* Modals */}
       <ShareReferralModal
         isOpen={isShareModalOpen}
         onClose={() => setIsShareModalOpen(false)}
         referralCode={partner.code}
         referralLink={partner.referralLink}
-        onAddDeal={handleAddNewDeal}
+        onCreateReferral={async (referral) => {
+          const created = await apiRequest<Deal>("/portal/deals/direct", {
+            method: "POST",
+            body: JSON.stringify(referral),
+          });
+          setDeals((current) => [created, ...current]);
+          await loadData();
+          return created;
+        }}
       />
-
       <DealDetailModal
         deal={selectedDeal}
         isOpen={Boolean(selectedDeal)}
         onClose={() => setSelectedDeal(null)}
-        onUpdateStatus={handleUpdateDealStatus}
+        onUpdateStatus={(dealId, status) => void handleUpdateDealStatus(dealId, status)}
       />
-
       <AddPartnerModal
         isOpen={isAddPartnerOpen}
         onClose={() => setIsAddPartnerOpen(false)}
-        onAddPartner={(p) => {
-          setToastMessage({
-            title: `Partner ${p.tradingName} created`,
-            subtitle: `Assigned code: ${p.uniqueCode}`,
+        onAddPartner={async (newPartner) => {
+          const created = await apiRequest<{ name: string; code: string }>("/portal/master/partners", {
+            method: "POST",
+            body: JSON.stringify({
+              tradingName: newPartner.tradingName,
+              primaryContact: newPartner.primaryContact,
+              email: newPartner.email,
+              partnerType: newPartner.partnerType,
+              uniqueCode: newPartner.uniqueCode,
+            }),
           });
-          setTimeout(() => setToastMessage(null), 4000);
+          const updatedDirectory = await apiRequest<PartnerDirectoryItem[]>("/portal/master/partners");
+          setPartners(updatedDirectory);
+          notify(`Partner ${created.name} created`, `Assigned code: ${created.code}`);
         }}
       />
     </div>

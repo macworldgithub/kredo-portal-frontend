@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { Bell, Eye, Menu } from "lucide-react";
+import { Bell, Eye, LogOut, Menu } from "lucide-react";
 
 interface HeaderProps {
   partnerName: string;
@@ -9,6 +9,8 @@ interface HeaderProps {
   onTogglePerspective: () => void;
   onOpenMobileSidebar: () => void;
   unreadCount?: number;
+  canSwitchPerspective: boolean;
+  onLogout: () => void;
 }
 
 export const Header: React.FC<HeaderProps> = ({
@@ -17,6 +19,8 @@ export const Header: React.FC<HeaderProps> = ({
   onTogglePerspective,
   onOpenMobileSidebar,
   unreadCount = 2,
+  canSwitchPerspective,
+  onLogout,
 }) => {
   return (
     <header className="sticky top-0 z-30 bg-[#f7f9fa]/90 backdrop-blur-md px-4 sm:px-8 py-3.5 border-b border-slate-200/80 flex items-center justify-between">
@@ -41,7 +45,7 @@ export const Header: React.FC<HeaderProps> = ({
 
       <div className="flex items-center gap-2 sm:gap-3">
         {/* LIVE DEMO Pill */}
-        <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#f4faee] border border-[#d6f0be] text-[11px] font-semibold text-[#3b7c1e] shadow-2xs">
+      <div className="hidden sm:flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#f4faee] border border-[#d6f0be] text-[11px] font-semibold text-[#3b7c1e] shadow-2xs">
           <span className="w-2 h-2 rounded-full bg-[#52a42b] animate-pulse"></span>
           <span>LIVE DEMO</span>
         </div>
@@ -58,12 +62,20 @@ export const Header: React.FC<HeaderProps> = ({
         </button>
 
         {/* Perspective Toggle Pill */}
-        <button
+        {canSwitchPerspective && <button
           onClick={onTogglePerspective}
-          className="flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#0a1926] hover:bg-[#13273c] text-white text-xs font-semibold shadow-xs transition-colors cursor-pointer"
+          className="flex items-center gap-2 px-3 sm:px-3.5 py-1.5 rounded-full bg-[#0a1926] hover:bg-[#13273c] text-white text-xs font-semibold shadow-xs transition-colors cursor-pointer"
         >
           <Eye className="w-3.5 h-3.5 text-sky-400" />
-          <span>{perspective === 'partner' ? 'Kredo Master' : 'Partner View'}</span>
+          <span className="hidden sm:inline">{perspective === 'partner' ? 'Kredo Master' : 'Partner View'}</span>
+        </button>}
+        <button
+          onClick={onLogout}
+          className="p-2 rounded-full bg-white border border-slate-200 text-slate-600 hover:text-rose-700 hover:border-rose-200 shadow-2xs transition-colors"
+          aria-label="Sign out"
+          title="Sign out"
+        >
+          <LogOut className="w-4 h-4" />
         </button>
       </div>
     </header>

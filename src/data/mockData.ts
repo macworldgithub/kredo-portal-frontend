@@ -4,7 +4,7 @@ export interface Deal {
   applicant: string;
   amount: string;
   type: string;
-  status: 'In assessment' | 'Approved' | 'Docs / settlement' | 'Settled' | 'Declined';
+  status: 'Application received' | 'In assessment' | 'Approved' | 'Docs / settlement' | 'Settled' | 'Declined' | 'Declined / withdrawn';
   lastActivity: string;
   commission: string;
   commissionStatus: 'Estimated' | 'Confirmed' | 'Paid';

@@ -29,6 +29,9 @@ interface SidebarProps {
   onTogglePerspective: () => void;
   isOpenMobile: boolean;
   onCloseMobile: () => void;
+  partnerName: string;
+  partnerCode: string;
+  canSwitchPerspective: boolean;
 }
 
 export const Sidebar: React.FC<SidebarProps> = ({
@@ -39,7 +42,10 @@ export const Sidebar: React.FC<SidebarProps> = ({
   onSelectMasterTab,
   onTogglePerspective,
   isOpenMobile,
-  onCloseMobile
+  onCloseMobile,
+  partnerName,
+  partnerCode,
+  canSwitchPerspective,
 }) => {
   const partnerNavItems = [
     { id: 'home' as PartnerNavTab, label: 'Home', icon: Home },
@@ -103,10 +109,10 @@ export const Sidebar: React.FC<SidebarProps> = ({
               </div>
               <div className="flex-1 min-w-0">
                 <div className="font-semibold text-sm truncate text-slate-100">
-                  {perspective === 'partner' ? 'Hayes Partners' : 'Kredo Master'}
+                  {perspective === 'partner' ? partnerName : 'Kredo Master'}
                 </div>
                 <div className="text-xs text-slate-400 font-mono">
-                  {perspective === 'partner' ? 'Code HAYES01' : 'All partner books'}
+                  {perspective === 'partner' ? `Code ${partnerCode}` : 'All partner books'}
                 </div>
               </div>
             </div>
@@ -215,7 +221,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
           </button>
 
           {/* Perspective Switcher Button */}
-          <div className="pt-2">
+          {canSwitchPerspective && <div className="pt-2">
             <button
               onClick={onTogglePerspective}
               className="w-full group text-left px-3.5 py-2.5 rounded-xl bg-[#0e2135] hover:bg-[#142d47] border border-[#1d3550] transition-colors cursor-pointer"
@@ -228,7 +234,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 <ArrowRight className="w-3.5 h-3.5 text-sky-400 group-hover:translate-x-0.5 transition-transform" />
               </div>
             </button>
-          </div>
+          </div>}
         </div>
       </aside>
     </>

@@ -1,17 +1,21 @@
 "use client";
 
-import React, { useState } from "react";
+import React from "react";
 import { Plus, Users, GitBranch, ArrowUpRight, TrendingUp, DollarSign } from "lucide-react";
-import { TOP_PARTNERS, NETWORK_DEALS } from "../data/netlifyData";
+import { MasterOverviewData } from "@/lib/api";
 
 interface MasterOverviewViewProps {
+  data: MasterOverviewData;
   onNavigateToPartners: () => void;
   onNavigateToPipeline: () => void;
+  onNavigateToReports: () => void;
 }
 
 export const MasterOverviewView: React.FC<MasterOverviewViewProps> = ({
+  data,
   onNavigateToPartners,
   onNavigateToPipeline,
+  onNavigateToReports,
 }) => {
   return (
     <div className="space-y-6">
@@ -23,7 +27,7 @@ export const MasterOverviewView: React.FC<MasterOverviewViewProps> = ({
             <span>KREDO MASTER</span>
           </div>
           <h1 className="text-3xl sm:text-4xl font-extrabold text-[#0a1926] tracking-tight mt-1">
-            Good morning, Craig.
+            Good morning.
           </h1>
           <p className="text-slate-500 text-sm mt-1">
             All partner books, pipeline movement, and commission exposure in one working view.
@@ -52,8 +56,8 @@ export const MasterOverviewView: React.FC<MasterOverviewViewProps> = ({
             </div>
           </div>
           <div className="mt-4">
-            <div className="text-4xl font-extrabold text-[#0a1926] tracking-tight">24</div>
-            <div className="text-xs font-medium text-[#2d5573] mt-2">3 added this month</div>
+            <div className="text-4xl font-extrabold text-[#0a1926] tracking-tight">{data.stats.activePartners}</div>
+            <div className="text-xs font-medium text-[#2d5573] mt-2">Active partner accounts</div>
           </div>
         </div>
 
@@ -68,8 +72,8 @@ export const MasterOverviewView: React.FC<MasterOverviewViewProps> = ({
             </div>
           </div>
           <div className="mt-4">
-            <div className="text-4xl font-extrabold text-[#0a1926] tracking-tight">41</div>
-            <div className="text-xs font-medium text-slate-500 mt-2">$3.2m requested</div>
+            <div className="text-4xl font-extrabold text-[#0a1926] tracking-tight">{data.stats.inFlightDeals}</div>
+            <div className="text-xs font-medium text-slate-500 mt-2">Applications in progress</div>
           </div>
         </div>
 
@@ -84,8 +88,8 @@ export const MasterOverviewView: React.FC<MasterOverviewViewProps> = ({
             </div>
           </div>
           <div className="mt-4">
-            <div className="text-4xl font-extrabold text-[#0a1926] tracking-tight">$1.48m</div>
-            <div className="text-xs font-medium text-slate-500 mt-2">Across 11 facilities</div>
+            <div className="text-4xl font-extrabold text-[#0a1926] tracking-tight">{data.stats.settledThisMonth}</div>
+            <div className="text-xs font-medium text-slate-500 mt-2">Settled referrals</div>
           </div>
         </div>
 
@@ -100,8 +104,8 @@ export const MasterOverviewView: React.FC<MasterOverviewViewProps> = ({
             </div>
           </div>
           <div className="mt-4">
-            <div className="text-4xl font-extrabold text-white tracking-tight">$31,725</div>
-            <div className="text-xs font-medium text-slate-300 mt-2">$18,450 confirmed</div>
+            <div className="text-4xl font-extrabold text-white tracking-tight">{data.stats.commissionAccrued}</div>
+            <div className="text-xs font-medium text-slate-300 mt-2">Commission accrued</div>
           </div>
         </div>
       </div>
@@ -115,7 +119,7 @@ export const MasterOverviewView: React.FC<MasterOverviewViewProps> = ({
               <h3 className="text-base font-bold text-slate-900">Referral funnel</h3>
               <p className="text-xs text-slate-400">September · all partners</p>
             </div>
-            <button className="text-xs font-bold text-slate-700 hover:text-sky-600 transition-colors">
+            <button onClick={onNavigateToReports} className="text-xs font-bold text-slate-700 hover:text-sky-600 transition-colors">
               Full report
             </button>
           </div>
@@ -124,40 +128,40 @@ export const MasterOverviewView: React.FC<MasterOverviewViewProps> = ({
             <div>
               <div className="flex justify-between text-xs font-bold text-slate-800 mb-1.5">
                 <span>Referred</span>
-                <span className="text-sm">62</span>
+                <span className="text-sm">{data.funnel.referred}</span>
               </div>
               <div className="w-full bg-slate-100 h-2.5 rounded-full overflow-hidden">
-                <div className="bg-[#1e4868] h-full rounded-full w-full"></div>
+                <div className="bg-[#1e4868] h-full rounded-full" style={{ width: `${data.funnel.referred ? 100 : 0}%` }}></div>
               </div>
             </div>
 
             <div>
               <div className="flex justify-between text-xs font-bold text-slate-800 mb-1.5">
                 <span>Application received</span>
-                <span className="text-sm">51</span>
+                <span className="text-sm">{data.funnel.received}</span>
               </div>
               <div className="w-full bg-slate-100 h-2.5 rounded-full overflow-hidden">
-                <div className="bg-[#1e4868] h-full rounded-full w-[82%]"></div>
+                <div className="bg-[#1e4868] h-full rounded-full" style={{ width: `${data.funnel.referred ? (data.funnel.received / data.funnel.referred) * 100 : 0}%` }}></div>
               </div>
             </div>
 
             <div>
               <div className="flex justify-between text-xs font-bold text-slate-800 mb-1.5">
                 <span>Approved</span>
-                <span className="text-sm">29</span>
+                <span className="text-sm">{data.funnel.approved}</span>
               </div>
               <div className="w-full bg-slate-100 h-2.5 rounded-full overflow-hidden">
-                <div className="bg-[#1e4868] h-full rounded-full w-[46%]"></div>
+                <div className="bg-[#1e4868] h-full rounded-full" style={{ width: `${data.funnel.referred ? (data.funnel.approved / data.funnel.referred) * 100 : 0}%` }}></div>
               </div>
             </div>
 
             <div>
               <div className="flex justify-between text-xs font-bold text-slate-800 mb-1.5">
                 <span>Settled</span>
-                <span className="text-sm">18</span>
+                <span className="text-sm">{data.funnel.settled}</span>
               </div>
               <div className="w-full bg-slate-100 h-2.5 rounded-full overflow-hidden">
-                <div className="bg-[#b45309] h-full rounded-full w-[29%]"></div>
+                <div className="bg-[#b45309] h-full rounded-full" style={{ width: `${data.funnel.referred ? (data.funnel.settled / data.funnel.referred) * 100 : 0}%` }}></div>
               </div>
             </div>
           </div>
@@ -175,7 +179,7 @@ export const MasterOverviewView: React.FC<MasterOverviewViewProps> = ({
             </div>
 
             <div className="space-y-3">
-              {TOP_PARTNERS.map((p) => (
+              {data.topPartners.map((p) => (
                 <div
                   key={p.code}
                   className="bg-white rounded-xl p-3.5 flex items-center justify-between border border-white/80 shadow-2xs"
@@ -223,7 +227,7 @@ export const MasterOverviewView: React.FC<MasterOverviewViewProps> = ({
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100">
-              {NETWORK_DEALS.map((deal) => (
+              {data.network.map((deal) => (
                 <tr key={deal.ref + deal.partner} className="hover:bg-slate-50/60 transition-colors">
                   <td className="py-3.5 px-6">
                     <div className="font-bold text-slate-900 text-xs">{deal.name}</div>

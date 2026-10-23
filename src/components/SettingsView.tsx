@@ -13,24 +13,69 @@ import {
   CheckCircle
 } from "lucide-react";
 import { PartnerProfile } from "../data/mockData";
+import { PASSWORD_PATTERN } from "@/lib/api";
 
 interface SettingsViewProps {
   partner: PartnerProfile;
-  onUpdatePartner: (updated: PartnerProfile) => void;
+  onUpdatePartner: (updated: PartnerProfile) => Promise<void>;
+  onUpdatePassword: (currentPassword: string, newPassword: string) => Promise<void>;
 }
 
 export const SettingsView: React.FC<SettingsViewProps> = ({
   partner,
   onUpdatePartner,
+  onUpdatePassword,
 }) => {
   const [formData, setFormData] = useState<PartnerProfile>({ ...partner });
   const [savedSuccess, setSavedSuccess] = useState(false);
+  const [saveError, setSaveError] = useState("");
+  const [saving, setSaving] = useState(false);
+  const [currentPassword, setCurrentPassword] = useState("");
+  const [newPassword, setNewPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [passwordError, setPasswordError] = useState("");
+  const [passwordSuccess, setPasswordSuccess] = useState("");
+  const [updatingPassword, setUpdatingPassword] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    onUpdatePartner(formData);
-    setSavedSuccess(true);
-    setTimeout(() => setSavedSuccess(false), 2500);
+    setSaving(true);
+    setSaveError("");
+    try {
+      await onUpdatePartner(formData);
+      setSavedSuccess(true);
+      setTimeout(() => setSavedSuccess(false), 2500);
+    } catch (error) {
+      setSaveError(error instanceof Error ? error.message : "Could not save settings.");
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const handlePasswordSubmit = async (event: React.FormEvent) => {
+    event.preventDefault();
+    setPasswordError("");
+    setPasswordSuccess("");
+    if (newPassword !== confirmPassword) {
+      setPasswordError("New passwords do not match.");
+      return;
+    }
+    if (!PASSWORD_PATTERN.test(newPassword)) {
+      setPasswordError("Password must be exactly 6 letters and/or digits, with no symbols or spaces.");
+      return;
+    }
+    setUpdatingPassword(true);
+    try {
+      await onUpdatePassword(currentPassword, newPassword);
+      setCurrentPassword("");
+      setNewPassword("");
+      setConfirmPassword("");
+      setPasswordSuccess("Password updated successfully.");
+    } catch (error) {
+      setPasswordError(error instanceof Error ? error.message : "Could not update password.");
+    } finally {
+      setUpdatingPassword(false);
+    }
   };
 
   return (
@@ -171,11 +216,13 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
         <div className="flex items-center gap-3">
           <button
             type="submit"
+            disabled={saving}
             className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-[#0a1926] hover:bg-[#14293d] text-white font-semibold text-xs shadow-xs transition-colors cursor-pointer"
           >
             <Save className="w-4 h-4" />
-            <span>Save Changes</span>
+            <span>{saving ? "Saving..." : "Save Changes"}</span>
           </button>
+          {saveError && <span role="alert" className="text-xs text-rose-600">{saveError}</span>}
           {savedSuccess && (
             <span className="flex items-center gap-1.5 text-xs text-emerald-600 font-semibold animate-in fade-in">
               <CheckCircle className="w-4 h-4" />
@@ -183,6 +230,40 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
             </span>
           )}
         </div>
+      </form>
+      <form onSubmit={handlePasswordSubmit} className="bg-white p-6 rounded-2xl border border-slate-200/90 shadow-2xs space-y-4">
+        <div className="pb-3 border-b border-slate-100">
+          <h3 className="text-sm font-bold text-slate-900">Update password</h3>
+          <p className="text-xs text-slate-500 mt-1">Use exactly 6 letters and/or digits for your new password.</p>
+        </div>
+        {passwordError && <p role="alert" className="text-xs text-rose-600">{passwordError}</p>}
+        {passwordSuccess && <p role="status" className="text-xs text-emerald-700">{passwordSuccess}</p>}
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          <label className="block text-xs font-semibold text-slate-700">
+            Current password
+            <input type="password" required autoComplete="current-password" value={currentPassword}
+              onChange={(event) => setCurrentPassword(event.target.value)}
+              className="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm font-normal text-slate-900" />
+          </label>
+          <label className="block text-xs font-semibold text-slate-700">
+            New password
+            <input type="password" required minLength={6} maxLength={6} pattern={PASSWORD_PATTERN.source}
+              title="Enter exactly 6 letters and/or digits." autoComplete="new-password" value={newPassword}
+              onChange={(event) => setNewPassword(event.target.value)}
+              className="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm font-normal text-slate-900" />
+          </label>
+          <label className="block text-xs font-semibold text-slate-700">
+            Confirm new password
+            <input type="password" required minLength={6} maxLength={6} pattern={PASSWORD_PATTERN.source}
+              title="Enter exactly 6 letters and/or digits." autoComplete="new-password" value={confirmPassword}
+              onChange={(event) => setConfirmPassword(event.target.value)}
+              className="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm font-normal text-slate-900" />
+          </label>
+        </div>
+        <button type="submit" disabled={updatingPassword}
+          className="rounded-xl bg-[#0a1926] px-5 py-2.5 text-xs font-semibold text-white disabled:opacity-60">
+          {updatingPassword ? "Updating..." : "Update password"}
+        </button>
       </form>
     </div>
   );
