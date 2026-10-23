@@ -130,6 +130,10 @@ export async function apiRequest<T>(
   options: RequestInit = {},
   authenticated = true,
 ): Promise<T> {
+  if (!API_BASE_URL) {
+    throw new Error("Backend API is not configured. Set NEXT_PUBLIC_API_URL in the deployment environment.");
+  }
+
   const headers = new Headers(options.headers);
   if (options.body && !headers.has("Content-Type")) {
     headers.set("Content-Type", "application/json");
