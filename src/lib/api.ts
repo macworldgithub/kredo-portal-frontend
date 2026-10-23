@@ -1,4 +1,4 @@
-import { API_BASE_URL } from "@/lib/config";
+import { getApiBaseUrl } from "@/lib/config";
 
 const TOKEN_KEY = "kredo.accessToken";
 const USER_KEY = "kredo.currentUser";
@@ -130,10 +130,7 @@ export async function apiRequest<T>(
   options: RequestInit = {},
   authenticated = true,
 ): Promise<T> {
-  if (!API_BASE_URL) {
-    throw new Error("Backend API is not configured. Set NEXT_PUBLIC_API_URL in the deployment environment.");
-  }
-
+  const apiUrl = `${getApiBaseUrl()}${path}`;
   const headers = new Headers(options.headers);
   if (options.body && !headers.has("Content-Type")) {
     headers.set("Content-Type", "application/json");
@@ -141,7 +138,14 @@ export async function apiRequest<T>(
   const token = authenticated ? getAccessToken() : null;
   if (token) headers.set("Authorization", `Bearer ${token}`);
 
-  const response = await fetch(`${API_BASE_URL}${path}`, { ...options, headers });
+  let response: Response;
+  try {
+    response = await fetch(apiUrl, { ...options, headers });
+  } catch {
+    throw new Error(
+      `Cannot reach the backend at ${apiUrl}. Make sure the backend is running, the URL is reachable from this device, and its CORS settings allow this website.`,
+    );
+  }
   if (!response.ok) {
     const payload = await response.json().catch(() => null) as
       | { message?: string | string[] }

@@ -25,6 +25,12 @@ The portal reads its API base URL from `NEXT_PUBLIC_API_URL`. Copy `.env.example
 NEXT_PUBLIC_API_URL=http://localhost:5000/api
 ```
 
+For testing from a phone on the same Wi-Fi, open the frontend using your
+computer's LAN address (for example, `http://192.168.1.20:3000`) instead of
+`localhost`. The frontend then targets the same computer at port `5000`.
+Configure the backend `CORS_ORIGINS` to include that frontend origin (for
+example, `http://192.168.1.20:3000`) and restart both development servers.
+
 Start the backend in a separate terminal from `../kredo-portal-backend` after
 configuring its `.env` and MongoDB connection:
 
@@ -71,8 +77,12 @@ in the Vercel project's Production (and Preview, if needed) environment
 variables to the deployed backend URL, including `/api`, for example:
 
 ```env
-NEXT_PUBLIC_API_URL=https://your-kredo-backend.vercel.app/api
+NEXT_PUBLIC_API_URL=https://kredo-portal-backend.vercel.app/api
 ```
+
+The frontend falls back to this production backend URL when the environment
+variable is missing. Set the variable explicitly in Vercel if your backend
+uses a different domain, then redeploy so Next.js includes it in the build.
 
 Deploy `kredo-portal-backend` as a separate Vercel project with that directory
 as its project root. Configure MongoDB Atlas, SMTP, master account, and CORS
