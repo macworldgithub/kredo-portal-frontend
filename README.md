@@ -18,8 +18,9 @@ Open [http://localhost:3000](http://localhost:3000) with your browser to see the
 
 ## Backend API
 
-The portal reads its API base URL from `NEXT_PUBLIC_API_URL`. Copy `.env.example` to
-`.env.local` and set the URL to the running NestJS backend, for example:
+The portal uses the deployed API by default. To override it for local backend
+development, create `.env.local` and set `NEXT_PUBLIC_API_URL` to the local
+NestJS backend:
 
 ```env
 NEXT_PUBLIC_API_URL=http://localhost:5000/api
@@ -77,7 +78,7 @@ in the Vercel project's Production (and Preview, if needed) environment
 variables to the deployed backend URL, including `/api`, for example:
 
 ```env
-NEXT_PUBLIC_API_URL=https://kred-backend.omnisuiteai.com/api
+NEXT_PUBLIC_API_URL=https://kredo-backend.omnisuiteai.com/api
 ```
 
 The frontend falls back to this production backend URL when the environment
