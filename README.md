@@ -77,16 +77,17 @@ in the Vercel project's Production (and Preview, if needed) environment
 variables to the deployed backend URL, including `/api`, for example:
 
 ```env
-NEXT_PUBLIC_API_URL=https://kredo-portal-backend.vercel.app/api
+NEXT_PUBLIC_API_URL=https://kred-backend.omnisuiteai.com/api
 ```
 
 The frontend falls back to this production backend URL when the environment
 variable is missing. Set the variable explicitly in Vercel if your backend
 uses a different domain, then redeploy so Next.js includes it in the build.
 
-Deploy `kredo-portal-backend` as a separate Vercel project with that directory
-as its project root. Configure MongoDB Atlas, SMTP, master account, and CORS
-environment variables as described in the backend README. Never commit `.env`.
+Deploy `kredo-portal-backend` to the VPS using the deployment instructions in
+its README, or use its Vercel deployment instructions if preferred. Configure
+MongoDB, SMTP, master account, and CORS environment variables as described in
+the backend README. Never commit `.env`.
 
 After both deployments finish, test sign-in, portal API requests, signup, and
 password recovery on the HTTPS frontend.

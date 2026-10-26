@@ -1,6 +1,6 @@
 const configuredApiUrl = process.env.NEXT_PUBLIC_API_URL?.trim();
 
-const productionApiUrl = "https://kredo-portal-backend.vercel.app/api";
+const productionApiUrl = "https://kred-backend.omnisuiteai.com/api";
 
 export function getApiBaseUrl(): string {
   if (configuredApiUrl) return configuredApiUrl.replace(/\/+$/, "");
