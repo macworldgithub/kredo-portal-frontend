@@ -1,14 +1,13 @@
 "use client";
 
 import React from "react";
-import { Bell, Eye, LogOut, Menu } from "lucide-react";
+import { Eye, LogOut, Menu } from "lucide-react";
 
 interface HeaderProps {
   partnerName: string;
   perspective: 'partner' | 'master';
   onTogglePerspective: () => void;
   onOpenMobileSidebar: () => void;
-  unreadCount?: number;
   canSwitchPerspective: boolean;
   onLogout: () => void;
 }
@@ -18,7 +17,6 @@ export const Header: React.FC<HeaderProps> = ({
   perspective,
   onTogglePerspective,
   onOpenMobileSidebar,
-  unreadCount = 2,
   canSwitchPerspective,
   onLogout,
 }) => {
@@ -49,17 +47,6 @@ export const Header: React.FC<HeaderProps> = ({
           <span className="w-2 h-2 rounded-full bg-[#52a42b] animate-pulse"></span>
           <span>LIVE DEMO</span>
         </div>
-
-        {/* Notifications */}
-        <button 
-          className="relative p-2 rounded-full bg-white border border-slate-200 text-slate-600 hover:text-slate-900 hover:border-slate-300 shadow-2xs transition-colors"
-          title="Notifications"
-        >
-          <Bell className="w-4 h-4" />
-          {unreadCount > 0 && (
-            <span className="absolute top-1 right-1 w-2 h-2 bg-amber-500 rounded-full"></span>
-          )}
-        </button>
 
         {/* Perspective Toggle Pill */}
         {canSwitchPerspective && <button

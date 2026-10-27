@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import { Download, Bell } from "lucide-react";
+import { Download } from "lucide-react";
 import { MasterPreferences, MasterReportData } from "@/lib/api";
 
 export const MasterReportsView: React.FC<{
@@ -155,9 +155,6 @@ export const MasterReportsView: React.FC<{
       {/* Bottom Card: Weekly report to Craig */}
       <div className="bg-[#d4eaf7]/70 border border-[#bedcf0] rounded-2xl p-5 flex items-center justify-between shadow-2xs">
         <div className="flex items-center gap-3.5">
-          <div className="w-10 h-10 rounded-xl bg-white flex items-center justify-center text-sky-800 shadow-2xs">
-            <Bell className="w-5 h-5" />
-          </div>
           <div>
             <h4 className="text-sm font-bold text-slate-900">Weekly report to Craig</h4>
             <p className="text-xs text-slate-500">Partners, funnel, commissions and exceptions · Mondays at 7:30am AEST</p>

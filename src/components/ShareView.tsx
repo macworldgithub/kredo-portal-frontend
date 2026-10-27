@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import { Copy, Check, Download, ExternalLink, Mail, Bell } from "lucide-react";
+import { Copy, Check, Download, ExternalLink, Mail } from "lucide-react";
 
 interface ShareViewProps {
   onOpenHeroDemo: () => void;
@@ -188,9 +188,6 @@ export const ShareView: React.FC<ShareViewProps> = ({
         <div className="bg-white rounded-2xl border border-slate-200/90 p-6 shadow-2xs flex flex-col justify-between">
           <div>
             <div className="flex items-center gap-3 mb-3">
-              <div className="w-8 h-8 rounded-xl bg-slate-50 border border-slate-200 flex items-center justify-center text-slate-600">
-                <Bell className="w-4 h-4" />
-              </div>
               <div>
                 <h3 className="text-sm font-bold text-slate-900">Update preference</h3>
                 <p className="text-[11px] text-slate-400">Choose how deal changes reach you</p>

@@ -289,7 +289,6 @@ export default function App() {
           onOpenMobileSidebar={() => setMobileSidebarOpen(true)}
           onLogout={logout}
           canSwitchPerspective={canSwitchPerspective}
-          unreadCount={0}
         />
         <main className="flex-1 p-4 sm:p-6 lg:p-8 max-w-7xl w-full mx-auto pb-28 lg:pb-8">
           {apiError && (
