@@ -4,12 +4,14 @@ export interface Deal {
   applicant: string;
   amount: string;
   type: string;
-  status: 'Application received' | 'In assessment' | 'Approved' | 'Docs / settlement' | 'Settled' | 'Declined' | 'Declined / withdrawn';
+  status: 'Lead received' | 'Customer invited' | 'Application submitted' | 'Waiting on customer' | 'Application received' | 'In assessment' | 'Approved' | 'Docs / settlement' | 'Settled' | 'Declined' | 'Closed Lost' | 'Declined / withdrawn';
   lastActivity: string;
   commission: string;
   commissionStatus: 'Estimated' | 'Confirmed' | 'Paid';
   code: string;
   submittedDate: string;
+  lostReason?: string;
+  diaryNotes?: { id: string; author: string; content: string; nextSteps?: string; isInternal: boolean; createdAt: string }[];
 }
 
 export interface CommissionItem {

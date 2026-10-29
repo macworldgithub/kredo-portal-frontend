@@ -2,13 +2,14 @@ export interface PartnerDeal {
   id: string;
   name: string;
   submitted: string;
-  stage: 'Application received' | 'In assessment' | 'Approved' | 'Docs / settlement' | 'Settled' | 'Declined' | 'Declined / withdrawn';
+  stage: 'Lead received' | 'Customer invited' | 'Application submitted' | 'Waiting on customer' | 'Application received' | 'In assessment' | 'Approved' | 'Docs / settlement' | 'Settled' | 'Declined' | 'Closed Lost' | 'Declined / withdrawn';
   amountBand: string;
   commission: string;
   commissionStatus: 'est.' | 'confirmed' | 'paid';
   rule?: string;
   facility?: string;
   partner?: string;
+  lostReason?: string;
 }
 
 export interface StatementDeal {
@@ -25,7 +26,7 @@ export interface NetworkDeal {
   name: string;
   partner: string;
   submitted: string;
-  stage: 'In assessment' | 'Approved' | 'Docs / settlement' | 'Settled';
+  stage: 'Lead received' | 'Customer invited' | 'Application submitted' | 'Waiting on customer' | 'In assessment' | 'Approved' | 'Docs / settlement' | 'Settled' | 'Declined' | 'Closed Lost' | 'Declined / withdrawn';
   amountBand: string;
   commission: string;
 }

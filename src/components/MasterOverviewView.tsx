@@ -1,14 +1,16 @@
 "use client";
 
-import React from "react";
-import { Plus, Users, GitBranch, ArrowUpRight, TrendingUp, DollarSign } from "lucide-react";
+import React, { useState } from "react";
+import { Plus, Users, GitBranch, ArrowUpRight, TrendingUp, DollarSign, XCircle, ChevronRight } from "lucide-react";
 import { MasterOverviewData } from "@/lib/api";
 
 interface MasterOverviewViewProps {
   data: MasterOverviewData;
   onNavigateToPartners: () => void;
-  onNavigateToPipeline: () => void;
+  onNavigateToPipeline: (filter?: string) => void;
   onNavigateToReports: () => void;
+  onNavigateToCommissions: () => void;
+  onViewPartnerBook: (partnerCode: string) => void;
 }
 
 export const MasterOverviewView: React.FC<MasterOverviewViewProps> = ({
@@ -16,18 +18,20 @@ export const MasterOverviewView: React.FC<MasterOverviewViewProps> = ({
   onNavigateToPartners,
   onNavigateToPipeline,
   onNavigateToReports,
+  onNavigateToCommissions,
+  onViewPartnerBook,
 }) => {
   return (
     <div className="space-y-6">
-      {/* Title & Add partner button - navigates to Partners directory */}
+      {/* Title & Add partner button */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <div className="text-[11px] font-bold text-slate-500 uppercase tracking-widest flex items-center gap-2">
             <span className="w-4 h-0.5 bg-slate-300"></span>
-            <span>KREDO MASTER</span>
+            <span>KREDO MASTER OPERATIONS</span>
           </div>
           <h1 className="text-3xl sm:text-4xl font-extrabold text-[#0a1926] tracking-tight mt-1">
-            Good morning.
+            Master Portfolio Overview
           </h1>
           <p className="text-slate-500 text-sm mt-1">
             All partner books, pipeline movement, and commission exposure in one working view.
@@ -43,12 +47,16 @@ export const MasterOverviewView: React.FC<MasterOverviewViewProps> = ({
         </button>
       </div>
 
-      {/* 4 Summary Stat Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        {/* Card 1: ACTIVE PARTNERS (sky card) */}
-        <div className="bg-[#d4eaf7] border border-[#bedcf0] rounded-2xl p-6 relative overflow-hidden shadow-2xs">
+      {/* 5 Summary Stat Cards with Drill-downs (Section 4.2 & 4.3) */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+        {/* Card 1: ACTIVE PARTNERS */}
+        <div
+          onClick={onNavigateToPartners}
+          className="bg-[#d4eaf7] border border-[#bedcf0] rounded-2xl p-5 relative overflow-hidden shadow-2xs hover:shadow-md transition-all cursor-pointer group"
+          title="Click to view all partners"
+        >
           <div className="flex items-start justify-between">
-            <span className="text-[11px] font-bold uppercase tracking-wider text-[#2d5573]">
+            <span className="text-[11px] font-bold uppercase tracking-wider text-[#2d5573] group-hover:text-[#0a1926] transition-colors">
               ACTIVE PARTNERS
             </span>
             <div className="w-8 h-8 rounded-full bg-white/70 flex items-center justify-center text-[#1c4b70]">
@@ -56,15 +64,22 @@ export const MasterOverviewView: React.FC<MasterOverviewViewProps> = ({
             </div>
           </div>
           <div className="mt-4">
-            <div className="text-4xl font-extrabold text-[#0a1926] tracking-tight">{data.stats.activePartners}</div>
-            <div className="text-xs font-medium text-[#2d5573] mt-2">Active partner accounts</div>
+            <div className="text-3xl sm:text-4xl font-extrabold text-[#0a1926] tracking-tight">{data.stats.activePartners}</div>
+            <div className="text-xs font-medium text-[#2d5573] mt-2 flex items-center justify-between">
+              <span>Active partner accounts</span>
+              <ChevronRight className="w-3.5 h-3.5 opacity-60 group-hover:opacity-100 group-hover:translate-x-0.5 transition-all" />
+            </div>
           </div>
         </div>
 
         {/* Card 2: IN-FLIGHT DEALS */}
-        <div className="bg-white border border-slate-200/90 rounded-2xl p-6 relative overflow-hidden shadow-2xs">
+        <div
+          onClick={() => onNavigateToPipeline("In assessment")}
+          className="bg-white border border-slate-200/90 rounded-2xl p-5 relative overflow-hidden shadow-2xs hover:shadow-md transition-all cursor-pointer group"
+          title="Click to view In-Flight deals"
+        >
           <div className="flex items-start justify-between">
-            <span className="text-[11px] font-bold uppercase tracking-wider text-slate-500">
+            <span className="text-[11px] font-bold uppercase tracking-wider text-slate-500 group-hover:text-slate-900 transition-colors">
               IN-FLIGHT DEALS
             </span>
             <div className="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center text-slate-600">
@@ -72,29 +87,68 @@ export const MasterOverviewView: React.FC<MasterOverviewViewProps> = ({
             </div>
           </div>
           <div className="mt-4">
-            <div className="text-4xl font-extrabold text-[#0a1926] tracking-tight">{data.stats.inFlightDeals}</div>
-            <div className="text-xs font-medium text-slate-500 mt-2">Applications in progress</div>
+            <div className="text-3xl sm:text-4xl font-extrabold text-[#0a1926] tracking-tight">{data.stats.inFlightDeals}</div>
+            <div className="text-xs font-medium text-slate-500 mt-2 flex items-center justify-between">
+              <span>Applications in progress</span>
+              <ChevronRight className="w-3.5 h-3.5 opacity-60 group-hover:opacity-100 group-hover:translate-x-0.5 transition-all" />
+            </div>
           </div>
         </div>
 
         {/* Card 3: SETTLED THIS MONTH */}
-        <div className="bg-white border border-slate-200/90 rounded-2xl p-6 relative overflow-hidden shadow-2xs">
+        <div
+          onClick={() => onNavigateToPipeline("Settled")}
+          className="bg-white border border-slate-200/90 rounded-2xl p-5 relative overflow-hidden shadow-2xs hover:shadow-md transition-all cursor-pointer group"
+          title="Click to view Settled deals"
+        >
           <div className="flex items-start justify-between">
-            <span className="text-[11px] font-bold uppercase tracking-wider text-slate-500">
-              SETTLED THIS MONTH
+            <span className="text-[11px] font-bold uppercase tracking-wider text-slate-500 group-hover:text-slate-900 transition-colors">
+              SETTLED
             </span>
-            <div className="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center text-slate-600">
+            <div className="w-8 h-8 rounded-full bg-emerald-50 text-emerald-600 flex items-center justify-center">
               <TrendingUp className="w-4 h-4" />
             </div>
           </div>
           <div className="mt-4">
-            <div className="text-4xl font-extrabold text-[#0a1926] tracking-tight">{data.stats.settledThisMonth}</div>
-            <div className="text-xs font-medium text-slate-500 mt-2">Settled referrals</div>
+            <div className="text-3xl sm:text-4xl font-extrabold text-[#0a1926] tracking-tight">{data.stats.settledThisMonth}</div>
+            <div className="text-xs font-medium text-slate-500 mt-2 flex items-center justify-between">
+              <span>Settled referrals</span>
+              <ChevronRight className="w-3.5 h-3.5 opacity-60 group-hover:opacity-100 group-hover:translate-x-0.5 transition-all" />
+            </div>
           </div>
         </div>
 
-        {/* Card 4: COMMISSION ACCRUED (dark card) */}
-        <div className="bg-[#0a1926] text-white border border-[#162f49] rounded-2xl p-6 relative overflow-hidden shadow-md">
+        {/* Card 4: CLOSED LOST (Section 4.2: Closed Lost tile on master view) */}
+        <div
+          onClick={() => onNavigateToPipeline("Closed Lost")}
+          className="bg-white border border-rose-100 rounded-2xl p-5 relative overflow-hidden shadow-2xs hover:shadow-md transition-all cursor-pointer group"
+          title="Click to view Closed Lost / Declined deals"
+        >
+          <div className="flex items-start justify-between">
+            <span className="text-[11px] font-bold uppercase tracking-wider text-rose-600">
+              CLOSED LOST
+            </span>
+            <div className="w-8 h-8 rounded-full bg-rose-50 text-rose-600 flex items-center justify-center">
+              <XCircle className="w-4 h-4" />
+            </div>
+          </div>
+          <div className="mt-4">
+            <div className="text-3xl sm:text-4xl font-extrabold text-slate-900 tracking-tight">
+              {data.stats.closedLostDeals ?? data.funnel.lost ?? 0}
+            </div>
+            <div className="text-xs font-medium text-slate-500 mt-2 flex items-center justify-between">
+              <span>Lost / declined deals</span>
+              <ChevronRight className="w-3.5 h-3.5 opacity-60 group-hover:opacity-100 group-hover:translate-x-0.5 transition-all" />
+            </div>
+          </div>
+        </div>
+
+        {/* Card 5: COMMISSION ACCRUED */}
+        <div
+          onClick={onNavigateToCommissions}
+          className="bg-[#0a1926] text-white border border-[#162f49] rounded-2xl p-5 relative overflow-hidden shadow-md hover:shadow-lg transition-all cursor-pointer group"
+          title="Click to view Master Commissions"
+        >
           <div className="flex items-start justify-between">
             <span className="text-[11px] font-bold uppercase tracking-wider text-slate-300">
               COMMISSION ACCRUED
@@ -104,162 +158,151 @@ export const MasterOverviewView: React.FC<MasterOverviewViewProps> = ({
             </div>
           </div>
           <div className="mt-4">
-            <div className="text-4xl font-extrabold text-white tracking-tight">{data.stats.commissionAccrued}</div>
-            <div className="text-xs font-medium text-slate-300 mt-2">Commission accrued</div>
+            <div className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">{data.stats.commissionAccrued}</div>
+            <div className="text-xs font-medium text-slate-300 mt-2 flex items-center justify-between">
+              <span>Total accrued payout</span>
+              <ChevronRight className="w-3.5 h-3.5 opacity-60 group-hover:opacity-100 group-hover:translate-x-0.5 transition-all" />
+            </div>
           </div>
         </div>
       </div>
 
-      {/* Middle Split: Referral Funnel (Left) & Top Partners (Right) */}
+      {/* Top Partners section (Section 4.3: Clicking a partner tile opens that partner's deals with filter and search) */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-        {/* Referral funnel */}
-        <div className="lg:col-span-7 bg-white rounded-2xl border border-slate-200/90 p-6 shadow-2xs">
-          <div className="flex items-center justify-between mb-6">
+        <div className="lg:col-span-6 bg-white rounded-2xl border border-slate-200/90 p-6 shadow-2xs">
+          <div className="flex items-center justify-between mb-4">
             <div>
-              <h3 className="text-base font-bold text-slate-900">Referral funnel</h3>
-              <p className="text-xs text-slate-400">September · all partners</p>
+              <h3 className="text-base font-bold text-[#0a1926]">Top Referral Partners</h3>
+              <p className="text-xs text-slate-500">Click a partner to inspect their live deal book</p>
             </div>
-            <button onClick={onNavigateToReports} className="text-xs font-bold text-slate-700 hover:text-sky-600 transition-colors">
-              Full report
+            <button
+              onClick={onNavigateToPartners}
+              className="text-xs font-bold text-sky-700 hover:underline"
+            >
+              All partners
             </button>
           </div>
 
-          <div className="space-y-5">
-            <div>
-              <div className="flex justify-between text-xs font-bold text-slate-800 mb-1.5">
-                <span>Referred</span>
-                <span className="text-sm">{data.funnel.referred}</span>
-              </div>
-              <div className="w-full bg-slate-100 h-2.5 rounded-full overflow-hidden">
-                <div className="bg-[#1e4868] h-full rounded-full" style={{ width: `${data.funnel.referred ? 100 : 0}%` }}></div>
-              </div>
-            </div>
+          <div className="space-y-3">
+            {data.topPartners.map((p) => (
+              <div
+                key={p.code}
+                onClick={() => onViewPartnerBook(p.code)}
+                className="flex items-center justify-between p-3.5 rounded-xl border border-slate-100 hover:border-slate-300 hover:bg-slate-50 transition-all cursor-pointer group"
+                title={`Drill down into ${p.name}'s book`}
+              >
+                <div className="flex items-center gap-3">
+                  <div className="w-8 h-8 rounded-full bg-[#0a1926] text-white flex items-center justify-center font-bold text-xs">
+                    {p.rank}
+                  </div>
+                  <div>
+                    <div className="text-xs font-bold text-slate-900 group-hover:text-sky-700 transition-colors">
+                      {p.name}
+                    </div>
+                    <div className="text-[11px] text-slate-500 font-mono">Code: {p.code}</div>
+                  </div>
+                </div>
 
-            <div>
-              <div className="flex justify-between text-xs font-bold text-slate-800 mb-1.5">
-                <span>Application received</span>
-                <span className="text-sm">{data.funnel.received}</span>
+                <div className="text-right flex items-center gap-3">
+                  <div>
+                    <div className="text-xs font-bold text-emerald-700">{p.volume}</div>
+                    <div className="text-[10px] text-slate-400 font-medium">{p.deals} deals</div>
+                  </div>
+                  <ChevronRight className="w-4 h-4 text-slate-300 group-hover:text-slate-600 transition-colors" />
+                </div>
               </div>
-              <div className="w-full bg-slate-100 h-2.5 rounded-full overflow-hidden">
-                <div className="bg-[#1e4868] h-full rounded-full" style={{ width: `${data.funnel.referred ? (data.funnel.received / data.funnel.referred) * 100 : 0}%` }}></div>
-              </div>
-            </div>
-
-            <div>
-              <div className="flex justify-between text-xs font-bold text-slate-800 mb-1.5">
-                <span>Approved</span>
-                <span className="text-sm">{data.funnel.approved}</span>
-              </div>
-              <div className="w-full bg-slate-100 h-2.5 rounded-full overflow-hidden">
-                <div className="bg-[#1e4868] h-full rounded-full" style={{ width: `${data.funnel.referred ? (data.funnel.approved / data.funnel.referred) * 100 : 0}%` }}></div>
-              </div>
-            </div>
-
-            <div>
-              <div className="flex justify-between text-xs font-bold text-slate-800 mb-1.5">
-                <span>Settled</span>
-                <span className="text-sm">{data.funnel.settled}</span>
-              </div>
-              <div className="w-full bg-slate-100 h-2.5 rounded-full overflow-hidden">
-                <div className="bg-[#b45309] h-full rounded-full" style={{ width: `${data.funnel.referred ? (data.funnel.settled / data.funnel.referred) * 100 : 0}%` }}></div>
-              </div>
-            </div>
+            ))}
           </div>
         </div>
 
-        {/* Top partners */}
-        <div className="lg:col-span-5 bg-[#d4eaf7]/70 border border-[#bedcf0] rounded-2xl p-6 shadow-2xs flex flex-col justify-between">
+        {/* Funnel tracking */}
+        <div className="lg:col-span-6 bg-white rounded-2xl border border-slate-200/90 p-6 shadow-2xs flex flex-col justify-between">
           <div>
             <div className="flex items-center justify-between mb-4">
               <div>
-                <h3 className="text-base font-bold text-slate-900">Top partners</h3>
-                <p className="text-xs text-slate-500">By settled volume</p>
+                <h3 className="text-base font-bold text-[#0a1926]">Pipeline Velocity Funnel</h3>
+                <p className="text-xs text-slate-500">Attributed volume conversion across stages</p>
               </div>
-              <TrendingUp className="w-4 h-4 text-sky-800" />
+              <button
+                onClick={() => onNavigateToPipeline()}
+                className="text-xs font-bold text-sky-700 hover:underline"
+              >
+                Master Pipeline
+              </button>
             </div>
 
-            <div className="space-y-3">
-              {data.topPartners.map((p) => (
-                <div
-                  key={p.code}
-                  className="bg-white rounded-xl p-3.5 flex items-center justify-between border border-white/80 shadow-2xs"
-                >
-                  <div className="flex items-center gap-3">
-                    <div className="w-7 h-7 rounded-lg bg-slate-100 font-bold text-xs text-slate-700 flex items-center justify-center">
-                      {p.rank}
-                    </div>
-                    <div>
-                      <div className="text-xs font-bold text-slate-900">{p.name}</div>
-                      <div className="text-[10px] text-slate-400 font-mono">{p.code} · {p.deals}</div>
-                    </div>
-                  </div>
-                  <div className="text-xs font-bold text-slate-900">{p.volume}</div>
+            <div className="space-y-3 pt-2">
+              <div>
+                <div className="flex justify-between text-xs font-bold text-slate-700 mb-1">
+                  <span>1. Introductions / Referred</span>
+                  <span>{data.funnel.referred}</span>
                 </div>
-              ))}
+                <div className="w-full bg-slate-100 h-2.5 rounded-full overflow-hidden">
+                  <div className="bg-[#1e4868] h-full" style={{ width: "100%" }}></div>
+                </div>
+              </div>
+
+              <div>
+                <div className="flex justify-between text-xs font-bold text-slate-700 mb-1">
+                  <span>2. Applications Received / Assessed</span>
+                  <span>{data.funnel.received}</span>
+                </div>
+                <div className="w-full bg-slate-100 h-2.5 rounded-full overflow-hidden">
+                  <div
+                    className="bg-[#0284c7] h-full"
+                    style={{
+                      width: `${data.funnel.referred ? Math.round((data.funnel.received / data.funnel.referred) * 100) : 0}%`,
+                    }}
+                  ></div>
+                </div>
+              </div>
+
+              <div>
+                <div className="flex justify-between text-xs font-bold text-slate-700 mb-1">
+                  <span>3. Credit Approved</span>
+                  <span>{data.funnel.approved}</span>
+                </div>
+                <div className="w-full bg-slate-100 h-2.5 rounded-full overflow-hidden">
+                  <div
+                    className="bg-[#10b981] h-full"
+                    style={{
+                      width: `${data.funnel.referred ? Math.round((data.funnel.approved / data.funnel.referred) * 100) : 0}%`,
+                    }}
+                  ></div>
+                </div>
+              </div>
+
+              <div>
+                <div className="flex justify-between text-xs font-bold text-slate-700 mb-1">
+                  <span>4. Settled Wins</span>
+                  <span>{data.funnel.settled}</span>
+                </div>
+                <div className="w-full bg-slate-100 h-2.5 rounded-full overflow-hidden">
+                  <div
+                    className="bg-[#0f766e] h-full"
+                    style={{
+                      width: `${data.funnel.referred ? Math.round((data.funnel.settled / data.funnel.referred) * 100) : 0}%`,
+                    }}
+                  ></div>
+                </div>
+              </div>
+
+              <div>
+                <div className="flex justify-between text-xs font-bold text-rose-700 mb-1">
+                  <span>5. Closed Lost</span>
+                  <span>{data.funnel.lost}</span>
+                </div>
+                <div className="w-full bg-slate-100 h-2.5 rounded-full overflow-hidden">
+                  <div
+                    className="bg-rose-500 h-full"
+                    style={{
+                      width: `${data.funnel.referred ? Math.round((data.funnel.lost / data.funnel.referred) * 100) : 0}%`,
+                    }}
+                  ></div>
+                </div>
+              </div>
             </div>
           </div>
-        </div>
-      </div>
-
-      {/* Bottom Table: Latest across the network */}
-      <div className="bg-white rounded-2xl border border-slate-200/90 shadow-2xs overflow-hidden">
-        <div className="p-5 border-b border-slate-100 flex items-center justify-between">
-          <h3 className="text-base font-bold text-slate-900">Latest across the network</h3>
-          <button
-            onClick={onNavigateToPipeline}
-            className="flex items-center gap-1 text-xs font-bold text-sky-600 hover:text-sky-800 cursor-pointer"
-          >
-            <span>Open pipeline</span>
-            <ArrowUpRight className="w-4 h-4" />
-          </button>
-        </div>
-
-        <div className="overflow-x-auto">
-          <table className="w-full text-left border-collapse text-xs">
-            <thead>
-              <tr className="border-b border-slate-200/80 bg-slate-50/60 text-slate-400 font-bold uppercase tracking-wider text-[10px]">
-                <th className="py-3.5 px-6">REF / BUSINESS</th>
-                <th className="py-3.5 px-4">PARTNER</th>
-                <th className="py-3.5 px-4">SUBMITTED</th>
-                <th className="py-3.5 px-4 text-center">STAGE</th>
-                <th className="py-3.5 px-4 text-center">AMOUNT BAND</th>
-                <th className="py-3.5 px-6">COMMISSION</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-slate-100">
-              {data.network.map((deal) => (
-                <tr key={deal.ref + deal.partner} className="hover:bg-slate-50/60 transition-colors">
-                  <td className="py-3.5 px-6">
-                    <div className="font-bold text-slate-900 text-xs">{deal.name}</div>
-                    <div className="text-[10px] text-slate-400 font-mono mt-0.5">{deal.ref}</div>
-                  </td>
-                  <td className="py-3.5 px-4 font-semibold text-slate-700">
-                    {deal.partner}
-                  </td>
-                  <td className="py-3.5 px-4 text-slate-500">
-                    {deal.submitted}
-                  </td>
-                  <td className="py-3.5 px-4 text-center">
-                    <span className={`inline-block px-2.5 py-0.5 rounded-full text-[10px] font-semibold border ${
-                      deal.stage === 'Settled'
-                        ? 'bg-[#effbf3] text-[#15803d] border-[#d3f4de]'
-                        : deal.stage === 'In assessment'
-                        ? 'bg-[#fef9ee] text-[#b45309] border-[#fdecd0]'
-                        : 'bg-[#f0fbf5] text-[#166534] border-[#d6f6e2]'
-                    }`}>
-                      {deal.stage}
-                    </span>
-                  </td>
-                  <td className="py-3.5 px-4 text-center font-bold text-slate-800">
-                    {deal.amountBand}
-                  </td>
-                  <td className="py-3.5 px-6 font-bold text-slate-900">
-                    {deal.commission}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
         </div>
       </div>
     </div>

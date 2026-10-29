@@ -2,7 +2,7 @@
 
 import React, { useState } from "react";
 import { X, Copy, Check, Send, Sparkles, Building, User, DollarSign, Mail, Phone } from "lucide-react";
-import { Deal } from "../data/mockData";
+import { Deal } from "@/lib/api";
 
 interface ShareReferralModalProps {
   isOpen: boolean;

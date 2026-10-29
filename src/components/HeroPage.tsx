@@ -8,10 +8,10 @@ import {
   ShieldCheck, 
   Clock, 
   BookOpen, 
-  Lock,
-  Building,
+  PhoneCall,
   Check
 } from "lucide-react";
+import { TalkToSomeoneModal } from "./TalkToSomeoneModal";
 
 interface HeroPageProps {
   onBackToDemo: () => void;
@@ -24,26 +24,45 @@ export const HeroPage: React.FC<HeroPageProps> = ({
   onApplyNow,
   referralCode,
 }) => {
+  const [talkModalOpen, setTalkModalOpen] = useState(false);
+
   return (
     <div className="min-h-screen bg-white text-[#0a1926] flex flex-col font-sans">
       {/* Top Banner Notice */}
-      <div className="bg-[#f0f4f8] py-1.5 px-4 text-center border-b border-slate-200">
-        <span className="text-[10px] font-bold text-slate-500 tracking-wider uppercase">
+      <div className="bg-[#f0f4f8] py-1.5 px-4 text-center border-b border-slate-200 flex items-center justify-between">
+        <span className="text-[10px] font-bold text-slate-500 tracking-wider uppercase mx-auto">
           KREDO REFERRAL PARTNER EDITION · {referralCode} ATTRIBUTION SECURED
         </span>
+        <a
+          href="tel:1300457336"
+          className="hidden md:inline-flex items-center gap-1 text-[11px] font-bold text-sky-800 hover:underline"
+        >
+          <PhoneCall className="w-3 h-3" />
+          <span>1300 4 KREDO (1300 457 336)</span>
+        </a>
       </div>
 
       {/* Header Bar with Official Logo */}
       <header className="px-6 sm:px-12 py-3.5 flex items-center justify-between border-b border-slate-100 bg-white sticky top-0 z-30">
         <div className="flex items-center">
-          <img
-            src="/logo.png"
-            alt="Kredo Business Finance"
-            className="h-8 sm:h-9 w-auto object-contain"
-          />
+          <button onClick={onBackToDemo} className="cursor-pointer" title="Back to Kredo">
+            <img
+              src="/logo.png"
+              alt="Kredo Business Finance"
+              className="h-8 sm:h-9 w-auto object-contain"
+            />
+          </button>
         </div>
 
         <div className="flex items-center gap-4">
+          <button
+            onClick={() => setTalkModalOpen(true)}
+            className="hidden sm:flex items-center gap-1.5 text-xs font-bold text-slate-700 hover:text-sky-800 transition-colors cursor-pointer"
+          >
+            <PhoneCall className="w-3.5 h-3.5" />
+            <span>Talk to someone</span>
+          </button>
+
           <button
             onClick={onBackToDemo}
             className="flex items-center gap-1.5 text-xs font-semibold text-slate-600 hover:text-slate-900 transition-colors cursor-pointer"
@@ -90,13 +109,10 @@ export const HeroPage: React.FC<HeroPageProps> = ({
               </button>
 
               <button
-                onClick={() => {
-                  const el = document.getElementById("offer-section");
-                  el?.scrollIntoView({ behavior: 'smooth' });
-                }}
+                onClick={() => setTalkModalOpen(true)}
                 className="px-5 py-3 rounded-full bg-white hover:bg-slate-50 text-slate-800 font-bold text-xs sm:text-sm border border-slate-200 shadow-2xs transition-all cursor-pointer"
               >
-                See the offer
+                Talk to someone
               </button>
             </div>
 
@@ -261,7 +277,7 @@ export const HeroPage: React.FC<HeroPageProps> = ({
         </div>
       </section>
 
-      {/* Footer with official logo */}
+      {/* Footer with official company details and 1300 4 KREDO (Section 2 & 3.1) */}
       <footer className="bg-[#0a1926] text-white py-12 px-6 sm:px-12 border-t border-[#162f48] mt-auto">
         <div className="max-w-6xl mx-auto flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
           <div className="space-y-3">
@@ -273,15 +289,29 @@ export const HeroPage: React.FC<HeroPageProps> = ({
               />
             </div>
             <p className="text-[11px] text-slate-400 max-w-lg leading-relaxed">
-              VHM Asset Finance ABN 96 661 380 150 trading as Kredo. Credit Representative 542867 is authorised under Australian Credit Licence 389328. General information only.
+              KREDO PTY LTD (ACN 702 536 669) · Level 3, 66 Hunter Street, Sydney NSW 2000.
+              <br />
+              VHM Asset Finance ABN 96 661 380 150 trading as Kredo. Credit Representative 542867 is authorised under Australian Credit Licence 389328.
             </p>
+            <div className="flex flex-wrap gap-4 text-xs font-semibold text-slate-300 pt-1">
+              <span>Phone: <a href="tel:1300457336" className="text-sky-400 hover:underline">1300 4 KREDO (1300 457 336)</a></span>
+              <span>Email: <a href="mailto:kredo@vhmpartners.com.au" className="text-sky-400 hover:underline">kredo@vhmpartners.com.au</a></span>
+            </div>
           </div>
 
-          <div className="text-[11px] text-slate-400">
-            © 2026 Kredo · Powered by Bele.ai
+          <div className="text-[11px] text-slate-400 space-y-1 md:text-right">
+            <div>© 2026 KREDO PTY LTD · Powered by Bele.ai</div>
+            <div className="text-[10px] text-slate-500">Australian Proprietary Company · NSW</div>
           </div>
         </div>
       </footer>
+
+      <TalkToSomeoneModal
+        isOpen={talkModalOpen}
+        onClose={() => setTalkModalOpen(false)}
+        referralCode={referralCode}
+        sourceContext="Hero page header / banner"
+      />
     </div>
   );
 };

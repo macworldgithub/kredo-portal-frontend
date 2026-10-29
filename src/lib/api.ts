@@ -12,15 +12,54 @@ export interface AuthUser {
   partnerCode: string | null;
 }
 
+export interface DiaryNote {
+  id: string;
+  author: string;
+  content: string;
+  nextSteps?: string;
+  isInternal: boolean;
+  createdAt: string;
+}
+
+export interface Deal {
+  id: string;
+  name: string;
+  applicant: string;
+  amount: string;
+  type: string;
+  status:
+    | "Lead received"
+    | "Customer invited"
+    | "Application submitted"
+    | "Waiting on customer"
+    | "In assessment"
+    | "Approved"
+    | "Docs / settlement"
+    | "Settled"
+    | "Declined"
+    | "Closed Lost"
+    | "Application received"
+    | "Declined / withdrawn";
+  lastActivity: string;
+  commission: string;
+  commissionStatus: "Estimated" | "Confirmed" | "Paid";
+  code: string;
+  submittedDate: string;
+  lostReason?: string;
+  diaryNotes?: DiaryNote[];
+}
+
 export interface DashboardData {
   partner: import("@/data/mockData").PartnerProfile;
   stats: {
     referredThisMonth: number;
     inFlight: number;
     settled: number;
+    closedLost: number;
+    totalCommissionsEarned: string;
     estimatedCommission: string;
   };
-  deals: import("@/data/mockData").Deal[];
+  deals: Deal[];
   referralCode: string;
   referralLink: string;
 }
@@ -30,6 +69,7 @@ export interface MasterOverviewData {
     activePartners: number;
     inFlightDeals: number;
     settledThisMonth: number;
+    closedLostDeals: number;
     commissionAccrued: string;
   };
   funnel: {
@@ -37,6 +77,7 @@ export interface MasterOverviewData {
     received: number;
     approved: number;
     settled: number;
+    lost: number;
   };
   topPartners: { rank: number; name: string; code: string; deals: number; volume: string }[];
   network: {
@@ -47,18 +88,29 @@ export interface MasterOverviewData {
     stage: string;
     amountBand: string;
     commission: string;
+    lostReason?: string;
   }[];
 }
 
 export interface MasterPipelineDeal {
   id: string;
   name: string;
+  applicant?: string;
   partner: string;
   partnerCode: string;
   submitted: string;
   stage: string;
   amountBand: string;
   commission: string;
+  lostReason?: string;
+  diaryNotes?: DiaryNote[];
+}
+
+export interface PipelineStageCounts {
+  leadReceived: number;
+  customerInvited: number;
+  applicationSubmitted: number;
+  waitingOnCustomer: number;
 }
 
 export interface PartnerDirectoryItem {
@@ -147,7 +199,7 @@ export async function apiRequest<T>(
     );
   }
   if (!response.ok) {
-    const payload = await response.json().catch(() => null) as
+    const payload = (await response.json().catch(() => null)) as
       | { message?: string | string[] }
       | null;
     const message = Array.isArray(payload?.message)

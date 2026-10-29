@@ -19,8 +19,9 @@ import { ShareReferralModal } from "@/components/ShareReferralModal";
 import { DealDetailModal } from "@/components/DealDetailModal";
 import { AddPartnerModal } from "@/components/AddPartnerModal";
 import { LoginView } from "@/components/LoginView";
+import { ContactWidget } from "@/components/ContactWidget";
 import { BarChart3, Briefcase, Check, Home, Percent, QrCode, Users, GitBranch, X } from "lucide-react";
-import { Deal, PartnerProfile, CommissionItem } from "@/data/mockData";
+import { PartnerProfile, CommissionItem } from "@/data/mockData";
 import { PartnerDeal } from "@/data/netlifyData";
 import {
   apiRequest,
@@ -28,6 +29,7 @@ import {
   AuthUser,
   clearAccessToken,
   DashboardData,
+  Deal,
   getAccessToken,
   getCurrentUser,
   MasterOverviewData,
@@ -35,6 +37,7 @@ import {
   MasterPipelineDeal,
   MasterReportData,
   PartnerDirectoryItem,
+  PipelineStageCounts,
 } from "@/lib/api";
 
 function settingsPayload(partner: PartnerProfile) {
@@ -71,7 +74,14 @@ export default function App() {
   const [masterCommissions, setMasterCommissions] = useState<ApiCommission[]>([]);
   const [masterOverview, setMasterOverview] = useState<MasterOverviewData | null>(null);
   const [masterPipeline, setMasterPipeline] = useState<MasterPipelineDeal[]>([]);
+  const [pipelineStageCounts, setPipelineStageCounts] = useState<PipelineStageCounts>({
+    leadReceived: 0,
+    customerInvited: 0,
+    applicationSubmitted: 0,
+    waitingOnCustomer: 0,
+  });
   const [pipelineSearchTerm, setPipelineSearchTerm] = useState("");
+  const [initialDealsStageFilter, setInitialDealsStageFilter] = useState("All stages");
   const [partners, setPartners] = useState<PartnerDirectoryItem[]>([]);
   const [masterReports, setMasterReports] = useState<MasterReportData | null>(null);
   const [masterPreferences, setMasterPreferences] = useState<MasterPreferences | null>(null);
@@ -110,15 +120,17 @@ export default function App() {
       setPartnerDeals(allDeals);
       setCommissions(commissionRows);
       if (user.role === "master") {
-        const [overview, pipeline, partnerRows, reports, preferences] = await Promise.all([
+        const [overview, pipeline, stageCounts, partnerRows, reports, preferences] = await Promise.all([
           apiRequest<MasterOverviewData>("/portal/master/overview"),
           apiRequest<MasterPipelineDeal[]>("/portal/master/pipeline"),
+          apiRequest<PipelineStageCounts>("/portal/master/pipeline-stages"),
           apiRequest<PartnerDirectoryItem[]>("/portal/master/partners"),
           apiRequest<MasterReportData>("/portal/master/reports"),
           apiRequest<MasterPreferences>("/portal/master/preferences"),
         ]);
         setMasterOverview(overview);
         setMasterPipeline(pipeline);
+        setPipelineStageCounts(stageCounts);
         setPartners(partnerRows);
         setMasterReports(reports);
         setMasterPreferences(preferences);
@@ -160,8 +172,10 @@ export default function App() {
     if (!canSwitchPerspective) return;
     const next = perspective === "partner" ? "master" : "partner";
     setPerspective(next);
-    notify(next === "master" ? "Kredo Master view" : "Partner Workspace view",
-      next === "master" ? "You can now see every partner book." : `Viewing as ${partner?.name || "partner"}.`);
+    notify(
+      next === "master" ? "Kredo Master view" : "Partner Workspace view",
+      next === "master" ? "You can now see every partner book." : `Viewing as ${partner?.name || "partner"}.`,
+    );
   };
 
   const selectDeal = async (dealId: string) => {
@@ -174,21 +188,57 @@ export default function App() {
     }
   };
 
-  const handleUpdateDealStatus = async (dealId: string, status: Deal["status"]) => {
+  const handleUpdateDealStatus = async (dealId: string, status: Deal["status"], lostReason?: string) => {
     setApiError("");
     try {
       const updated = await apiRequest<Deal>(`/portal/deals/${encodeURIComponent(dealId)}/status`, {
         method: "PATCH",
-        body: JSON.stringify({ status }),
+        body: JSON.stringify({ status, lostReason }),
       });
-      setDeals((current) => current.map((deal) => deal.id === dealId ? updated : deal));
-      setPartnerDeals((current) => current.map((deal) => deal.id === dealId
-        ? { ...deal, stage: status }
-        : deal));
+      setDeals((current) => current.map((deal) => (deal.id === dealId ? updated : deal)));
+      setPartnerDeals((current) =>
+        current.map((deal) => (deal.id === dealId ? { ...deal, stage: status, lostReason } : deal)),
+      );
       setSelectedDeal(updated);
       void loadData();
+      notify("Deal updated", `${updated.name} moved to ${status}`);
     } catch (error) {
       setApiError(error instanceof Error ? error.message : "Could not update deal status.");
+    }
+  };
+
+  const handleAddDiaryNote = async (
+    dealId: string,
+    note: { content: string; nextSteps?: string; isInternal?: boolean },
+  ) => {
+    setApiError("");
+    try {
+      const updated = await apiRequest<Deal>(`/portal/deals/${encodeURIComponent(dealId)}/notes`, {
+        method: "POST",
+        body: JSON.stringify(note),
+      });
+      setSelectedDeal(updated);
+      void loadData();
+      notify("Diary note added", "New note saved to audit trail.");
+    } catch (error) {
+      setApiError(error instanceof Error ? error.message : "Could not save diary note.");
+    }
+  };
+
+  const handleUpdateCommission = async (
+    dealId: string,
+    updates: { status?: "Confirmed" | "Paid" | "Processing"; commissionAmount?: string },
+  ) => {
+    setApiError("");
+    try {
+      await apiRequest(`/portal/commissions/${encodeURIComponent(dealId)}`, {
+        method: "PATCH",
+        body: JSON.stringify(updates),
+      });
+      await loadData();
+      notify("Commission adjusted", `Updated deal commission record.`);
+    } catch (error) {
+      setApiError(error instanceof Error ? error.message : "Could not update commission.");
     }
   };
 
@@ -197,10 +247,14 @@ export default function App() {
   }
 
   if (!user) {
-    return <LoginView onLogin={(authenticatedUser) => {
-      setUser(authenticatedUser);
-      setPerspective(authenticatedUser.role);
-    }} />;
+    return (
+      <LoginView
+        onLogin={(authenticatedUser) => {
+          setUser(authenticatedUser);
+          setPerspective(authenticatedUser.role);
+        }}
+      />
+    );
   }
 
   if (activeFlow === "hero-page") {
@@ -208,7 +262,7 @@ export default function App() {
       <HeroPage
         onBackToDemo={() => setActiveFlow("dashboard")}
         onApplyNow={() => setActiveFlow("apply-form")}
-        referralCode={partner?.code || user.partnerCode || ""}
+        referralCode={partner?.code || user.partnerCode || "SPUD"}
       />
     );
   }
@@ -217,13 +271,18 @@ export default function App() {
     return (
       <ApplicationForm
         onBackToDemo={() => setActiveFlow("dashboard")}
-        referralCode={partner?.code}
-        onSubmitApplication={(application) =>
-          apiRequest("/portal/applications", {
-            method: "POST",
-            body: JSON.stringify(application),
-          }, false)
-        }
+        referralCode={partner?.code || "SPUD"}
+        onSubmitApplication={async (application) => {
+          await apiRequest(
+            "/portal/applications",
+            {
+              method: "POST",
+              body: JSON.stringify(application),
+            },
+            false,
+          );
+          void loadData();
+        }}
       />
     );
   }
@@ -232,13 +291,24 @@ export default function App() {
     return (
       <main className="min-h-screen grid place-items-center p-6 text-center">
         <div>
-          {loading ? <p className="text-sm text-slate-500">Loading your workspace...</p> : (
+          {loading ? (
+            <p className="text-sm text-slate-500">Loading your workspace...</p>
+          ) : (
             <>
-              <p role="alert" className="text-sm text-rose-700">{apiError || "Partner profile could not be loaded."}</p>
-              <button onClick={() => void loadData()} className="mt-3 rounded-lg bg-[#0a1926] px-4 py-2 text-sm font-semibold text-white">Try again</button>
+              <p role="alert" className="text-sm text-rose-700">
+                {apiError || "Partner profile could not be loaded."}
+              </p>
+              <button
+                onClick={() => void loadData()}
+                className="mt-3 rounded-lg bg-[#0a1926] px-4 py-2 text-sm font-semibold text-white"
+              >
+                Try again
+              </button>
             </>
           )}
-          <button onClick={logout} className="mt-3 block mx-auto text-xs text-slate-500 underline">Sign out</button>
+          <button onClick={logout} className="mt-3 block mx-auto text-xs text-slate-500 underline">
+            Sign out
+          </button>
         </div>
       </main>
     );
@@ -292,9 +362,14 @@ export default function App() {
         />
         <main className="flex-1 p-4 sm:p-6 lg:p-8 max-w-7xl w-full mx-auto pb-28 lg:pb-8">
           {apiError && (
-            <div role="alert" className="mb-5 flex items-center justify-between gap-3 rounded-xl border border-rose-200 bg-rose-50 px-4 py-3 text-xs text-rose-700">
+            <div
+              role="alert"
+              className="mb-5 flex items-center justify-between gap-3 rounded-xl border border-rose-200 bg-rose-50 px-4 py-3 text-xs text-rose-700"
+            >
               <span>{apiError}</span>
-              <button onClick={() => void loadData()} className="font-bold underline">Retry</button>
+              <button onClick={() => void loadData()} className="font-bold underline">
+                Retry
+              </button>
             </div>
           )}
           {loading && <p className="mb-4 text-xs text-slate-500">Refreshing workspace data...</p>}
@@ -304,10 +379,22 @@ export default function App() {
               {currentPartnerTab === "home" && (
                 <HomeView
                   deals={deals}
-                  stats={dashboardStats || { referredThisMonth: 0, inFlight: 0, settled: 0, estimatedCommission: "$0" }}
+                  stats={
+                    dashboardStats || {
+                      referredThisMonth: 0,
+                      inFlight: 0,
+                      settled: 0,
+                      closedLost: 0,
+                      totalCommissionsEarned: "$0",
+                      estimatedCommission: "$0",
+                    }
+                  }
                   onOpenShareModal={() => setIsShareModalOpen(true)}
                   onSelectDeal={setSelectedDeal}
-                  onNavigateToDeals={() => setCurrentPartnerTab("deals")}
+                  onNavigateToDeals={(filter) => {
+                    if (filter) setInitialDealsStageFilter(filter);
+                    setCurrentPartnerTab("deals");
+                  }}
                   onNavigateToCommissions={() => setCurrentPartnerTab("commissions")}
                   onNavigateToShare={() => setCurrentPartnerTab("share")}
                   partnerCode={partner.code}
@@ -315,7 +402,11 @@ export default function App() {
                 />
               )}
               {currentPartnerTab === "deals" && (
-                <DealsView deals={partnerDeals} onSelectDeal={(deal) => void selectDeal(deal.id)} />
+                <DealsView
+                  deals={partnerDeals}
+                  initialStageFilter={initialDealsStageFilter}
+                  onSelectDeal={(deal) => void selectDeal(deal.id)}
+                />
               )}
               {currentPartnerTab === "commissions" && <CommissionsView commissions={commissions} />}
               {currentPartnerTab === "share" && (
@@ -360,8 +451,16 @@ export default function App() {
                 <MasterOverviewView
                   data={masterOverview}
                   onNavigateToPartners={() => setCurrentMasterTab("partners")}
-                  onNavigateToPipeline={() => setCurrentMasterTab("pipeline")}
+                  onNavigateToPipeline={(filter) => {
+                    if (filter) setPipelineSearchTerm(filter === "Closed Lost" ? "Closed Lost" : "");
+                    setCurrentMasterTab("pipeline");
+                  }}
                   onNavigateToReports={() => setCurrentMasterTab("reports")}
+                  onNavigateToCommissions={() => setCurrentMasterTab("commissions")}
+                  onViewPartnerBook={(partnerCode) => {
+                    setPipelineSearchTerm(partnerCode);
+                    setCurrentMasterTab("pipeline");
+                  }}
                 />
               )}
               {currentMasterTab === "partners" && (
@@ -377,12 +476,18 @@ export default function App() {
               {currentMasterTab === "pipeline" && (
                 <MasterPipelineView
                   deals={masterPipeline}
+                  stageCounts={pipelineStageCounts}
                   searchTerm={pipelineSearchTerm}
                   onSearchChange={setPipelineSearchTerm}
                   onSelectDeal={(dealId) => void selectDeal(dealId)}
                 />
               )}
-              {currentMasterTab === "commissions" && <MasterCommissionsView commissions={masterCommissions} />}
+              {currentMasterTab === "commissions" && (
+                <MasterCommissionsView
+                  commissions={masterCommissions}
+                  onUpdateCommission={handleUpdateCommission}
+                />
+              )}
               {currentMasterTab === "reports" && masterReports && masterPreferences && (
                 <MasterReportsView
                   data={masterReports}
@@ -425,7 +530,12 @@ export default function App() {
             ? [
                 { label: "Home", icon: Home, active: currentPartnerTab === "home", select: () => setCurrentPartnerTab("home") },
                 { label: "Deals", icon: Briefcase, active: currentPartnerTab === "deals", select: () => setCurrentPartnerTab("deals") },
-                { label: "Commissions", icon: Percent, active: currentPartnerTab === "commissions", select: () => setCurrentPartnerTab("commissions") },
+                {
+                  label: "Commissions",
+                  icon: Percent,
+                  active: currentPartnerTab === "commissions",
+                  select: () => setCurrentPartnerTab("commissions"),
+                },
                 { label: "Share", icon: QrCode, active: currentPartnerTab === "share", select: () => setCurrentPartnerTab("share") },
               ]
             : [
@@ -470,7 +580,9 @@ export default function App() {
         deal={selectedDeal}
         isOpen={Boolean(selectedDeal)}
         onClose={() => setSelectedDeal(null)}
-        onUpdateStatus={(dealId, status) => void handleUpdateDealStatus(dealId, status)}
+        onUpdateStatus={handleUpdateDealStatus}
+        onAddNote={handleAddDiaryNote}
+        canEdit={true}
       />
       <AddPartnerModal
         isOpen={isAddPartnerOpen}
@@ -491,6 +603,9 @@ export default function App() {
           notify(`Partner ${created.name} created`, `Assigned code: ${created.code}`);
         }}
       />
+
+      {/* Floating Talk to Someone widget with 1300 4 KREDO (Section 3.5) */}
+      <ContactWidget />
     </div>
   );
 }
