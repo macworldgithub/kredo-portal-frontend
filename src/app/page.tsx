@@ -242,6 +242,35 @@ export default function App() {
     }
   };
 
+  const handleUpdatePartner = async (code: string, updates: any) => {
+    setApiError("");
+    try {
+      await apiRequest(`/portal/master/partners/${encodeURIComponent(code)}`, {
+        method: "PATCH",
+        body: JSON.stringify(updates),
+      });
+      await loadData();
+      notify("Partner updated", `Saved updates for ${code}.`);
+    } catch (error) {
+      setApiError(error instanceof Error ? error.message : "Could not update partner.");
+      throw error;
+    }
+  };
+
+  const handleDeletePartner = async (code: string) => {
+    setApiError("");
+    try {
+      await apiRequest(`/portal/master/partners/${encodeURIComponent(code)}`, {
+        method: "DELETE",
+      });
+      await loadData();
+      notify("Partner deleted", `Removed partner ${code} from network.`);
+    } catch (error) {
+      setApiError(error instanceof Error ? error.message : "Could not delete partner.");
+      throw error;
+    }
+  };
+
   if (!authReady) {
     return <main className="min-h-screen grid place-items-center text-sm text-slate-500">Loading Kredo...</main>;
   }
@@ -471,6 +500,8 @@ export default function App() {
                     setPipelineSearchTerm(partnerCode);
                     setCurrentMasterTab("pipeline");
                   }}
+                  onUpdatePartner={handleUpdatePartner}
+                  onDeletePartner={handleDeletePartner}
                 />
               )}
               {currentMasterTab === "pipeline" && (
