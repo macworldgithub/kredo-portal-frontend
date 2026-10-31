@@ -20,7 +20,7 @@ export const CommissionsView: React.FC<{ commissions: CommissionItem[] }> = ({ c
             <span className="w-4 h-0.5 bg-slate-300"></span>
             <span>YOUR STATEMENT</span>
           </div>
-          <h1 className="text-2xl sm:text-3xl lg:text-2xl sm:text-3xl lg:text-4xl font-extrabold text-[#0a1926] tracking-tight mt-1">
+          <h1 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-[#0a1926] tracking-tight mt-1">
             Commissions
           </h1>
           <p className="text-slate-500 text-sm mt-1">
@@ -67,7 +67,7 @@ export const CommissionsView: React.FC<{ commissions: CommissionItem[] }> = ({ c
             </div>
           </div>
           <div className="mt-4">
-            <div className="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-[#0a1926] tracking-tight">{formatCurrency(sumByStatus("Processing"))}</div>
+            <div className="text-xl sm:text-2xl font-bold text-[#0a1926] tracking-tight">{formatCurrency(sumByStatus("Processing"))}</div>
             <div className="text-xs font-medium text-[#2d5573] mt-2">Current period</div>
           </div>
         </div>
@@ -83,7 +83,7 @@ export const CommissionsView: React.FC<{ commissions: CommissionItem[] }> = ({ c
             </div>
           </div>
           <div className="mt-4">
-            <div className="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-[#0a1926] tracking-tight">{formatCurrency(sumByStatus("Confirmed"))}</div>
+            <div className="text-xl sm:text-2xl font-bold text-[#0a1926] tracking-tight">{formatCurrency(sumByStatus("Confirmed"))}</div>
             <div className="text-xs font-medium text-slate-500 mt-2">Awaiting approval</div>
           </div>
         </div>
@@ -99,7 +99,7 @@ export const CommissionsView: React.FC<{ commissions: CommissionItem[] }> = ({ c
             </div>
           </div>
           <div className="mt-4">
-            <div className="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-white tracking-tight">{formatCurrency(sumByStatus("Paid"))}</div>
+            <div className="text-xl sm:text-2xl font-bold text-white tracking-tight">{formatCurrency(sumByStatus("Paid"))}</div>
             <div className="text-xs font-medium text-slate-300 mt-2">Total paid commissions</div>
           </div>
         </div>

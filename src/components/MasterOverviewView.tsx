@@ -64,7 +64,7 @@ export const MasterOverviewView: React.FC<MasterOverviewViewProps> = ({
             </div>
           </div>
           <div className="mt-4">
-            <div className="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-[#0a1926] tracking-tight">{data.stats.activePartners}</div>
+            <div className="text-xl sm:text-2xl font-bold text-[#0a1926] tracking-tight">{data.stats.activePartners}</div>
             <div className="text-xs font-medium text-[#2d5573] mt-2 flex items-center justify-between">
               <span>Active partner accounts</span>
               <ChevronRight className="w-3.5 h-3.5 opacity-60 group-hover:opacity-100 group-hover:translate-x-0.5 transition-all" />
@@ -87,7 +87,7 @@ export const MasterOverviewView: React.FC<MasterOverviewViewProps> = ({
             </div>
           </div>
           <div className="mt-4">
-            <div className="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-[#0a1926] tracking-tight">{data.stats.inFlightDeals}</div>
+            <div className="text-xl sm:text-2xl font-bold text-[#0a1926] tracking-tight">{data.stats.inFlightDeals}</div>
             <div className="text-xs font-medium text-slate-500 mt-2 flex items-center justify-between">
               <span>Applications in progress</span>
               <ChevronRight className="w-3.5 h-3.5 opacity-60 group-hover:opacity-100 group-hover:translate-x-0.5 transition-all" />
@@ -110,7 +110,7 @@ export const MasterOverviewView: React.FC<MasterOverviewViewProps> = ({
             </div>
           </div>
           <div className="mt-4">
-            <div className="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-[#0a1926] tracking-tight">{data.stats.settledThisMonth}</div>
+            <div className="text-xl sm:text-2xl font-bold text-[#0a1926] tracking-tight">{data.stats.settledThisMonth}</div>
             <div className="text-xs font-medium text-slate-500 mt-2 flex items-center justify-between">
               <span>Settled referrals</span>
               <ChevronRight className="w-3.5 h-3.5 opacity-60 group-hover:opacity-100 group-hover:translate-x-0.5 transition-all" />
@@ -133,7 +133,7 @@ export const MasterOverviewView: React.FC<MasterOverviewViewProps> = ({
             </div>
           </div>
           <div className="mt-4">
-            <div className="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-slate-900 tracking-tight">
+            <div className="text-xl sm:text-2xl font-bold text-slate-900 tracking-tight">
               {data.stats.closedLostDeals ?? data.funnel.lost ?? 0}
             </div>
             <div className="text-xs font-medium text-slate-500 mt-2 flex items-center justify-between">
@@ -158,7 +158,7 @@ export const MasterOverviewView: React.FC<MasterOverviewViewProps> = ({
             </div>
           </div>
           <div className="mt-4">
-            <div className="text-xl sm:text-2xl lg:text-3xl font-extrabold text-white tracking-tight">{data.stats.commissionAccrued}</div>
+            <div className="text-lg sm:text-xl font-bold text-white tracking-tight truncate">{data.stats.commissionAccrued}</div>
             <div className="text-xs font-medium text-slate-300 mt-2 flex items-center justify-between">
               <span>Total accrued payout</span>
               <ChevronRight className="w-3.5 h-3.5 opacity-60 group-hover:opacity-100 group-hover:translate-x-0.5 transition-all" />
