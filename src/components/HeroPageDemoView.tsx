@@ -66,7 +66,7 @@ export const HeroPageDemoView: React.FC<HeroPageDemoViewProps> = ({
             <span>Fast-Track Commercial Lending Partner Network</span>
           </div>
 
-          <h1 className="text-3xl sm:text-5xl font-black text-[#0a1926] tracking-tight leading-tight">
+          <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-black text-[#0a1926] tracking-tight leading-tight">
             Fast, Flexible Business Finance Tailored For Your Growth.
           </h1>
 

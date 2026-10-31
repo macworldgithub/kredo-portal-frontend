@@ -91,7 +91,7 @@ export const HeroPage: React.FC<HeroPageProps> = ({
               <span>MARK &ldquo;SPUD&rdquo; CARROLL × KREDO</span>
             </div>
 
-            <h1 className="text-4xl sm:text-6xl font-black tracking-tight text-[#0a1926] leading-[1.08]">
+            <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black tracking-tight text-[#0a1926] leading-[1.08]">
               Backing your next<br />business move.
             </h1>
 
@@ -194,7 +194,7 @@ export const HeroPage: React.FC<HeroPageProps> = ({
               <span>A SIMPLE THANK YOU</span>
             </div>
 
-            <h2 className="text-3xl sm:text-4xl font-extrabold text-[#0a1926] tracking-tight">
+            <h2 className="text-2xl sm:text-3xl md:text-4xl font-extrabold text-[#0a1926] tracking-tight">
               Settle through this page.<br />Receive a signed copy.
             </h2>
 
@@ -238,7 +238,7 @@ export const HeroPage: React.FC<HeroPageProps> = ({
               <span className="w-4 h-0.5 bg-slate-300"></span>
               <span>WHY KREDO</span>
             </div>
-            <h2 className="text-3xl font-extrabold text-[#0a1926] tracking-tight mt-1">
+            <h2 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-[#0a1926] tracking-tight mt-1">
               Finance, without the runaround.
             </h2>
           </div>

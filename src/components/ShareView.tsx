@@ -73,7 +73,7 @@ export const ShareView: React.FC<ShareViewProps> = ({
           <span className="w-4 h-0.5 bg-slate-300"></span>
           <span>PARTNER TOOLKIT</span>
         </div>
-        <h1 className="text-3xl sm:text-4xl font-extrabold text-[#0a1926] tracking-tight mt-1">
+        <h1 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-[#0a1926] tracking-tight mt-1">
           Share & QR
         </h1>
         <p className="text-slate-500 text-sm mt-1">
@@ -90,7 +90,7 @@ export const ShareView: React.FC<ShareViewProps> = ({
             <span className="px-3 py-1 rounded-full bg-[#172c42] text-slate-300 text-[10px] font-bold tracking-wider uppercase border border-[#234263]">
               YOUR ONE-SOURCE LINK
             </span>
-            <h2 className="text-3xl sm:text-4xl font-extrabold tracking-tight text-white leading-tight">
+            <h2 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold tracking-tight text-white leading-tight">
               Ready for the next conversation.
             </h2>
             <p className="text-slate-300 text-xs sm:text-sm leading-relaxed">

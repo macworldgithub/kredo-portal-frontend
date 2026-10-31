@@ -74,7 +74,7 @@ export const MasterCommissionsView: React.FC<MasterCommissionsViewProps> = ({
             <span className="w-4 h-0.5 bg-slate-300"></span>
             <span>COMMISSION LEDGER & AUDIT</span>
           </div>
-          <h1 className="text-3xl sm:text-4xl font-extrabold text-[#0a1926] tracking-tight mt-1">
+          <h1 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-[#0a1926] tracking-tight mt-1">
             Master Commissions
           </h1>
           <p className="text-slate-500 text-sm mt-1">

@@ -130,7 +130,7 @@ export const MasterPipelineView: React.FC<MasterPipelineViewProps> = ({
             <span className="w-4 h-0.5 bg-slate-300"></span>
             <span>ALL PARTNER BOOKS</span>
           </div>
-          <h1 className="text-3xl sm:text-4xl font-extrabold text-[#0a1926] tracking-tight mt-1">
+          <h1 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-[#0a1926] tracking-tight mt-1">
             Master Pipeline
           </h1>
           <p className="text-slate-500 text-sm mt-1">
@@ -166,7 +166,7 @@ export const MasterPipelineView: React.FC<MasterPipelineViewProps> = ({
               <Send className="w-3.5 h-3.5" />
             </div>
           </div>
-          <div className="mt-2 text-3xl font-extrabold text-[#0a1926] tracking-tight">
+          <div className="mt-2 text-xl sm:text-2xl lg:text-3xl font-extrabold text-[#0a1926] tracking-tight">
             {stageCounts.leadReceived}
           </div>
           <div className="text-[11px] text-slate-400 mt-1">Initial introduction</div>
@@ -189,7 +189,7 @@ export const MasterPipelineView: React.FC<MasterPipelineViewProps> = ({
               <Users className="w-3.5 h-3.5" />
             </div>
           </div>
-          <div className="mt-2 text-3xl font-extrabold text-[#0a1926] tracking-tight">
+          <div className="mt-2 text-xl sm:text-2xl lg:text-3xl font-extrabold text-[#0a1926] tracking-tight">
             {stageCounts.customerInvited}
           </div>
           <div className="text-[11px] text-slate-400 mt-1">Link shared with client</div>
@@ -212,7 +212,7 @@ export const MasterPipelineView: React.FC<MasterPipelineViewProps> = ({
               <ArrowDownCircle className="w-3.5 h-3.5" />
             </div>
           </div>
-          <div className="mt-2 text-3xl font-extrabold text-[#0a1926] tracking-tight">
+          <div className="mt-2 text-xl sm:text-2xl lg:text-3xl font-extrabold text-[#0a1926] tracking-tight">
             {stageCounts.applicationSubmitted}
           </div>
           <div className="text-[11px] text-slate-400 mt-1">Form completed online</div>
@@ -235,7 +235,7 @@ export const MasterPipelineView: React.FC<MasterPipelineViewProps> = ({
               <Clock className="w-3.5 h-3.5" />
             </div>
           </div>
-          <div className="mt-2 text-3xl font-extrabold text-[#0a1926] tracking-tight">
+          <div className="mt-2 text-xl sm:text-2xl lg:text-3xl font-extrabold text-[#0a1926] tracking-tight">
             {stageCounts.waitingOnCustomer}
           </div>
           <div className="text-[11px] text-slate-400 mt-1">Awaiting docs / financials</div>

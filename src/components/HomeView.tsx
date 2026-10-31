@@ -92,7 +92,7 @@ export const HomeView: React.FC<HomeViewProps> = ({
             <span className="w-4 h-0.5 bg-slate-300"></span>
             <span>{new Date().toLocaleDateString("en-AU", { weekday: "long", day: "numeric", month: "long" }).toUpperCase()}</span>
           </div>
-          <h1 className="text-3xl sm:text-4xl font-extrabold text-[#0a1926] tracking-tight mt-1">
+          <h1 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-[#0a1926] tracking-tight mt-1">
             Your referrals, at a glance.
           </h1>
           <p className="text-slate-500 text-sm mt-1 max-w-xl">
@@ -126,7 +126,7 @@ export const HomeView: React.FC<HomeViewProps> = ({
             </div>
           </div>
           <div className="mt-4">
-            <div className="text-3xl sm:text-4xl font-extrabold text-[#0a1926] tracking-tight">{stats.referredThisMonth}</div>
+            <div className="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-[#0a1926] tracking-tight">{stats.referredThisMonth}</div>
             <div className="text-xs font-medium text-[#2d5573] mt-2 flex items-center justify-between">
               <span>Referrals this month</span>
               <ChevronRight className="w-3.5 h-3.5 opacity-60 group-hover:opacity-100 group-hover:translate-x-0.5 transition-all" />
@@ -149,7 +149,7 @@ export const HomeView: React.FC<HomeViewProps> = ({
             </div>
           </div>
           <div className="mt-4">
-            <div className="text-3xl sm:text-4xl font-extrabold text-[#0a1926] tracking-tight">{stats.inFlight}</div>
+            <div className="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-[#0a1926] tracking-tight">{stats.inFlight}</div>
             <div className="text-xs font-medium text-slate-500 mt-2 flex items-center justify-between">
               <span>In assessment & pipeline</span>
               <ChevronRight className="w-3.5 h-3.5 opacity-60 group-hover:opacity-100 group-hover:translate-x-0.5 transition-all" />
@@ -172,7 +172,7 @@ export const HomeView: React.FC<HomeViewProps> = ({
             </div>
           </div>
           <div className="mt-4">
-            <div className="text-3xl sm:text-4xl font-extrabold text-[#0a1926] tracking-tight">{stats.settled}</div>
+            <div className="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-[#0a1926] tracking-tight">{stats.settled}</div>
             <div className="text-xs font-medium text-slate-500 mt-2 flex items-center justify-between">
               <span>Settled referrals</span>
               <ChevronRight className="w-3.5 h-3.5 opacity-60 group-hover:opacity-100 group-hover:translate-x-0.5 transition-all" />
@@ -195,7 +195,7 @@ export const HomeView: React.FC<HomeViewProps> = ({
             </div>
           </div>
           <div className="mt-4">
-            <div className="text-3xl sm:text-4xl font-extrabold text-slate-900 tracking-tight">{stats.closedLost ?? 0}</div>
+            <div className="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-slate-900 tracking-tight">{stats.closedLost ?? 0}</div>
             <div className="text-xs font-medium text-slate-500 mt-2 flex items-center justify-between">
               <span>Lost / declined deals</span>
               <ChevronRight className="w-3.5 h-3.5 opacity-60 group-hover:opacity-100 group-hover:translate-x-0.5 transition-all" />
@@ -218,7 +218,7 @@ export const HomeView: React.FC<HomeViewProps> = ({
             </div>
           </div>
           <div className="mt-4">
-            <div className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">
+            <div className="text-xl sm:text-2xl lg:text-3xl font-extrabold text-white tracking-tight">
               {stats.totalCommissionsEarned || stats.estimatedCommission || "$0"}
             </div>
             <div className="text-[11px] font-medium text-slate-300 mt-2 flex items-center justify-between">
