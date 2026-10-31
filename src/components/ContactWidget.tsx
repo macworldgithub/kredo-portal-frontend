@@ -50,149 +50,156 @@ export const ContactWidget: React.FC = () => {
   };
 
   return (
-    <div className="floating-contact-widget fixed right-4 sm:right-5 z-30 font-sans print:hidden">
+    <>
+      {/* Backdrop to close modal when clicking outside */}
       {isOpen && (
-        <div className="mb-3 w-[calc(100vw-2rem)] max-w-sm sm:w-96 max-h-[calc(100dvh-10rem)] overflow-y-auto rounded-3xl bg-white p-5 shadow-2xl border border-slate-200 animate-in slide-in-from-bottom-3 duration-200">
-          <div className="flex items-center justify-between pb-3 border-b border-slate-100">
-            <div>
-              <h4 className="text-sm font-bold text-[#0a1926]">Talk to someone</h4>
-              <p className="text-[11px] text-slate-500">Kredo commercial finance team</p>
-            </div>
-            <button
-              onClick={() => setIsOpen(false)}
-              className="p-1 rounded-lg text-slate-400 hover:text-slate-700"
-            >
-              <X className="w-4 h-4" />
-            </button>
-          </div>
-
-          {!showContactForm ? (
-            <div className="py-4 space-y-3">
-              {/* Call Us - 1300 4 KREDO (1300 457 336) */}
-              <a
-                href="tel:1300457336"
-                className="flex items-center gap-3.5 p-3.5 rounded-2xl bg-slate-50 hover:bg-slate-100 border border-slate-200 transition-colors group cursor-pointer"
-              >
-                <div className="w-10 h-10 rounded-xl bg-sky-500/10 text-sky-700 flex items-center justify-center group-hover:bg-[#0a1926] group-hover:text-white transition-colors">
-                  <Phone className="w-5 h-5" />
-                </div>
-                <div>
-                  <div className="text-xs font-bold text-slate-900">Call Us directly</div>
-                  <div className="text-xs font-mono font-bold text-sky-700">1300 4 KREDO (1300 457 336)</div>
-                </div>
-              </a>
-
-              {/* Send Message / Request Callback */}
-              <button
-                type="button"
-                onClick={() => setShowContactForm(true)}
-                className="w-full flex items-center gap-3.5 p-3.5 rounded-2xl bg-[#0a1926] hover:bg-slate-800 text-white transition-colors cursor-pointer text-left"
-              >
-                <div className="w-10 h-10 rounded-xl bg-white/10 text-sky-400 flex items-center justify-center">
-                  <MessageSquare className="w-5 h-5" />
-                </div>
-                <div>
-                  <div className="text-xs font-bold text-white">Send Message / Request Callback</div>
-                  <div className="text-[11px] text-slate-300">We respond in under 20 minutes</div>
-                </div>
-              </button>
-
-              <div className="pt-2 text-center text-[10px] text-slate-400">
-                Operating 8:30am – 6:00pm AEST · Sydney NSW
-              </div>
-            </div>
-          ) : submitted ? (
-            <div className="py-6 text-center space-y-2">
-              <CheckCircle2 className="w-10 h-10 text-emerald-600 mx-auto" />
-              <h5 className="text-sm font-bold text-slate-900">Message Sent</h5>
-              <p className="text-xs text-slate-600">A finance manager will call you back shortly.</p>
-              <button
-                type="button"
-                onClick={handleReset}
-                className="mt-3 px-4 py-1.5 rounded-full bg-[#0a1926] text-white text-xs font-bold"
-              >
-                Close
-              </button>
-            </div>
-          ) : (
-            <form onSubmit={handleSubmit} className="py-3 space-y-3">
-              <div>
-                <input
-                  type="text"
-                  required
-                  placeholder="Business Name *"
-                  value={businessName}
-                  onChange={(e) => setBusinessName(e.target.value)}
-                  className="w-full px-3 py-2 text-xs border border-slate-200 rounded-xl"
-                />
-              </div>
-              <div>
-                <input
-                  type="text"
-                  required
-                  placeholder="Your Name *"
-                  value={contactName}
-                  onChange={(e) => setContactName(e.target.value)}
-                  className="w-full px-3 py-2 text-xs border border-slate-200 rounded-xl"
-                />
-              </div>
-              <div>
-                <input
-                  type="tel"
-                  required
-                  placeholder="Phone Number *"
-                  value={phone}
-                  onChange={(e) => setPhone(e.target.value)}
-                  className="w-full px-3 py-2 text-xs border border-slate-200 rounded-xl"
-                />
-              </div>
-              <div>
-                <input
-                  type="email"
-                  required
-                  placeholder="Email Address *"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  className="w-full px-3 py-2 text-xs border border-slate-200 rounded-xl"
-                />
-              </div>
-              <div className="flex gap-2 pt-1">
-                <button
-                  type="button"
-                  onClick={() => setShowContactForm(false)}
-                  className="px-3 py-2 text-xs rounded-xl border border-slate-200 text-slate-600"
-                >
-                  Back
-                </button>
-                <button
-                  type="submit"
-                  disabled={submitting}
-                  className="flex-1 py-2 rounded-xl bg-[#0a1926] text-white text-xs font-bold"
-                >
-                  {submitting ? "Sending..." : "Submit"}
-                </button>
-              </div>
-            </form>
-          )}
-        </div>
+        <div
+          className="fixed inset-0 z-35 bg-black/20 backdrop-blur-[1px] print:hidden"
+          onClick={() => setIsOpen(false)}
+        />
       )}
 
-      {/* Floating Toggle Button: Icon only on mobile (above bottom nav), full pill with number on desktop */}
-      <button
-        onClick={() => setIsOpen(!isOpen)}
-        aria-label={isOpen ? "Close contact options" : "Call Kredo - 1300 4 KREDO"}
-        title={isOpen ? "Close" : "1300 4 KREDO"}
-        className="flex items-center justify-center w-12 h-12 lg:w-auto lg:h-auto lg:px-4 lg:py-3 lg:gap-2.5 rounded-full bg-[#0a1926] text-white shadow-xl hover:bg-[#14293d] hover:scale-105 active:scale-95 transition-all cursor-pointer border border-sky-400/20 shrink-0"
-      >
-        {isOpen ? (
-          <X className="w-5 h-5 lg:w-4 lg:h-4 text-sky-400" />
-        ) : (
-          <Phone className="w-5 h-5 lg:w-4 lg:h-4 text-sky-400" />
+      <div className="floating-contact-widget fixed right-4 sm:right-5 z-40 font-sans print:hidden flex flex-col items-end">
+        {isOpen && (
+          <div className="w-[calc(100vw-2rem)] max-w-sm sm:w-96 max-h-[calc(100dvh-10rem)] overflow-y-auto rounded-3xl bg-white p-5 shadow-2xl border border-slate-200 animate-in slide-in-from-bottom-3 duration-200">
+            <div className="flex items-center justify-between pb-3 border-b border-slate-100">
+              <div>
+                <h4 className="text-sm font-bold text-[#0a1926]">Talk to someone</h4>
+                <p className="text-[11px] text-slate-500">Kredo commercial finance team</p>
+              </div>
+              <button
+                onClick={() => setIsOpen(false)}
+                className="p-1 rounded-lg text-slate-400 hover:text-slate-700"
+                aria-label="Close"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+
+            {!showContactForm ? (
+              <div className="py-4 space-y-3">
+                {/* Call Us - 1300 4 KREDO (1300 457 336) */}
+                <a
+                  href="tel:1300457336"
+                  className="flex items-center gap-3.5 p-3.5 rounded-2xl bg-slate-50 hover:bg-slate-100 border border-slate-200 transition-colors group cursor-pointer"
+                >
+                  <div className="w-10 h-10 rounded-xl bg-sky-500/10 text-sky-700 flex items-center justify-center group-hover:bg-[#0a1926] group-hover:text-white transition-colors">
+                    <Phone className="w-5 h-5" />
+                  </div>
+                  <div>
+                    <div className="text-xs font-bold text-slate-900">Call Us directly</div>
+                    <div className="text-xs font-mono font-bold text-sky-700">1300 4 KREDO (1300 457 336)</div>
+                  </div>
+                </a>
+
+                {/* Send Message / Request Callback */}
+                <button
+                  type="button"
+                  onClick={() => setShowContactForm(true)}
+                  className="w-full flex items-center gap-3.5 p-3.5 rounded-2xl bg-[#0a1926] hover:bg-slate-800 text-white transition-colors cursor-pointer text-left"
+                >
+                  <div className="w-10 h-10 rounded-xl bg-white/10 text-sky-400 flex items-center justify-center">
+                    <MessageSquare className="w-5 h-5" />
+                  </div>
+                  <div>
+                    <div className="text-xs font-bold text-white">Send Message / Request Callback</div>
+                    <div className="text-[11px] text-slate-300">We respond in under 20 minutes</div>
+                  </div>
+                </button>
+
+                <div className="pt-2 text-center text-[10px] text-slate-400">
+                  Operating 8:30am – 6:00pm AEST · Sydney NSW
+                </div>
+              </div>
+            ) : submitted ? (
+              <div className="py-6 text-center space-y-2">
+                <CheckCircle2 className="w-10 h-10 text-emerald-600 mx-auto" />
+                <h5 className="text-sm font-bold text-slate-900">Message Sent</h5>
+                <p className="text-xs text-slate-600">A finance manager will call you back shortly.</p>
+                <button
+                  type="button"
+                  onClick={handleReset}
+                  className="mt-3 px-4 py-1.5 rounded-full bg-[#0a1926] text-white text-xs font-bold"
+                >
+                  Close
+                </button>
+              </div>
+            ) : (
+              <form onSubmit={handleSubmit} className="py-3 space-y-3">
+                <div>
+                  <input
+                    type="text"
+                    required
+                    placeholder="Business Name *"
+                    value={businessName}
+                    onChange={(e) => setBusinessName(e.target.value)}
+                    className="w-full px-3 py-2 text-xs border border-slate-200 rounded-xl"
+                  />
+                </div>
+                <div>
+                  <input
+                    type="text"
+                    required
+                    placeholder="Your Name *"
+                    value={contactName}
+                    onChange={(e) => setContactName(e.target.value)}
+                    className="w-full px-3 py-2 text-xs border border-slate-200 rounded-xl"
+                  />
+                </div>
+                <div>
+                  <input
+                    type="tel"
+                    required
+                    placeholder="Phone Number *"
+                    value={phone}
+                    onChange={(e) => setPhone(e.target.value)}
+                    className="w-full px-3 py-2 text-xs border border-slate-200 rounded-xl"
+                  />
+                </div>
+                <div>
+                  <input
+                    type="email"
+                    required
+                    placeholder="Email Address *"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    className="w-full px-3 py-2 text-xs border border-slate-200 rounded-xl"
+                  />
+                </div>
+                <div className="flex gap-2 pt-1">
+                  <button
+                    type="button"
+                    onClick={() => setShowContactForm(false)}
+                    className="px-3 py-2 text-xs rounded-xl border border-slate-200 text-slate-600"
+                  >
+                    Back
+                  </button>
+                  <button
+                    type="submit"
+                    disabled={submitting}
+                    className="flex-1 py-2 rounded-xl bg-[#0a1926] text-white text-xs font-bold"
+                  >
+                    {submitting ? "Sending..." : "Submit"}
+                  </button>
+                </div>
+              </form>
+            )}
+          </div>
         )}
-        <span className="hidden lg:inline text-xs font-bold tracking-wide">
-          {isOpen ? "Close" : "1300 4 KREDO"}
-        </span>
-      </button>
-    </div>
+
+        {/* Floating Toggle Button: Hidden when modal is open */}
+        {!isOpen && (
+          <button
+            onClick={() => setIsOpen(true)}
+            aria-label="Call Kredo - 1300 4 KREDO"
+            title="1300 4 KREDO"
+            className="flex items-center justify-center w-12 h-12 lg:w-auto lg:h-auto lg:px-4 lg:py-3 lg:gap-2.5 rounded-full bg-[#0a1926] text-white shadow-xl hover:bg-[#14293d] hover:scale-105 active:scale-95 transition-all cursor-pointer border border-sky-400/20 shrink-0"
+          >
+            <Phone className="w-5 h-5 lg:w-4 lg:h-4 text-sky-400" />
+            <span className="hidden lg:inline text-xs font-bold tracking-wide">1300 4 KREDO</span>
+          </button>
+        )}
+      </div>
+    </>
   );
 };
