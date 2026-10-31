@@ -177,13 +177,21 @@ export const ContactWidget: React.FC = () => {
         </div>
       )}
 
-      {/* Floating Toggle Button */}
+      {/* Floating Toggle Button: Icon only on mobile (above bottom nav), full pill with number on desktop */}
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="flex items-center gap-2.5 px-4 py-3 rounded-full bg-[#0a1926] text-white shadow-xl hover:bg-[#14293d] hover:scale-105 active:scale-95 transition-all cursor-pointer border border-sky-400/20"
+        aria-label={isOpen ? "Close contact options" : "Call Kredo - 1300 4 KREDO"}
+        title={isOpen ? "Close" : "1300 4 KREDO"}
+        className="flex items-center justify-center w-12 h-12 lg:w-auto lg:h-auto lg:px-4 lg:py-3 lg:gap-2.5 rounded-full bg-[#0a1926] text-white shadow-xl hover:bg-[#14293d] hover:scale-105 active:scale-95 transition-all cursor-pointer border border-sky-400/20 shrink-0"
       >
-        <Phone className="w-4 h-4 text-sky-400" />
-        <span className="text-xs font-bold tracking-wide">1300 4 KREDO</span>
+        {isOpen ? (
+          <X className="w-5 h-5 lg:w-4 lg:h-4 text-sky-400" />
+        ) : (
+          <Phone className="w-5 h-5 lg:w-4 lg:h-4 text-sky-400" />
+        )}
+        <span className="hidden lg:inline text-xs font-bold tracking-wide">
+          {isOpen ? "Close" : "1300 4 KREDO"}
+        </span>
       </button>
     </div>
   );
