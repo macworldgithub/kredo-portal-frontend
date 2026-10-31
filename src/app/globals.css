@@ -59,6 +59,16 @@ canvas {
   bottom: max(0.75rem, env(safe-area-inset-bottom));
 }
 
+.floating-contact-widget {
+  bottom: calc(max(0.75rem, env(safe-area-inset-bottom)) + 5rem);
+}
+
+@media (min-width: 1024px) {
+  .floating-contact-widget {
+    bottom: 1.25rem;
+  }
+}
+
 /* Custom scrollbars */
 ::-webkit-scrollbar {
   width: 6px;

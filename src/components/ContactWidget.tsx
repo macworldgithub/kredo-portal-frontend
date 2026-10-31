@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import { MessageSquare, Phone, X, Send, CheckCircle2 } from "lucide-react";
+import { MessageSquare, Phone, X, CheckCircle2 } from "lucide-react";
 import { apiRequest } from "@/lib/api";
 
 export const ContactWidget: React.FC = () => {
@@ -50,9 +50,9 @@ export const ContactWidget: React.FC = () => {
   };
 
   return (
-    <div className="fixed bottom-5 right-5 z-40 font-sans print:hidden">
+    <div className="floating-contact-widget fixed right-4 sm:right-5 z-30 font-sans print:hidden">
       {isOpen && (
-        <div className="mb-3 w-80 sm:w-96 rounded-3xl bg-white p-5 shadow-2xl border border-slate-200 animate-in slide-in-from-bottom-3 duration-200">
+        <div className="mb-3 w-[calc(100vw-2rem)] max-w-sm sm:w-96 max-h-[calc(100dvh-10rem)] overflow-y-auto rounded-3xl bg-white p-5 shadow-2xl border border-slate-200 animate-in slide-in-from-bottom-3 duration-200">
           <div className="flex items-center justify-between pb-3 border-b border-slate-100">
             <div>
               <h4 className="text-sm font-bold text-[#0a1926]">Talk to someone</h4>
@@ -82,7 +82,7 @@ export const ContactWidget: React.FC = () => {
                 </div>
               </a>
 
-              {/* Send Message / Contact Form Option */}
+              {/* Send Message / Request Callback */}
               <button
                 type="button"
                 onClick={() => setShowContactForm(true)}
@@ -188,4 +188,3 @@ export const ContactWidget: React.FC = () => {
     </div>
   );
 };
-
