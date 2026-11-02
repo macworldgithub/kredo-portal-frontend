@@ -1,7 +1,7 @@
 "use client";
 
-import React, { useState } from "react";
-import { Plus, Users, GitBranch, ArrowUpRight, TrendingUp, DollarSign, XCircle, ChevronRight } from "lucide-react";
+import React from "react";
+import { Plus, Users, GitBranch, TrendingUp, DollarSign, XCircle, ChevronRight } from "lucide-react";
 import { MasterOverviewData } from "@/lib/api";
 
 interface MasterOverviewViewProps {
@@ -11,6 +11,7 @@ interface MasterOverviewViewProps {
   onNavigateToReports: () => void;
   onNavigateToCommissions: () => void;
   onViewPartnerBook: (partnerCode: string) => void;
+  onOpenAddPartner: () => void;
 }
 
 export const MasterOverviewView: React.FC<MasterOverviewViewProps> = ({
@@ -20,6 +21,7 @@ export const MasterOverviewView: React.FC<MasterOverviewViewProps> = ({
   onNavigateToReports,
   onNavigateToCommissions,
   onViewPartnerBook,
+  onOpenAddPartner,
 }) => {
   return (
     <div className="space-y-6">
@@ -39,7 +41,7 @@ export const MasterOverviewView: React.FC<MasterOverviewViewProps> = ({
         </div>
 
         <button
-          onClick={onNavigateToPartners}
+          onClick={onOpenAddPartner}
           className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-[#0a1926] hover:bg-[#14293d] text-white font-bold text-xs shadow-md transition-colors self-start sm:self-auto cursor-pointer"
         >
           <Plus className="w-4 h-4" />
@@ -118,7 +120,7 @@ export const MasterOverviewView: React.FC<MasterOverviewViewProps> = ({
           </div>
         </div>
 
-        {/* Card 4: CLOSED LOST (Section 4.2: Closed Lost tile on master view) */}
+        {/* Card 4: CLOSED LOST */}
         <div
           onClick={() => onNavigateToPipeline("Closed Lost")}
           className="bg-white border border-rose-100 rounded-2xl p-5 relative overflow-hidden shadow-2xs hover:shadow-md transition-all cursor-pointer group"
@@ -167,7 +169,7 @@ export const MasterOverviewView: React.FC<MasterOverviewViewProps> = ({
         </div>
       </div>
 
-      {/* Top Partners section (Section 4.3: Clicking a partner tile opens that partner's deals with filter and search) */}
+      {/* Top Partners section */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
         <div className="lg:col-span-6 bg-white rounded-2xl border border-slate-200/90 p-6 shadow-2xs">
           <div className="flex items-center justify-between mb-4">
@@ -177,7 +179,7 @@ export const MasterOverviewView: React.FC<MasterOverviewViewProps> = ({
             </div>
             <button
               onClick={onNavigateToPartners}
-              className="text-xs font-bold text-sky-700 hover:underline"
+              className="text-xs font-bold text-sky-700 hover:underline cursor-pointer"
             >
               All partners
             </button>
@@ -225,7 +227,7 @@ export const MasterOverviewView: React.FC<MasterOverviewViewProps> = ({
               </div>
               <button
                 onClick={() => onNavigateToPipeline()}
-                className="text-xs font-bold text-sky-700 hover:underline"
+                className="text-xs font-bold text-sky-700 hover:underline cursor-pointer"
               >
                 Master Pipeline
               </button>

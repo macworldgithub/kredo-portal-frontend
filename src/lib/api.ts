@@ -124,6 +124,9 @@ export interface PartnerDirectoryItem {
   settled: string;
   status: "Active" | "Paused";
   avatar: string;
+  phone?: string;
+  abn?: string;
+  commissionRate?: string;
 }
 
 export interface MasterReportData {

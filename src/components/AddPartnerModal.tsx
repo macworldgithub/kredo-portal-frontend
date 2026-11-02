@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import { X, ArrowRight, ChevronDown } from "lucide-react";
+import { X, ArrowRight, ChevronDown, Percent, Phone, Hash } from "lucide-react";
 
 interface AddPartnerModalProps {
   isOpen: boolean;
@@ -10,6 +10,9 @@ interface AddPartnerModalProps {
     tradingName: string;
     primaryContact: string;
     email: string;
+    phone?: string;
+    abn?: string;
+    commissionRate?: string;
     partnerType: string;
     uniqueCode: string;
   }) => Promise<void>;
@@ -23,6 +26,9 @@ export const AddPartnerModal: React.FC<AddPartnerModalProps> = ({
   const [tradingName, setTradingName] = useState("");
   const [primaryContact, setPrimaryContact] = useState("");
   const [email, setEmail] = useState("");
+  const [phone, setPhone] = useState("");
+  const [abn, setAbn] = useState("");
+  const [commissionRate, setCommissionRate] = useState("1.00%");
   const [partnerType, setPartnerType] = useState("Standard");
   const [uniqueCode, setUniqueCode] = useState("PARTNE2");
   const [submitting, setSubmitting] = useState(false);
@@ -47,6 +53,9 @@ export const AddPartnerModal: React.FC<AddPartnerModalProps> = ({
         tradingName,
         primaryContact,
         email,
+        phone: phone || "1300 4 KREDO",
+        abn: abn || "48 000 000 000",
+        commissionRate: commissionRate || "1.00%",
         partnerType,
         uniqueCode,
       });
@@ -54,6 +63,9 @@ export const AddPartnerModal: React.FC<AddPartnerModalProps> = ({
       setTradingName("");
       setPrimaryContact("");
       setEmail("");
+      setPhone("");
+      setAbn("");
+      setCommissionRate("1.00%");
     } catch (submitError) {
       setError(submitError instanceof Error ? submitError.message : "Could not create partner.");
     } finally {
@@ -81,16 +93,17 @@ export const AddPartnerModal: React.FC<AddPartnerModalProps> = ({
             Add a referral partner
           </h2>
           <p className="text-xs text-slate-500 mt-1.5">
-            Create the organisation, issue its code, and prepare the first portal invite.
+            Create the organisation, set commission structure, and send their automated welcome invite.
           </p>
         </div>
 
-        {/* Form Body strictly matching user screenshot */}
-        <form onSubmit={handleSubmit} className="space-y-4">
+        {/* Form Body */}
+        <form onSubmit={handleSubmit} className="space-y-3.5">
           {error && <p role="alert" className="rounded-lg bg-rose-50 px-3 py-2 text-xs text-rose-700">{error}</p>}
+          
           <div>
-            <label className="block text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-1.5">
-              TRADING NAME
+            <label className="block text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-1">
+              TRADING NAME *
             </label>
             <input
               type="text"
@@ -103,13 +116,13 @@ export const AddPartnerModal: React.FC<AddPartnerModalProps> = ({
                 }
               }}
               placeholder="e.g. Rowan Advisory"
-              className="w-full px-4 py-2.5 text-xs text-slate-800 border border-slate-200 rounded-xl focus:outline-hidden focus:ring-2 focus:ring-[#0a1926]/10 focus:border-[#0a1926] placeholder:text-slate-400"
+              className="w-full px-4 py-2 text-xs text-slate-800 border border-slate-200 rounded-xl focus:outline-hidden focus:ring-2 focus:ring-[#0a1926]/10 focus:border-[#0a1926] placeholder:text-slate-400"
             />
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div>
-              <label className="block text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-1.5">
+              <label className="block text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-1">
                 PRIMARY CONTACT
               </label>
               <input
@@ -117,68 +130,121 @@ export const AddPartnerModal: React.FC<AddPartnerModalProps> = ({
                 value={primaryContact}
                 onChange={(e) => setPrimaryContact(e.target.value)}
                 placeholder="Full name"
-                className="w-full px-4 py-2.5 text-xs text-slate-800 border border-slate-200 rounded-xl focus:outline-hidden focus:ring-2 focus:ring-[#0a1926]/10 focus:border-[#0a1926] placeholder:text-slate-400"
+                className="w-full px-4 py-2 text-xs text-slate-800 border border-slate-200 rounded-xl focus:outline-hidden focus:ring-2 focus:ring-[#0a1926]/10 focus:border-[#0a1926] placeholder:text-slate-400"
               />
             </div>
 
             <div>
-              <label className="block text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-1.5">
-                EMAIL
+              <label className="block text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-1">
+                EMAIL *
               </label>
               <input
                 type="email"
+                required
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="name@firm.com.au"
-                className="w-full px-4 py-2.5 text-xs text-slate-800 border border-slate-200 rounded-xl focus:outline-hidden focus:ring-2 focus:ring-[#0a1926]/10 focus:border-[#0a1926] placeholder:text-slate-400"
+                className="w-full px-4 py-2 text-xs text-slate-800 border border-slate-200 rounded-xl focus:outline-hidden focus:ring-2 focus:ring-[#0a1926]/10 focus:border-[#0a1926] placeholder:text-slate-400"
               />
             </div>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div>
-              <label className="block text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-1.5">
+              <label className="block text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-1">
+                PHONE NUMBER
+              </label>
+              <div className="relative">
+                <input
+                  type="text"
+                  value={phone}
+                  onChange={(e) => setPhone(e.target.value)}
+                  placeholder="0412 345 678"
+                  className="w-full px-4 py-2 text-xs text-slate-800 border border-slate-200 rounded-xl focus:outline-hidden focus:ring-2 focus:ring-[#0a1926]/10 focus:border-[#0a1926] placeholder:text-slate-400"
+                />
+              </div>
+            </div>
+
+            <div>
+              <label className="block text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-1">
+                ABN
+              </label>
+              <div className="relative">
+                <input
+                  type="text"
+                  value={abn}
+                  onChange={(e) => setAbn(e.target.value)}
+                  placeholder="48 192 847 219"
+                  className="w-full px-4 py-2 text-xs text-slate-800 border border-slate-200 rounded-xl focus:outline-hidden focus:ring-2 focus:ring-[#0a1926]/10 focus:border-[#0a1926] placeholder:text-slate-400"
+                />
+              </div>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div>
+              <label className="block text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-1">
+                COMMISSION STRUCTURE
+              </label>
+              <div className="relative">
+                <select
+                  value={commissionRate}
+                  onChange={(e) => setCommissionRate(e.target.value)}
+                  className="w-full px-4 py-2 text-xs text-slate-800 border border-slate-200 rounded-xl focus:outline-hidden appearance-none bg-white pr-8 font-medium"
+                >
+                  <option value="0.70%">0.70% (Standard Tier)</option>
+                  <option value="0.80%">0.80%</option>
+                  <option value="1.00%">1.00% (Default Advisory)</option>
+                  <option value="1.25%">1.25% (Growth Tier)</option>
+                  <option value="1.50%">1.50% (Hero / Elite)</option>
+                </select>
+                <ChevronDown className="w-4 h-4 text-slate-400 absolute right-3 top-2.5 pointer-events-none" />
+              </div>
+            </div>
+
+            <div>
+              <label className="block text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-1">
                 PARTNER TYPE
               </label>
               <div className="relative">
                 <select
                   value={partnerType}
                   onChange={(e) => setPartnerType(e.target.value)}
-                  className="w-full px-4 py-2.5 text-xs text-slate-800 border border-slate-200 rounded-xl focus:outline-hidden appearance-none bg-white pr-8 font-medium"
+                  className="w-full px-4 py-2 text-xs text-slate-800 border border-slate-200 rounded-xl focus:outline-hidden appearance-none bg-white pr-8 font-medium"
                 >
                   <option>Standard</option>
                   <option>Hero</option>
                   <option>Corporate</option>
                 </select>
-                <ChevronDown className="w-4 h-4 text-slate-400 absolute right-3 top-3 pointer-events-none" />
-              </div>
-            </div>
-
-            <div>
-              <label className="block text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-1.5">
-                UNIQUE CODE
-              </label>
-              <div className="flex items-center gap-2">
-                <input
-                  type="text"
-                  required
-                  value={uniqueCode}
-                  onChange={(e) => setUniqueCode(e.target.value.toUpperCase())}
-                  className="w-full px-3.5 py-2.5 text-xs font-mono font-bold text-slate-900 border border-slate-200 rounded-xl uppercase focus:outline-hidden"
-                />
-                <button
-                  type="button"
-                  onClick={handleGenerateCode}
-                  className="px-3 py-2.5 rounded-xl border border-slate-200 hover:bg-slate-50 text-slate-700 text-xs font-semibold shrink-0 cursor-pointer transition-colors"
-                >
-                  Generate
-                </button>
+                <ChevronDown className="w-4 h-4 text-slate-400 absolute right-3 top-2.5 pointer-events-none" />
               </div>
             </div>
           </div>
 
-          {/* Action buttons strictly matching user screenshot */}
-          <div className="pt-6 flex items-center justify-end gap-3">
+          <div>
+            <label className="block text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-1">
+              UNIQUE PARTNER CODE *
+            </label>
+            <div className="flex items-center gap-2">
+              <input
+                type="text"
+                required
+                value={uniqueCode}
+                onChange={(e) => setUniqueCode(e.target.value.toUpperCase())}
+                className="w-full px-3.5 py-2 text-xs font-mono font-bold text-slate-900 border border-slate-200 rounded-xl uppercase focus:outline-hidden"
+              />
+              <button
+                type="button"
+                onClick={handleGenerateCode}
+                className="px-3 py-2 rounded-xl border border-slate-200 hover:bg-slate-50 text-slate-700 text-xs font-semibold shrink-0 cursor-pointer transition-colors"
+              >
+                Generate
+              </button>
+            </div>
+          </div>
+
+          {/* Action buttons */}
+          <div className="pt-4 flex items-center justify-end gap-3">
             <button
               type="button"
               onClick={onClose}
@@ -192,7 +258,7 @@ export const AddPartnerModal: React.FC<AddPartnerModalProps> = ({
               disabled={submitting}
               className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-[#0a1926] hover:bg-[#14293d] text-white text-xs font-bold shadow-sm transition-colors cursor-pointer"
             >
-              <span>{submitting ? "Creating..." : "Create partner"}</span>
+              <span>{submitting ? "Creating & Sending Invite..." : "Create partner"}</span>
               <ArrowRight className="w-3.5 h-3.5 text-sky-400" />
             </button>
           </div>

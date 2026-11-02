@@ -207,6 +207,39 @@ export default function App() {
     }
   };
 
+  const handleUpdateDeal = async (
+    dealId: string,
+    updates: { name?: string; applicant?: string; amount?: string; type?: string },
+  ) => {
+    setApiError("");
+    try {
+      const updated = await apiRequest<Deal>(`/portal/deals/${encodeURIComponent(dealId)}`, {
+        method: "PATCH",
+        body: JSON.stringify(updates),
+      });
+      setDeals((current) => current.map((d) => (d.id === dealId ? updated : d)));
+      setPartnerDeals((current) =>
+        current.map((d) =>
+          d.id === dealId
+            ? {
+                ...d,
+                name: updated.name,
+                amountBand: updated.amount,
+                facility: updated.amount,
+                commission: updated.commission,
+              }
+            : d,
+        ),
+      );
+      setSelectedDeal(updated);
+      void loadData();
+      notify("Lead updated", `${updated.name} details have been saved.`);
+    } catch (error) {
+      setApiError(error instanceof Error ? error.message : "Could not update lead details.");
+      throw error;
+    }
+  };
+
   const handleAddDiaryNote = async (
     dealId: string,
     note: { content: string; nextSteps?: string; isInternal?: boolean },
@@ -354,7 +387,7 @@ export default function App() {
             <div className="text-xs font-bold text-white leading-tight">{toastMessage.title}</div>
             <div className="text-[11px] text-emerald-300 mt-0.5">{toastMessage.subtitle}</div>
           </div>
-          <button onClick={() => setToastMessage(null)} className="text-emerald-400 hover:text-white p-0.5">
+          <button onClick={() => setToastMessage(null)} className="text-emerald-400 hover:text-white p-0.5 cursor-pointer">
             <X className="w-3.5 h-3.5" />
           </button>
         </div>
@@ -396,7 +429,7 @@ export default function App() {
               className="mb-5 flex items-center justify-between gap-3 rounded-xl border border-rose-200 bg-rose-50 px-4 py-3 text-xs text-rose-700"
             >
               <span>{apiError}</span>
-              <button onClick={() => void loadData()} className="font-bold underline">
+              <button onClick={() => void loadData()} className="font-bold underline cursor-pointer">
                 Retry
               </button>
             </div>
@@ -490,6 +523,7 @@ export default function App() {
                     setPipelineSearchTerm(partnerCode);
                     setCurrentMasterTab("pipeline");
                   }}
+                  onOpenAddPartner={() => setIsAddPartnerOpen(true)}
                 />
               )}
               {currentMasterTab === "partners" && (
@@ -581,7 +615,7 @@ export default function App() {
               type="button"
               onClick={select}
               aria-current={active ? "page" : undefined}
-              className={`flex min-h-14 flex-col items-center justify-center gap-1 rounded-xl px-1 py-2 text-[clamp(0.5625rem,2.5vw,0.875rem)] font-semibold transition-colors ${
+              className={`flex min-h-14 flex-col items-center justify-center gap-1 rounded-xl px-1 py-2 text-[clamp(0.5625rem,2.5vw,0.875rem)] font-semibold transition-colors cursor-pointer ${
                 active ? "bg-[#0a1926] text-white" : "text-slate-500 hover:bg-slate-100"
               }`}
             >
@@ -612,6 +646,7 @@ export default function App() {
         isOpen={Boolean(selectedDeal)}
         onClose={() => setSelectedDeal(null)}
         onUpdateStatus={handleUpdateDealStatus}
+        onUpdateDeal={handleUpdateDeal}
         onAddNote={handleAddDiaryNote}
         canEdit={true}
       />
@@ -625,13 +660,16 @@ export default function App() {
               tradingName: newPartner.tradingName,
               primaryContact: newPartner.primaryContact,
               email: newPartner.email,
+              phone: newPartner.phone,
+              abn: newPartner.abn,
+              commissionRate: newPartner.commissionRate,
               partnerType: newPartner.partnerType,
               uniqueCode: newPartner.uniqueCode,
             }),
           });
           const updatedDirectory = await apiRequest<PartnerDirectoryItem[]>("/portal/master/partners");
           setPartners(updatedDirectory);
-          notify(`Partner ${created.name} created`, `Assigned code: ${created.code}`);
+          notify(`Partner ${created.name} created`, `Assigned code: ${created.code}. Welcome email sent.`);
         }}
       />
 

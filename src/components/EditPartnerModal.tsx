@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { X, Building, Mail, Phone, Tag, ShieldCheck, Check } from "lucide-react";
+import { X, Building, Mail, Phone, Tag, ShieldCheck, Check, Percent, FileText } from "lucide-react";
 import { PartnerDirectoryItem } from "@/lib/api";
 
 interface EditPartnerModalProps {
@@ -14,6 +14,8 @@ interface EditPartnerModalProps {
     partnerType: string;
     status: string;
     phone?: string;
+    abn?: string;
+    commissionRate?: string;
   }) => Promise<void>;
 }
 
@@ -25,9 +27,11 @@ export const EditPartnerModal: React.FC<EditPartnerModalProps> = ({
 }) => {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
-  const [partnerType, setPartnerType] = useState<"Hero" | "Standard">("Standard");
+  const [partnerType, setPartnerType] = useState<"Hero" | "Standard" | "Corporate">("Standard");
   const [status, setStatus] = useState<"Active" | "Paused">("Active");
   const [phone, setPhone] = useState("");
+  const [abn, setAbn] = useState("");
+  const [commissionRate, setCommissionRate] = useState("1.00%");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState("");
 
@@ -37,7 +41,9 @@ export const EditPartnerModal: React.FC<EditPartnerModalProps> = ({
       setEmail(partner.email || "");
       setPartnerType(partner.badge === "Hero" ? "Hero" : "Standard");
       setStatus(partner.status || "Active");
-      setPhone("1300 4 KREDO");
+      setPhone(partner.phone || "1300 4 KREDO");
+      setAbn(partner.abn || "48 000 000 000");
+      setCommissionRate(partner.commissionRate || "1.00%");
       setError("");
     }
   }, [partner]);
@@ -60,6 +66,8 @@ export const EditPartnerModal: React.FC<EditPartnerModalProps> = ({
         partnerType,
         status,
         phone: phone.trim(),
+        abn: abn.trim(),
+        commissionRate: commissionRate.trim(),
       });
       onClose();
     } catch (err) {
@@ -85,7 +93,7 @@ export const EditPartnerModal: React.FC<EditPartnerModalProps> = ({
               <h3 className="text-lg font-bold text-slate-900">Edit Partner Details</h3>
             </div>
             <p className="text-xs text-slate-500 mt-1">
-              Update attribution, contact details or switch status for <span className="font-mono font-bold text-slate-800">{partner.code}</span>.
+              Update partner details, ABN, and commission structure for <span className="font-mono font-bold text-slate-800">{partner.code}</span>.
             </p>
           </div>
           <button 
@@ -97,7 +105,7 @@ export const EditPartnerModal: React.FC<EditPartnerModalProps> = ({
         </div>
 
         {/* Form */}
-        <form onSubmit={handleSubmit} className="p-6 space-y-4">
+        <form onSubmit={handleSubmit} className="p-6 space-y-3.5">
           {error && (
             <p role="alert" className="rounded-lg bg-rose-50 px-3 py-2 text-xs text-rose-700 border border-rose-200">
               {error}
@@ -151,16 +159,50 @@ export const EditPartnerModal: React.FC<EditPartnerModalProps> = ({
 
           <div className="grid grid-cols-2 gap-3">
             <div>
+              <label className="block text-xs font-semibold text-slate-700 mb-1">ABN</label>
+              <div className="relative">
+                <FileText className="w-4 h-4 absolute left-3 top-3 text-slate-400" />
+                <input
+                  type="text"
+                  value={abn}
+                  onChange={(e) => setAbn(e.target.value)}
+                  placeholder="48 192 847 219"
+                  className="w-full pl-9 pr-3 py-2 text-xs border border-slate-200 rounded-lg focus:outline-hidden focus:ring-2 focus:ring-[#0a1926]/20 focus:border-[#0a1926]"
+                />
+              </div>
+            </div>
+            <div>
+              <label className="block text-xs font-semibold text-slate-700 mb-1">Commission Structure</label>
+              <div className="relative">
+                <Percent className="w-4 h-4 absolute left-3 top-3 text-slate-400" />
+                <select
+                  value={commissionRate}
+                  onChange={(e) => setCommissionRate(e.target.value)}
+                  className="w-full pl-9 pr-3 py-2 text-xs border border-slate-200 rounded-lg focus:outline-hidden focus:ring-2 focus:ring-[#0a1926]/20 bg-white"
+                >
+                  <option value="0.70%">0.70% (Standard Tier)</option>
+                  <option value="0.80%">0.80%</option>
+                  <option value="1.00%">1.00% (Default Advisory)</option>
+                  <option value="1.25%">1.25% (Growth Tier)</option>
+                  <option value="1.50%">1.50% (Hero / Elite)</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-2 gap-3">
+            <div>
               <label className="block text-xs font-semibold text-slate-700 mb-1">Tier / Badge</label>
               <div className="relative">
                 <Tag className="w-4 h-4 absolute left-3 top-3 text-slate-400" />
                 <select
                   value={partnerType}
-                  onChange={(e) => setPartnerType(e.target.value as "Hero" | "Standard")}
+                  onChange={(e) => setPartnerType(e.target.value as any)}
                   className="w-full pl-9 pr-3 py-2 text-xs border border-slate-200 rounded-lg focus:outline-hidden focus:ring-2 focus:ring-[#0a1926]/20 bg-white"
                 >
                   <option value="Standard">Standard</option>
                   <option value="Hero">Hero Tier</option>
+                  <option value="Corporate">Corporate</option>
                 </select>
               </div>
             </div>
@@ -185,14 +227,14 @@ export const EditPartnerModal: React.FC<EditPartnerModalProps> = ({
             <button
               type="button"
               onClick={onClose}
-              className="px-4 py-2 text-xs font-semibold text-slate-600 hover:bg-slate-100 rounded-xl transition-colors"
+              className="px-4 py-2 text-xs font-semibold text-slate-600 hover:bg-slate-100 rounded-xl transition-colors cursor-pointer"
             >
               Cancel
             </button>
             <button
               type="submit"
               disabled={isSubmitting}
-              className="px-5 py-2 rounded-xl bg-[#0a1926] hover:bg-[#14293d] text-white text-xs font-bold shadow-md transition-colors disabled:opacity-50 flex items-center gap-1.5"
+              className="px-5 py-2 rounded-xl bg-[#0a1926] hover:bg-[#14293d] text-white text-xs font-bold shadow-md transition-colors disabled:opacity-50 flex items-center gap-1.5 cursor-pointer"
             >
               {isSubmitting ? (
                 <span>Saving...</span>
@@ -209,4 +251,3 @@ export const EditPartnerModal: React.FC<EditPartnerModalProps> = ({
     </div>
   );
 };
-
