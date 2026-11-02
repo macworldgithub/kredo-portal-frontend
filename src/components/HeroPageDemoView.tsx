@@ -44,9 +44,9 @@ export const HeroPageDemoView: React.FC<HeroPageDemoViewProps> = ({
       {/* Main Hero Showcase */}
       <div className="bg-white rounded-3xl border border-slate-200 shadow-sm overflow-hidden">
         {/* Navigation Mockup */}
-        <div className="px-6 py-4 border-b border-slate-100 flex items-center justify-between">
+        <div className="px-6 py-2.5 border-b border-slate-100 flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <div className="w-7 h-7 rounded-lg bg-[#0a1926] text-sky-400 font-black flex items-center justify-center text-xs">
+            <div className="w-5.5 h-5.5 rounded-md bg-[#0a1926] text-sky-400 font-black flex items-center justify-center text-xs">
               K
             </div>
             <span className="font-bold tracking-tight text-slate-900 text-sm">KREDO</span>
