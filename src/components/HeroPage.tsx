@@ -278,32 +278,31 @@ export const HeroPage: React.FC<HeroPageProps> = ({
       </section>
 
       {/* Footer with official company details and 1300 4 KREDO (Section 2 & 3.1) */}
-      <footer className="bg-[#0a1926] text-white py-2 px-6 sm:px-12 border-t border-[#162f48] mt-auto">
-        <div className="max-w-6xl mx-auto flex flex-col md:flex-row items-start md:items-center justify-between gap-3">
-          <div className="space-y-2">
-            <div className="bg-white inline-block px-3 py-1 rounded-md shadow-xs">
-              <img
-                src="/logo.png"
-                alt="Kredo"
-                className="h-5 sm:h-6 w-auto max-w-[110px] object-contain"
-              />
-            </div>
-            <p className="text-[11px] text-slate-400 max-w-lg leading-relaxed">
-              KREDO PTY LTD (ACN 702 536 669) · Level 3, 66 Hunter Street, Sydney NSW 2000.
-              <br />
-              VHM Asset Finance ABN 96 661 380 150 trading as Kredo. Credit Representative 542867 is authorised under Australian Credit Licence 389328.
-            </p>
-            <div className="flex flex-wrap gap-4 text-xs font-semibold text-slate-300 pt-1">
-              <span>Phone: <a href="tel:1300457336" className="text-sky-400 hover:underline">1300 4 KREDO (1300 457 336)</a></span>
-              <span>Email: <a href="mailto:kredo@vhmpartners.com.au" className="text-sky-400 hover:underline">kredo@vhmpartners.com.au</a></span>
-            </div>
+      <footer className="bg-[#0a1926] text-white py-1.5 px-6 sm:px-10 border-t border-[#162f48] mt-auto">        <div className="max-w-6xl mx-auto flex flex-col md:flex-row items-start md:items-center justify-between gap-3">
+        <div className="space-y-1">
+          <div className="bg-white inline-block px-3 py-1 rounded-md shadow-xs">
+            <img
+              src="/logo.png"
+              alt="Kredo"
+              className="h-5 sm:h-6 w-auto max-w-[110px] object-contain"
+            />
           </div>
-
-          <div className="text-[11px] text-slate-400 space-y-1 md:text-right">
-            <div>© 2026 KREDO PTY LTD · Powered by Bele.ai</div>
-            <div className="text-[10px] text-slate-500">Australian Proprietary Company · NSW</div>
+          <p className="text-[11px] text-slate-400 max-w-lg leading-relaxed">
+            KREDO PTY LTD (ACN 702 536 669) · Level 3, 66 Hunter Street, Sydney NSW 2000.
+            <br />
+            VHM Asset Finance ABN 96 661 380 150 trading as Kredo. Credit Representative 542867 is authorised under Australian Credit Licence 389328.
+          </p>
+          <div className="flex flex-wrap gap-4 text-xs font-semibold text-slate-300 pt-1">
+            <span>Phone: <a href="tel:1300457336" className="text-sky-400 hover:underline">1300 4 KREDO (1300 457 336)</a></span>
+            <span>Email: <a href="mailto:kredo@vhmpartners.com.au" className="text-sky-400 hover:underline">kredo@vhmpartners.com.au</a></span>
           </div>
         </div>
+
+        <div className="text-[11px] text-slate-400 space-y-1 md:text-right">
+          <div>© 2026 KREDO PTY LTD · Powered by Bele.ai</div>
+          <div className="text-[10px] text-slate-500">Australian Proprietary Company · NSW</div>
+        </div>
+      </div>
       </footer>
 
       <TalkToSomeoneModal
