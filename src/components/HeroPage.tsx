@@ -49,7 +49,7 @@ export const HeroPage: React.FC<HeroPageProps> = ({
             <img
               src="/logo.png"
               alt="Kredo Business Finance"
-              className="h-6 sm:h-8 w-auto object-contain"
+              className="h-9 sm:h-11 w-auto max-w-[175px] object-contain"
             />
           </button>
         </div>
@@ -281,11 +281,11 @@ export const HeroPage: React.FC<HeroPageProps> = ({
       <footer className="bg-[#0a1926] text-white py-4 px-6 sm:px-12 border-t border-[#162f48] mt-auto">
         <div className="max-w-6xl mx-auto flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
           <div className="space-y-3">
-            <div className="bg-white inline-block px-2.5 py-1 rounded shadow-xs">
+            <div className="bg-white inline-block px-3 py-1.5 rounded-md shadow-xs">
               <img
                 src="/logo.png"
                 alt="Kredo"
-                className="h-5 sm:h-6 w-auto object-contain"
+                className="h-7 sm:h-8 w-auto max-w-[130px] object-contain"
               />
             </div>
             <p className="text-[11px] text-slate-400 max-w-lg leading-relaxed">
