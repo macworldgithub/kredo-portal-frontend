@@ -1,13 +1,13 @@
 "use client";
 
 import React, { useState } from "react";
-import { 
-  ArrowLeft, 
-  ArrowRight, 
-  CheckCircle, 
-  ShieldCheck, 
-  Clock, 
-  BookOpen, 
+import {
+  ArrowLeft,
+  ArrowRight,
+  CheckCircle,
+  ShieldCheck,
+  Clock,
+  BookOpen,
   PhoneCall,
   Check
 } from "lucide-react";
@@ -49,7 +49,7 @@ export const HeroPage: React.FC<HeroPageProps> = ({
             <img
               src="/logo.png"
               alt="Kredo Business Finance"
-              className="h-9 sm:h-10 w-auto object-contain"
+              className="h-6 sm:h-8 w-auto object-contain"
             />
           </button>
         </div>
@@ -144,7 +144,7 @@ export const HeroPage: React.FC<HeroPageProps> = ({
                   <rect x="470" y="140" width="24" height="190" rx="4" fill="#0369a1" />
                   <rect x="510" y="90" width="24" height="240" rx="4" fill="#0c4a6e" />
                   <line x1="380" y1="330" x2="550" y2="330" stroke="#cbd5e1" strokeWidth="2" />
-                  
+
                   <ellipse cx="230" cy="270" rx="75" ry="45" fill="#0a1926" opacity="0.88" />
                   <ellipse cx="230" cy="270" rx="66" ry="38" fill="#e0f2fe" opacity="0.75" />
                   <ellipse cx="370" cy="265" rx="70" ry="42" fill="#0a1926" opacity="0.88" />
@@ -285,7 +285,7 @@ export const HeroPage: React.FC<HeroPageProps> = ({
               <img
                 src="/logo.png"
                 alt="Kredo"
-                className="h-7 sm:h-8 w-auto object-contain"
+                className="h-5 sm:h-6 w-auto object-contain"
               />
             </div>
             <p className="text-[11px] text-slate-400 max-w-lg leading-relaxed">
