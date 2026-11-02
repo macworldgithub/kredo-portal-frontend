@@ -43,13 +43,13 @@ export const HeroPage: React.FC<HeroPageProps> = ({
       </div>
 
       {/* Header Bar with Official Logo */}
-      <header className="px-6 sm:px-12 py-0.5 flex items-center justify-between border-b border-slate-100 bg-white sticky top-0 z-30">
+      <header className="px-6 sm:px-12 py-1.5 flex items-center justify-between border-b border-slate-100 bg-white sticky top-0 z-30">
         <div className="flex items-center">
           <button onClick={onBackToDemo} className="cursor-pointer" title="Back to Kredo">
             <img
               src="/logo.png"
               alt="Kredo Business Finance"
-              className="h-6 sm:h-8 w-auto max-w-[140px] object-contain"
+              className="h-6 w-auto max-w-[95px] object-contain"
             />
           </button>
         </div>
@@ -278,13 +278,13 @@ export const HeroPage: React.FC<HeroPageProps> = ({
       </section>
 
       {/* Footer with official company details and 1300 4 KREDO (Section 2 & 3.1) */}
-      <footer className="bg-[#0a1926] text-white py-1.5 px-6 sm:px-10 border-t border-[#162f48] mt-auto">        <div className="max-w-6xl mx-auto flex flex-col md:flex-row items-start md:items-center justify-between gap-3">
+      <footer className="bg-[#0a1926] text-white py-4 px-6 sm:px-10 border-t border-[#162f48] mt-auto">        <div className="max-w-6xl mx-auto flex flex-col md:flex-row items-start md:items-center justify-between gap-3">
         <div className="space-y-1">
-          <div className="bg-white inline-block px-3 py-1 rounded-md shadow-xs">
+          <div className="bg-white inline-block px-2 py-0.5 rounded shadow-xs">
             <img
               src="/logo.png"
               alt="Kredo"
-              className="h-5 sm:h-6 w-auto max-w-[110px] object-contain"
+              className="h-4.5 w-auto max-w-[75px] object-contain"
             />
           </div>
           <p className="text-[11px] text-slate-400 max-w-lg leading-relaxed">
