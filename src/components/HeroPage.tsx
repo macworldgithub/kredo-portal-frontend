@@ -43,13 +43,13 @@ export const HeroPage: React.FC<HeroPageProps> = ({
       </div>
 
       {/* Header Bar with Official Logo */}
-      <header className="px-6 sm:px-12 py-1.5 flex items-center justify-between border-b border-slate-100 bg-white sticky top-0 z-30">
+      <header className="px-6 sm:px-12 py-0.5 flex items-center justify-between border-b border-slate-100 bg-white sticky top-0 z-30">
         <div className="flex items-center">
           <button onClick={onBackToDemo} className="cursor-pointer" title="Back to Kredo">
             <img
               src="/logo.png"
               alt="Kredo Business Finance"
-              className="h-9 sm:h-11 w-auto max-w-[175px] object-contain"
+              className="h-8 sm:h-10 w-auto max-w-[160px] object-contain"
             />
           </button>
         </div>
@@ -73,7 +73,7 @@ export const HeroPage: React.FC<HeroPageProps> = ({
 
           <button
             onClick={onApplyNow}
-            className="flex items-center gap-2 px-5 py-2 rounded-full bg-[#0a1926] hover:bg-[#14293d] text-white font-bold text-xs shadow-md transition-all cursor-pointer"
+            className="flex items-center gap-2 px-5 py-1.5 rounded-full bg-[#0a1926] hover:bg-[#14293d] text-white font-bold text-xs shadow-md transition-all cursor-pointer"
           >
             <span>Apply now</span>
             <ArrowRight className="w-3.5 h-3.5 text-sky-400" />
@@ -278,14 +278,14 @@ export const HeroPage: React.FC<HeroPageProps> = ({
       </section>
 
       {/* Footer with official company details and 1300 4 KREDO (Section 2 & 3.1) */}
-      <footer className="bg-[#0a1926] text-white py-4 px-6 sm:px-12 border-t border-[#162f48] mt-auto">
-        <div className="max-w-6xl mx-auto flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
-          <div className="space-y-3">
-            <div className="bg-white inline-block px-3 py-1.5 rounded-md shadow-xs">
+      <footer className="bg-[#0a1926] text-white py-2 px-6 sm:px-12 border-t border-[#162f48] mt-auto">
+        <div className="max-w-6xl mx-auto flex flex-col md:flex-row items-start md:items-center justify-between gap-3">
+          <div className="space-y-2">
+            <div className="bg-white inline-block px-3 py-1 rounded-md shadow-xs">
               <img
                 src="/logo.png"
                 alt="Kredo"
-                className="h-7 sm:h-8 w-auto max-w-[130px] object-contain"
+                className="h-6 sm:h-7 w-auto max-w-[115px] object-contain"
               />
             </div>
             <p className="text-[11px] text-slate-400 max-w-lg leading-relaxed">
