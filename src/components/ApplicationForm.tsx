@@ -1,14 +1,14 @@
 "use client";
 
 import React, { useState } from "react";
-import { 
-  ArrowLeft, 
-  ArrowRight, 
-  Check, 
-  Lock, 
-  Briefcase, 
-  User, 
-  FileCheck, 
+import {
+  ArrowLeft,
+  ArrowRight,
+  Check,
+  Lock,
+  Briefcase,
+  User,
+  FileCheck,
   Plus,
   Trash2,
   PhoneCall,
@@ -157,7 +157,9 @@ export const ApplicationForm: React.FC<ApplicationFormProps> = ({
             <img
               src="/logo.png"
               alt="Kredo Business Finance"
-              className="h-8 w-auto object-contain transition-opacity group-hover:opacity-80"
+              // className="h-8 w-auto object-contain transition-opacity group-hover:opacity-80"
+              width={140}
+              height={140}
             />
           </button>
         </div>
@@ -202,13 +204,12 @@ export const ApplicationForm: React.FC<ApplicationFormProps> = ({
               {/* Progress Milestones */}
               <div className="mt-10 space-y-6">
                 <div className="flex items-center gap-3.5">
-                  <div className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold transition-colors ${
-                    currentStep === 1 
-                      ? 'bg-white text-[#0a1926] ring-4 ring-white/20' 
-                      : currentStep > 1 
-                      ? 'bg-emerald-500 text-white' 
+                  <div className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold transition-colors ${currentStep === 1
+                    ? 'bg-white text-[#0a1926] ring-4 ring-white/20'
+                    : currentStep > 1
+                      ? 'bg-emerald-500 text-white'
                       : 'bg-[#182f48] text-slate-400'
-                  }`}>
+                    }`}>
                     {currentStep > 1 ? <Check className="w-4 h-4 stroke-[3]" /> : <Briefcase className="w-4 h-4" />}
                   </div>
                   <div>
@@ -218,13 +219,12 @@ export const ApplicationForm: React.FC<ApplicationFormProps> = ({
                 </div>
 
                 <div className="flex items-center gap-3.5">
-                  <div className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold transition-colors ${
-                    currentStep === 2 
-                      ? 'bg-white text-[#0a1926] ring-4 ring-white/20' 
-                      : currentStep > 2 
-                      ? 'bg-emerald-500 text-white' 
+                  <div className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold transition-colors ${currentStep === 2
+                    ? 'bg-white text-[#0a1926] ring-4 ring-white/20'
+                    : currentStep > 2
+                      ? 'bg-emerald-500 text-white'
                       : 'bg-[#182f48] text-slate-400'
-                  }`}>
+                    }`}>
                     {currentStep > 2 ? <Check className="w-4 h-4 stroke-[3]" /> : <User className="w-4 h-4" />}
                   </div>
                   <div>
@@ -234,11 +234,10 @@ export const ApplicationForm: React.FC<ApplicationFormProps> = ({
                 </div>
 
                 <div className="flex items-center gap-3.5">
-                  <div className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold transition-colors ${
-                    currentStep === 3 
-                      ? 'bg-white text-[#0a1926] ring-4 ring-white/20' 
-                      : 'bg-[#182f48] text-slate-400'
-                  }`}>
+                  <div className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold transition-colors ${currentStep === 3
+                    ? 'bg-white text-[#0a1926] ring-4 ring-white/20'
+                    : 'bg-[#182f48] text-slate-400'
+                    }`}>
                     <FileCheck className="w-4 h-4" />
                   </div>
                   <div>
@@ -284,7 +283,7 @@ export const ApplicationForm: React.FC<ApplicationFormProps> = ({
             ) : (
               <form onSubmit={handleNextStep} className="space-y-6">
                 {submitError && <p role="alert" className="rounded-lg bg-rose-50 px-3 py-2 text-xs text-rose-700">{submitError}</p>}
-                
+
                 {/* Step indicator header */}
                 <div className="flex items-center justify-between pb-2">
                   <div>
@@ -304,7 +303,7 @@ export const ApplicationForm: React.FC<ApplicationFormProps> = ({
 
                 {/* Progress bar line */}
                 <div className="w-full bg-slate-100 h-1 rounded-full overflow-hidden">
-                  <div 
+                  <div
                     className="bg-[#1e4868] h-full transition-all duration-300"
                     style={{ width: currentStep === 1 ? '33%' : currentStep === 2 ? '66%' : '100%' }}
                   ></div>

@@ -49,7 +49,8 @@ export const HeroPage: React.FC<HeroPageProps> = ({
             <img
               src="/logo.png"
               alt="Kredo Business Finance"
-              className="h-6 w-auto max-w-[95px] object-contain"
+              width={140}
+              height={140}
             />
           </button>
         </div>
@@ -73,7 +74,7 @@ export const HeroPage: React.FC<HeroPageProps> = ({
 
           <button
             onClick={onApplyNow}
-            className="flex items-center gap-2 px-5 py-1.5 rounded-full bg-[#0a1926] hover:bg-[#14293d] text-white font-bold text-xs shadow-md transition-all cursor-pointer"
+            className="hidden sm:flex items-center gap-2 px-5 py-1.5 rounded-full bg-[#0a1926] hover:bg-[#14293d] text-white font-bold text-xs shadow-md transition-all cursor-pointer"
           >
             <span>Apply now</span>
             <ArrowRight className="w-3.5 h-3.5 text-sky-400" />
@@ -279,12 +280,14 @@ export const HeroPage: React.FC<HeroPageProps> = ({
 
       {/* Footer with official company details and 1300 4 KREDO (Section 2 & 3.1) */}
       <footer className="bg-[#0a1926] text-white py-4 px-6 sm:px-10 border-t border-[#162f48] mt-auto">        <div className="max-w-6xl mx-auto flex flex-col md:flex-row items-start md:items-center justify-between gap-3">
-        <div className="space-y-1">
+        <div className="space-y-2">
           <div className="bg-white inline-block px-2 py-0.5 rounded shadow-xs">
             <img
               src="/logo.png"
               alt="Kredo"
-              className="h-4.5 w-auto max-w-[75px] object-contain"
+              // className="h-4.5 w-auto max-w-[75px] object-contain"
+              width={140}
+              height={140}
             />
           </div>
           <p className="text-[11px] text-slate-400 max-w-lg leading-relaxed">
@@ -293,8 +296,9 @@ export const HeroPage: React.FC<HeroPageProps> = ({
             VHM Asset Finance ABN 96 661 380 150 trading as Kredo. Credit Representative 542867 is authorised under Australian Credit Licence 389328.
           </p>
           <div className="flex flex-wrap gap-4 text-xs font-semibold text-slate-300 pt-1">
-            <span>Phone: <a href="tel:1300457336" className="text-sky-400 hover:underline">1300 4 KREDO (1300 457 336)</a></span>
-            <span>Email: <a href="mailto:kredo@vhmpartners.com.au" className="text-sky-400 hover:underline">kredo@vhmpartners.com.au</a></span>
+            <span>Phone: <a href="tel:1300457336" className="text-sky-400 hover:underline">1300 4 KREDO (1300 457 336)</a>
+              <br />
+              Email: <a href="mailto:kredo@vhmpartners.com.au" className="text-sky-400 hover:underline">kredo@vhmpartners.com.au</a></span>
           </div>
         </div>
 
