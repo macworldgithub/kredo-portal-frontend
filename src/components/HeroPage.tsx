@@ -49,7 +49,7 @@ export const HeroPage: React.FC<HeroPageProps> = ({
             <img
               src="/logo.png"
               alt="Kredo Business Finance"
-              className="h-8 sm:h-10 w-auto max-w-[160px] object-contain"
+              className="h-6 sm:h-8 w-auto max-w-[140px] object-contain"
             />
           </button>
         </div>
@@ -285,7 +285,7 @@ export const HeroPage: React.FC<HeroPageProps> = ({
               <img
                 src="/logo.png"
                 alt="Kredo"
-                className="h-6 sm:h-7 w-auto max-w-[115px] object-contain"
+                className="h-5 sm:h-6 w-auto max-w-[110px] object-contain"
               />
             </div>
             <p className="text-[11px] text-slate-400 max-w-lg leading-relaxed">
