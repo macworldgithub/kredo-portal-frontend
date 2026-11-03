@@ -68,6 +68,48 @@ export const ApplicationForm: React.FC<ApplicationFormProps> = ({
   const [tradingName, setTradingName] = useState("");
   const [abn, setAbn] = useState("");
   const [abnError, setAbnError] = useState("");
+  const [abnLoading, setAbnLoading] = useState(false);
+  const [verifiedBusiness, setVerifiedBusiness] = useState<{
+    entityName?: string;
+    entityType?: string;
+    status?: string;
+    gst?: boolean;
+  } | null>(null);
+
+  const handleVerifyAbn = async () => {
+    const cleanAbn = abn.replace(/\s/g, '');
+    if (!cleanAbn) {
+      setAbnError("Please enter an ABN to verify.");
+      return;
+    }
+    if (!isValidABN(abn)) {
+      setAbnError("Please enter a valid 11-digit Australian Business Number (ABN).");
+      return;
+    }
+
+    setAbnLoading(true);
+    setAbnError("");
+    try {
+      const response = await fetch(`https://www.abn.omnisuiteai.com/api/abn/${cleanAbn}/json`);
+      const result = await response.json();
+      if (!response.ok || !result.success) {
+        throw new Error(result?.message || "Unable to verify ABN with Australian Business Register");
+      }
+      setVerifiedBusiness({
+        entityName: result.data?.EntityName,
+        entityType: result.data?.EntityTypeName,
+        status: result.data?.AbnStatus,
+        gst: result.data?.Gst,
+      });
+      if (result.data?.EntityName && !tradingName) {
+        setTradingName(result.data.EntityName);
+      }
+    } catch (err: any) {
+      setAbnError(err.message || "ABN lookup service unavailable. You can still continue if ABN is valid.");
+    } finally {
+      setAbnLoading(false);
+    }
+  };
   const [amount, setAmount] = useState("$50,000 – $100,000");
   const [purpose, setPurpose] = useState("Cashflow assistance");
 
