@@ -16,6 +16,22 @@ import {
 } from "lucide-react";
 import { TalkToSomeoneModal } from "./TalkToSomeoneModal";
 
+/**
+ * Validates an Australian Business Number (ABN).
+ * ABN must be exactly 11 digits and pass the ATO checksum algorithm.
+ */
+function isValidABN(input: string): boolean {
+  const digits = input.replace(/\s/g, '');
+  if (!/^\d{11}$/.test(digits)) return false;
+
+  const weights = [10, 1, 3, 5, 7, 9, 11, 13, 15, 17, 19];
+  const nums = digits.split('').map(Number);
+  // Subtract 1 from the first digit per ATO algorithm
+  nums[0] -= 1;
+  const sum = nums.reduce((acc, digit, i) => acc + digit * weights[i], 0);
+  return sum % 89 === 0;
+}
+
 export interface DirectorItem {
   salutation: string;
   firstName: string;
@@ -51,6 +67,7 @@ export const ApplicationForm: React.FC<ApplicationFormProps> = ({
   // Form State - Step 1
   const [tradingName, setTradingName] = useState("");
   const [abn, setAbn] = useState("");
+  const [abnError, setAbnError] = useState("");
   const [amount, setAmount] = useState("$50,000 – $100,000");
   const [purpose, setPurpose] = useState("Cashflow assistance");
 
@@ -111,6 +128,17 @@ export const ApplicationForm: React.FC<ApplicationFormProps> = ({
     e.preventDefault();
     if (currentStep === 1) {
       if (!tradingName) return;
+      // ABN validation using ATO checksum algorithm
+      const trimmedAbn = abn.replace(/\s/g, '');
+      if (!trimmedAbn) {
+        setAbnError("ABN is required.");
+        return;
+      }
+      if (!isValidABN(abn)) {
+        setAbnError("Please enter a valid 11-digit Australian Business Number (ABN).");
+        return;
+      }
+      setAbnError("");
       setCurrentStep(2);
     } else if (currentStep === 2) {
       const first = directors[0];
@@ -347,11 +375,18 @@ export const ApplicationForm: React.FC<ApplicationFormProps> = ({
                       </label>
                       <input
                         type="text"
+                        required
                         value={abn}
-                        onChange={(e) => setAbn(e.target.value)}
+                        onChange={(e) => {
+                          setAbn(e.target.value);
+                          if (abnError) setAbnError("");
+                        }}
                         placeholder="11 digit Australian Business Number"
-                        className="w-full px-4 py-2.5 text-xs text-slate-900 border border-slate-200 rounded-xl focus:outline-hidden focus:ring-2 focus:ring-[#0a1926]/10 focus:border-[#0a1926] placeholder:text-slate-400"
+                        className={`w-full px-4 py-2.5 text-xs text-slate-900 border rounded-xl focus:outline-hidden focus:ring-2 focus:ring-[#0a1926]/10 focus:border-[#0a1926] placeholder:text-slate-400 ${abnError ? "border-rose-400 bg-rose-50/50" : "border-slate-200"}`}
                       />
+                      {abnError && (
+                        <p className="mt-1 text-[11px] text-rose-600 font-medium">{abnError}</p>
+                      )}
                     </div>
 
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">

@@ -13,6 +13,9 @@ interface AddPartnerModalProps {
     phone?: string;
     abn?: string;
     commissionRate?: string;
+    bankAccount?: string;
+    bsb?: string;
+    accountName?: string;
     partnerType: string;
     uniqueCode: string;
   }) => Promise<void>;
@@ -29,6 +32,9 @@ export const AddPartnerModal: React.FC<AddPartnerModalProps> = ({
   const [phone, setPhone] = useState("");
   const [abn, setAbn] = useState("");
   const [commissionRate, setCommissionRate] = useState("1.00%");
+  const [bankAccountName, setBankAccountName] = useState("");
+  const [bankBsb, setBankBsb] = useState("");
+  const [bankAccountNumber, setBankAccountNumber] = useState("");
   const [partnerType, setPartnerType] = useState("Standard");
   const [uniqueCode, setUniqueCode] = useState("PARTNE2");
   const [submitting, setSubmitting] = useState(false);
@@ -56,6 +62,9 @@ export const AddPartnerModal: React.FC<AddPartnerModalProps> = ({
         phone: phone || "1300 4 KREDO",
         abn: abn || "48 000 000 000",
         commissionRate: commissionRate || "1.00%",
+        bankAccount: bankAccountNumber || "",
+        bsb: bankBsb || "",
+        accountName: bankAccountName || "",
         partnerType,
         uniqueCode,
       });
@@ -66,6 +75,9 @@ export const AddPartnerModal: React.FC<AddPartnerModalProps> = ({
       setPhone("");
       setAbn("");
       setCommissionRate("1.00%");
+      setBankAccountName("");
+      setBankBsb("");
+      setBankAccountNumber("");
     } catch (submitError) {
       setError(submitError instanceof Error ? submitError.message : "Could not create partner.");
     } finally {
@@ -76,7 +88,7 @@ export const AddPartnerModal: React.FC<AddPartnerModalProps> = ({
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs animate-in fade-in duration-150">
       <div 
-        className="bg-white rounded-3xl shadow-2xl border border-slate-200/90 max-w-lg w-full p-8 relative overflow-hidden"
+        className="bg-white rounded-3xl shadow-2xl border border-slate-200/90 max-w-lg w-full p-8 max-h-[90vh] overflow-y-auto relative"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Close Button top right */}
@@ -217,6 +229,53 @@ export const AddPartnerModal: React.FC<AddPartnerModalProps> = ({
                   <option>Corporate</option>
                 </select>
                 <ChevronDown className="w-4 h-4 text-slate-400 absolute right-3 top-2.5 pointer-events-none" />
+              </div>
+            </div>
+          </div>
+
+          {/* Bank Details for Commission Payments */}
+          <div className="pt-2 mt-1 border-t border-slate-100">
+            <p className="text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-2">
+              COMMISSION BANK DETAILS
+            </p>
+            <div className="space-y-3">
+              <div>
+                <label className="block text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-1">
+                  ACCOUNT NAME
+                </label>
+                <input
+                  type="text"
+                  value={bankAccountName}
+                  onChange={(e) => setBankAccountName(e.target.value)}
+                  placeholder="e.g. Rowan Advisory Pty Ltd"
+                  className="w-full px-4 py-2 text-xs text-slate-800 border border-slate-200 rounded-xl focus:outline-hidden focus:ring-2 focus:ring-[#0a1926]/10 focus:border-[#0a1926] placeholder:text-slate-400"
+                />
+              </div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-1">
+                    BSB
+                  </label>
+                  <input
+                    type="text"
+                    value={bankBsb}
+                    onChange={(e) => setBankBsb(e.target.value)}
+                    placeholder="e.g. 062-000"
+                    className="w-full px-4 py-2 text-xs text-slate-800 border border-slate-200 rounded-xl focus:outline-hidden focus:ring-2 focus:ring-[#0a1926]/10 focus:border-[#0a1926] placeholder:text-slate-400"
+                  />
+                </div>
+                <div>
+                  <label className="block text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-1">
+                    ACCOUNT NUMBER
+                  </label>
+                  <input
+                    type="text"
+                    value={bankAccountNumber}
+                    onChange={(e) => setBankAccountNumber(e.target.value)}
+                    placeholder="e.g. 1098 4421"
+                    className="w-full px-4 py-2 text-xs text-slate-800 border border-slate-200 rounded-xl focus:outline-hidden focus:ring-2 focus:ring-[#0a1926]/10 focus:border-[#0a1926] placeholder:text-slate-400"
+                  />
+                </div>
               </div>
             </div>
           </div>

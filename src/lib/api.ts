@@ -127,6 +127,9 @@ export interface PartnerDirectoryItem {
   phone?: string;
   abn?: string;
   commissionRate?: string;
+  bankAccount?: string;
+  bsb?: string;
+  accountName?: string;
 }
 
 export interface MasterReportData {

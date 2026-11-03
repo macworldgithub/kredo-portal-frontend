@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { X, Building, Mail, Phone, Tag, ShieldCheck, Check, Percent, FileText } from "lucide-react";
+import { X, Building, Mail, Phone, Tag, ShieldCheck, Check, Percent, FileText, Hash } from "lucide-react";
 import { PartnerDirectoryItem } from "@/lib/api";
 
 interface EditPartnerModalProps {
@@ -16,6 +16,9 @@ interface EditPartnerModalProps {
     phone?: string;
     abn?: string;
     commissionRate?: string;
+    bankAccount?: string;
+    bsb?: string;
+    accountName?: string;
   }) => Promise<void>;
 }
 
@@ -32,6 +35,9 @@ export const EditPartnerModal: React.FC<EditPartnerModalProps> = ({
   const [phone, setPhone] = useState("");
   const [abn, setAbn] = useState("");
   const [commissionRate, setCommissionRate] = useState("1.00%");
+  const [bankAccountName, setBankAccountName] = useState("");
+  const [bankBsb, setBankBsb] = useState("");
+  const [bankAccountNumber, setBankAccountNumber] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState("");
 
@@ -44,6 +50,9 @@ export const EditPartnerModal: React.FC<EditPartnerModalProps> = ({
       setPhone(partner.phone || "1300 4 KREDO");
       setAbn(partner.abn || "48 000 000 000");
       setCommissionRate(partner.commissionRate || "1.00%");
+      setBankAccountName(partner.accountName || "");
+      setBankBsb(partner.bsb || "");
+      setBankAccountNumber(partner.bankAccount || "");
       setError("");
     }
   }, [partner]);
@@ -68,6 +77,9 @@ export const EditPartnerModal: React.FC<EditPartnerModalProps> = ({
         phone: phone.trim(),
         abn: abn.trim(),
         commissionRate: commissionRate.trim(),
+        bankAccount: bankAccountNumber.trim(),
+        bsb: bankBsb.trim(),
+        accountName: bankAccountName.trim(),
       });
       onClose();
     } catch (err) {
@@ -80,7 +92,7 @@ export const EditPartnerModal: React.FC<EditPartnerModalProps> = ({
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs animate-in fade-in duration-150">
       <div 
-        className="bg-white rounded-2xl shadow-2xl border border-slate-200 max-w-lg w-full overflow-hidden transition-all transform scale-100"
+        className="bg-white rounded-2xl shadow-2xl border border-slate-200 max-w-lg w-full overflow-hidden max-h-[90vh] overflow-y-auto transition-all transform scale-100"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
@@ -219,6 +231,54 @@ export const EditPartnerModal: React.FC<EditPartnerModalProps> = ({
                   <option value="Active">Active</option>
                   <option value="Paused">Paused</option>
                 </select>
+              </div>
+            </div>
+          </div>
+
+          {/* Bank Details for Commission Payments */}
+          <div className="pt-2 mt-1 border-t border-slate-100">
+            <p className="text-xs font-semibold text-slate-700 mb-2">Commission Bank Details</p>
+            <div className="space-y-3">
+              <div>
+                <label className="block text-xs font-semibold text-slate-700 mb-1">Account Name</label>
+                <div className="relative">
+                  <Building className="w-4 h-4 absolute left-3 top-3 text-slate-400" />
+                  <input
+                    type="text"
+                    value={bankAccountName}
+                    onChange={(e) => setBankAccountName(e.target.value)}
+                    placeholder="e.g. Hayes Partners Pty Ltd"
+                    className="w-full pl-9 pr-3 py-2 text-xs border border-slate-200 rounded-lg focus:outline-hidden focus:ring-2 focus:ring-[#0a1926]/20 focus:border-[#0a1926]"
+                  />
+                </div>
+              </div>
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-xs font-semibold text-slate-700 mb-1">BSB</label>
+                  <div className="relative">
+                    <Hash className="w-4 h-4 absolute left-3 top-3 text-slate-400" />
+                    <input
+                      type="text"
+                      value={bankBsb}
+                      onChange={(e) => setBankBsb(e.target.value)}
+                      placeholder="e.g. 062-000"
+                      className="w-full pl-9 pr-3 py-2 text-xs border border-slate-200 rounded-lg focus:outline-hidden focus:ring-2 focus:ring-[#0a1926]/20 focus:border-[#0a1926]"
+                    />
+                  </div>
+                </div>
+                <div>
+                  <label className="block text-xs font-semibold text-slate-700 mb-1">Account Number</label>
+                  <div className="relative">
+                    <Hash className="w-4 h-4 absolute left-3 top-3 text-slate-400" />
+                    <input
+                      type="text"
+                      value={bankAccountNumber}
+                      onChange={(e) => setBankAccountNumber(e.target.value)}
+                      placeholder="e.g. 1098 4421"
+                      className="w-full pl-9 pr-3 py-2 text-xs border border-slate-200 rounded-lg focus:outline-hidden focus:ring-2 focus:ring-[#0a1926]/20 focus:border-[#0a1926]"
+                    />
+                  </div>
+                </div>
               </div>
             </div>
           </div>
