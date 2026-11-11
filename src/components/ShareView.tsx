@@ -196,8 +196,8 @@ export const ShareView: React.FC<ShareViewProps> = ({
 
             <div className="p-4 bg-slate-50/80 rounded-xl border border-slate-200/80 flex items-center justify-between mt-3">
               <div>
-                <div className="text-xs font-bold text-slate-900">Daily digest</div>
-                <div className="text-[11px] text-slate-500">One summary at 4:30pm AEST</div>
+                <div className="text-xs font-bold text-slate-900">Status update emails</div>
+                <div className="text-[11px] text-slate-500">An email whenever an application changes stage</div>
               </div>
 
               {/* Toggle switch */}

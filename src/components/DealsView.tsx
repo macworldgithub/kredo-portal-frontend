@@ -1,12 +1,12 @@
 "use client";
 
 import React, { useState } from "react";
-import { Search, ChevronDown, Download, ChevronRight, XCircle, FileText, CheckCircle2 } from "lucide-react";
-import { Deal } from "@/lib/api";
+import { Search, Download, ChevronRight, XCircle } from "lucide-react";
+import { PartnerDeal } from "@/data/netlifyData";
 
 interface DealsViewProps {
-  deals: any[];
-  onSelectDeal: (deal: any) => void;
+  deals: PartnerDeal[];
+  onSelectDeal: (deal: PartnerDeal) => void;
   initialStageFilter?: string;
 }
 
@@ -93,7 +93,7 @@ export const DealsView: React.FC<DealsViewProps> = ({
 
   const exportCsv = () => {
     const rows = [
-      "ID,BUSINESS,APPLICANT,SUBMITTED,STAGE,AMOUNT,COMMISSION,LOST REASON",
+      "ID,BUSINESS,APPLICANT,SUBMITTED,STAGE,AMOUNT,LOST REASON",
       ...filteredDeals.map((d) =>
         [
           d.id,
@@ -102,7 +102,6 @@ export const DealsView: React.FC<DealsViewProps> = ({
           d.submitted || "",
           d.stage || "",
           d.facility || d.amountBand || "",
-          d.commission || "",
           d.lostReason || "",
         ]
           .map((v) => `"${String(v).replaceAll('"', '""')}"`)
@@ -232,14 +231,13 @@ export const DealsView: React.FC<DealsViewProps> = ({
                 <th className="py-3.5 px-4">Submitted</th>
                 <th className="py-3.5 px-4">Stage</th>
                 <th className="py-3.5 px-4">Facility Amount</th>
-                <th className="py-3.5 px-4">Commission</th>
                 <th className="py-3.5 px-4 text-right">Details</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100 text-xs">
               {filteredDeals.length === 0 ? (
                 <tr>
-                  <td colSpan={7} className="py-12 text-center text-slate-400">
+                  <td colSpan={6} className="py-12 text-center text-slate-400">
                     No deals match the selected criteria.
                   </td>
                 </tr>
@@ -269,10 +267,6 @@ export const DealsView: React.FC<DealsViewProps> = ({
                       </span>
                     </td>
                     <td className="py-3.5 px-4 font-bold text-slate-800">{deal.facility || deal.amountBand}</td>
-                    <td className="py-3.5 px-4">
-                      <div className="font-bold text-emerald-700">{deal.commission}</div>
-                      <div className="text-[10px] text-slate-400 uppercase font-semibold">{deal.commissionStatus}</div>
-                    </td>
                     <td className="py-3.5 px-4 text-right">
                       <div className="inline-flex items-center gap-1 text-[11px] font-bold text-[#0a1926] group-hover:text-sky-700 transition-colors">
                         <span>Inspect</span>

@@ -5,6 +5,7 @@ import { X, Copy, Check, Send, Sparkles, Building, User, DollarSign, Mail, Phone
 import { Deal } from "@/lib/api";
 
 interface ShareReferralModalProps {
+  initialTab?: "link" | "direct";
   isOpen: boolean;
   onClose: () => void;
   referralCode: string;
@@ -21,13 +22,14 @@ interface ShareReferralModalProps {
 }
 
 export const ShareReferralModal: React.FC<ShareReferralModalProps> = ({
+  initialTab = "link",
   isOpen,
   onClose,
   referralCode,
   referralLink,
   onCreateReferral
 }) => {
-  const [activeTab, setActiveTab] = useState<'link' | 'direct'>('link');
+  const [activeTab, setActiveTab] = useState<'link' | 'direct'>(initialTab);
   const [copiedLink, setCopiedLink] = useState(false);
   const [copiedCode, setCopiedCode] = useState(false);
 
@@ -189,7 +191,7 @@ export const ShareReferralModal: React.FC<ShareReferralModalProps> = ({
               </div>
 
               <div className="p-3.5 rounded-xl bg-amber-50/80 border border-amber-200/60 text-xs text-amber-900 leading-relaxed">
-                <span className="font-semibold">Commission rule:</span> Commercial loans originating with your tag guarantee a 0.70% – 1.00% trail settlement commission paid upon funding.
+                <span>Your referral code links this client to your business for progress tracking.</span>
               </div>
             </div>
           ) : (

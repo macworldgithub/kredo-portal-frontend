@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { Download, TrendingUp, CheckCircle, FileText, Briefcase } from "lucide-react";
+import { Download, TrendingUp, CheckCircle, Briefcase } from "lucide-react";
 import { Deal } from "@/lib/api";
 
 interface SalesReportingViewProps {
@@ -27,7 +27,7 @@ export const SalesReportingView: React.FC<SalesReportingViewProps> = ({ deals })
   );
 
   const totalSettledAmount = settledDeals.reduce(
-    (sum, d) => sum + parseAmount(d.amount),
+    (sum, d) => sum + (d.financedAmount ?? parseAmount(d.amount)),
     0
   );
   const convertedAccounts = settledDeals.length;
@@ -46,13 +46,14 @@ export const SalesReportingView: React.FC<SalesReportingViewProps> = ({ deals })
 
   const exportSalesCsv = () => {
     const csv = [
-      "DEAL ID,BUSINESS NAME,DIRECTOR,FACILITY AMOUNT,TYPE,STATUS,SUBMITTED DATE",
+      "DEAL ID,BUSINESS NAME,DIRECTOR,FACILITY AMOUNT,AMOUNT FINANCED,TYPE,STATUS,SUBMITTED DATE",
       ...deals.map((item) =>
         [
           item.id,
           item.name,
           item.applicant,
           item.amount,
+          item.status === "Settled" ? formatCurrency(item.financedAmount ?? parseAmount(item.amount)) : "",
           item.type,
           item.status,
           item.submittedDate,
@@ -205,6 +206,7 @@ export const SalesReportingView: React.FC<SalesReportingViewProps> = ({ deals })
                 <th className="py-3.5 px-6">BUSINESS / CLIENT</th>
                 <th className="py-3.5 px-4">DIRECTOR</th>
                 <th className="py-3.5 px-4 text-center">FACILITY AMOUNT</th>
+                <th className="py-3.5 px-4 text-center">AMOUNT FINANCED</th>
                 <th className="py-3.5 px-4">TYPE</th>
                 <th className="py-3.5 px-6 text-center">STAGE</th>
                 <th className="py-3.5 px-6 text-right">DATE</th>
@@ -213,7 +215,7 @@ export const SalesReportingView: React.FC<SalesReportingViewProps> = ({ deals })
             <tbody className="divide-y divide-slate-100">
               {deals.length === 0 ? (
                 <tr>
-                  <td colSpan={6} className="py-8 text-center text-slate-400">
+                  <td colSpan={7} className="py-8 text-center text-slate-400">
                     No referrals recorded yet.
                   </td>
                 </tr>
@@ -230,6 +232,7 @@ export const SalesReportingView: React.FC<SalesReportingViewProps> = ({ deals })
                     <td className="py-4 px-4 text-center font-bold text-slate-900">
                       {row.amount}
                     </td>
+                    <td className="py-4 px-4 text-center">{row.status === "Settled" ? formatCurrency(row.financedAmount ?? parseAmount(row.amount)) : "-"}</td>
                     <td className="py-4 px-4 text-slate-600 font-medium">
                       {row.type}
                     </td>

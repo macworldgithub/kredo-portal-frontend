@@ -1,11 +1,12 @@
 export interface PartnerDeal {
+  applicant?: string;
   id: string;
   name: string;
   submitted: string;
   stage: 'Lead received' | 'Customer invited' | 'Application submitted' | 'Waiting on customer' | 'Application received' | 'In assessment' | 'Approved' | 'Docs / settlement' | 'Settled' | 'Declined' | 'Closed Lost' | 'Declined / withdrawn';
   amountBand: string;
-  commission: string;
-  commissionStatus: 'est.' | 'confirmed' | 'paid';
+  commission?: string;
+  commissionStatus?: 'est.' | 'confirmed' | 'paid';
   rule?: string;
   facility?: string;
   partner?: string;

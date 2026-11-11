@@ -5,7 +5,6 @@ import { Sidebar, PartnerNavTab, MasterNavTab } from "@/components/Sidebar";
 import { Header } from "@/components/Header";
 import { HomeView } from "@/components/HomeView";
 import { DealsView } from "@/components/DealsView";
-import { CommissionsView } from "@/components/CommissionsView";
 import { SalesReportingView } from "@/components/SalesReportingView";
 import { ShareView } from "@/components/ShareView";
 import { HeroPage } from "@/components/HeroPage";
@@ -21,8 +20,8 @@ import { DealDetailModal } from "@/components/DealDetailModal";
 import { AddPartnerModal } from "@/components/AddPartnerModal";
 import { LoginView } from "@/components/LoginView";
 import { ContactWidget } from "@/components/ContactWidget";
-import { BarChart3, Briefcase, Check, Home, Percent, QrCode, Users, GitBranch, X, TrendingUp } from "lucide-react";
-import { PartnerProfile, CommissionItem } from "@/data/mockData";
+import { BarChart3, Briefcase, Check, Home, QrCode, Users, GitBranch, X, TrendingUp } from "lucide-react";
+import { PartnerProfile } from "@/data/mockData";
 import { PartnerDeal } from "@/data/netlifyData";
 import {
   apiRequest,
@@ -50,6 +49,7 @@ function settingsPayload(partner: PartnerProfile) {
     bsb: partner.bsb,
     abn: partner.abn,
     notificationsEnabled: partner.notificationsEnabled,
+    statusUpdateAlerts: partner.statusUpdateAlerts,
     settlementAlerts: partner.settlementAlerts,
     marketingEmails: partner.marketingEmails,
   };
@@ -64,6 +64,7 @@ export default function App() {
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
   const [activeFlow, setActiveFlow] = useState<"dashboard" | "hero-page" | "apply-form">("dashboard");
   const [toastMessage, setToastMessage] = useState<{ title: string; subtitle: string } | null>(null);
+  const [shareModalTab, setShareModalTab] = useState<"link" | "direct">("link");
   const [isShareModalOpen, setIsShareModalOpen] = useState(false);
   const [isAddPartnerOpen, setIsAddPartnerOpen] = useState(false);
   const [selectedDeal, setSelectedDeal] = useState<Deal | null>(null);
@@ -71,7 +72,6 @@ export default function App() {
   const [dashboardStats, setDashboardStats] = useState<DashboardData["stats"] | null>(null);
   const [deals, setDeals] = useState<Deal[]>([]);
   const [partnerDeals, setPartnerDeals] = useState<PartnerDeal[]>([]);
-  const [commissions, setCommissions] = useState<CommissionItem[]>([]);
   const [masterCommissions, setMasterCommissions] = useState<ApiCommission[]>([]);
   const [masterOverview, setMasterOverview] = useState<MasterOverviewData | null>(null);
   const [masterPipeline, setMasterPipeline] = useState<MasterPipelineDeal[]>([]);
@@ -89,6 +89,8 @@ export default function App() {
   const [loading, setLoading] = useState(false);
   const [apiError, setApiError] = useState("");
 
+  const [now, setNow] = useState(0);
+
   const canSwitchPerspective = user?.role === "master";
 
   useEffect(() => {
@@ -101,25 +103,25 @@ export default function App() {
       } else {
         clearAccessToken();
       }
+      setNow(Date.now());
       setAuthReady(true);
     });
   }, []);
 
-  const loadData = useCallback(async () => {
+  const loadData = useCallback(async (background = false) => {
     if (!user) return;
-    setLoading(true);
+    if (!background) setLoading(true);
     setApiError("");
     try {
       const [dashboard, allDeals, commissionRows] = await Promise.all([
         apiRequest<DashboardData>("/portal/dashboard"),
         apiRequest<PartnerDeal[]>("/portal/deals"),
-        apiRequest<ApiCommission[]>("/portal/commissions"),
+        user.role === "master" ? apiRequest<ApiCommission[]>("/portal/commissions") : Promise.resolve([]),
       ]);
       setPartner(dashboard.partner);
       setDashboardStats(dashboard.stats);
       setDeals(dashboard.deals);
       setPartnerDeals(allDeals);
-      setCommissions(commissionRows);
       if (user.role === "master") {
         const [overview, pipeline, stageCounts, partnerRows, reports, preferences] = await Promise.all([
           apiRequest<MasterOverviewData>("/portal/master/overview"),
@@ -145,8 +147,17 @@ export default function App() {
   }, [user]);
 
   useEffect(() => {
-    if (authReady && user) void Promise.resolve().then(loadData);
+    if (authReady && user) void Promise.resolve().then(() => loadData());
   }, [authReady, user, loadData]);
+
+  useEffect(() => {
+    if (!user) return;
+    const timer = window.setInterval(() => {
+      setNow(Date.now());
+      void loadData(true);
+    }, 30000);
+    return () => window.clearInterval(timer);
+  }, [user, loadData]);
 
   const notify = (title: string, subtitle: string) => {
     setToastMessage({ title, subtitle });
@@ -160,7 +171,7 @@ export default function App() {
     setDashboardStats(null);
     setDeals([]);
     setPartnerDeals([]);
-    setCommissions([]);
+    setMasterCommissions([]);
     setMasterOverview(null);
     setMasterPipeline([]);
     setPartners([]);
@@ -183,7 +194,11 @@ export default function App() {
     setApiError("");
     try {
       const detail = await apiRequest<Deal>(`/portal/deals/${encodeURIComponent(dealId)}`);
-      setSelectedDeal(detail);
+      if (perspective === "partner" && user?.role === "partner" && detail.statusUpdatedAt) {
+        const seen = await apiRequest<Deal>(`/portal/deals/${encodeURIComponent(dealId)}/status-seen`, { method: "PATCH" });
+        setSelectedDeal(seen);
+        setDeals((current) => current.map((deal) => deal.id === dealId ? seen : deal));
+      } else setSelectedDeal(detail);
     } catch (error) {
       setApiError(error instanceof Error ? error.message : "Could not load deal.");
     }
@@ -210,7 +225,7 @@ export default function App() {
 
   const handleUpdateDeal = async (
     dealId: string,
-    updates: { name?: string; applicant?: string; amount?: string; type?: string },
+    updates: { name?: string; applicant?: string; amount?: string; type?: string; lender?: string; financedAmount?: number },
   ) => {
     setApiError("");
     try {
@@ -243,7 +258,7 @@ export default function App() {
 
   const handleAddDiaryNote = async (
     dealId: string,
-    note: { content: string; nextSteps?: string; isInternal?: boolean },
+    note: { content: string; nextSteps?: string; isInternal?: boolean; author?: string },
   ) => {
     setApiError("");
     try {
@@ -256,6 +271,7 @@ export default function App() {
       notify("Diary note added", "New note saved to audit trail.");
     } catch (error) {
       setApiError(error instanceof Error ? error.message : "Could not save diary note.");
+      throw error;
     }
   };
 
@@ -276,7 +292,7 @@ export default function App() {
     }
   };
 
-  const handleUpdatePartner = async (code: string, updates: any) => {
+  const handleUpdatePartner = async (code: string, updates: Partial<PartnerDirectoryItem>) => {
     setApiError("");
     try {
       await apiRequest(`/portal/master/partners/${encodeURIComponent(code)}`, {
@@ -422,7 +438,7 @@ export default function App() {
           onOpenMobileSidebar={() => setMobileSidebarOpen(true)}
           onLogout={logout}
           canSwitchPerspective={canSwitchPerspective}
-          onSubmitReferral={() => setActiveFlow("apply-form")}
+          onSubmitReferral={() => { setShareModalTab("direct"); setIsShareModalOpen(true); }}
         />
         <main className="flex-1 p-4 sm:p-6 lg:p-8 max-w-7xl w-full mx-auto pb-40 lg:pb-8">
           {apiError && (
@@ -435,6 +451,26 @@ export default function App() {
                 Retry
               </button>
             </div>
+          )}
+          {perspective === "partner" && deals.some((deal) => deal.statusUpdatedAt && deal.statusUpdatedAt !== deal.statusSeenAt) && (
+            <section aria-label="Application status updates" className="mb-5 rounded-xl border border-sky-200 bg-sky-50 p-4">
+              <h2 className="text-sm font-bold text-sky-950">Application status updates</h2>
+              {deals.filter((deal) => deal.statusUpdatedAt && deal.statusUpdatedAt !== deal.statusSeenAt).map((deal) => (
+                <button key={deal.id} onClick={() => void selectDeal(deal.id)} className="mt-2 block text-left text-xs text-sky-900 underline">
+                  {deal.name}: {deal.status} - review update
+                </button>
+              ))}
+            </section>
+          )}
+          {perspective === "master" && masterPipeline.some((deal) => deal.followUpReminders?.some((reminder) => !reminder.completed && new Date(reminder.dueAt || `${reminder.dueDate}T${reminder.dueTime || "00:00"}`).getTime() <= now)) && (
+            <section aria-label="Due follow-up reminders" className="mb-5 rounded-xl border border-amber-200 bg-amber-50 p-4">
+              <h2 className="text-sm font-bold text-amber-950">Follow-ups due</h2>
+              {masterPipeline.flatMap((deal) => (deal.followUpReminders || []).filter((reminder) => !reminder.completed && new Date(reminder.dueAt || `${reminder.dueDate}T${reminder.dueTime || "00:00"}`).getTime() <= now).map((reminder) => (
+                <button key={`${deal.id}-${reminder.id}`} onClick={() => void selectDeal(deal.id)} className="mt-2 block text-left text-xs text-amber-950 underline">
+                  {deal.name} - {reminder.author}, {reminder.dueDate} at {reminder.dueTime || "00:00"}: {reminder.comment}
+                </button>
+              )))}
+            </section>
           )}
           {loading && <p className="mb-4 text-xs text-slate-500">Refreshing workspace data...</p>}
 
@@ -453,8 +489,8 @@ export default function App() {
                       estimatedCommission: "$0",
                     }
                   }
-                  onOpenShareModal={() => setIsShareModalOpen(true)}
-                  onSelectDeal={setSelectedDeal}
+                  onOpenShareModal={() => { setShareModalTab("link"); setIsShareModalOpen(true); }}
+                  onSelectDeal={(deal) => void selectDeal(deal.id)}
                   onNavigateToDeals={(filter) => {
                     if (filter) setInitialDealsStageFilter(filter);
                     setCurrentPartnerTab("deals");
@@ -482,11 +518,11 @@ export default function App() {
                   onOpenHeroDemo={() => setActiveFlow("hero-page")}
                   referralCode={partner.code}
                   referralLink={partner.referralLink}
-                  dailyDigest={partner.notificationsEnabled}
+                  dailyDigest={partner.statusUpdateAlerts ?? partner.notificationsEnabled}
                   onToggleDailyDigest={async (enabled) => {
                     const saved = await apiRequest<PartnerProfile>("/portal/settings", {
                       method: "PATCH",
-                      body: JSON.stringify(settingsPayload({ ...partner, notificationsEnabled: enabled })),
+                      body: JSON.stringify(settingsPayload({ ...partner, notificationsEnabled: enabled, statusUpdateAlerts: enabled })),
                     });
                     setPartner(saved);
                   }}
@@ -633,6 +669,8 @@ export default function App() {
       </div>
 
       <ShareReferralModal
+        key={`${isShareModalOpen}-${shareModalTab}`}
+        initialTab={shareModalTab}
         isOpen={isShareModalOpen}
         onClose={() => setIsShareModalOpen(false)}
         referralCode={partner.code}
@@ -648,12 +686,20 @@ export default function App() {
         }}
       />
       <DealDetailModal
+        key={selectedDeal?.id || "closed"}
         deal={selectedDeal}
         isOpen={Boolean(selectedDeal)}
         onClose={() => setSelectedDeal(null)}
         onUpdateStatus={handleUpdateDealStatus}
         onUpdateDeal={handleUpdateDeal}
         onAddNote={handleAddDiaryNote}
+        onUpdateNote={async (dealId, noteId, note) => {
+          const updated = await apiRequest<Deal>(`/portal/deals/${encodeURIComponent(dealId)}/notes/${encodeURIComponent(noteId)}`, {
+            method: "PATCH", body: JSON.stringify(note),
+          });
+          setSelectedDeal(updated);
+          await loadData();
+        }}
         onAddReminder={async (dealId, reminder) => {
           const updated = await apiRequest<Deal>(`/portal/deals/${encodeURIComponent(dealId)}/reminders`, {
             method: "POST",
@@ -673,6 +719,7 @@ export default function App() {
           notify("Follow-up updated", completed ? "Follow-up marked completed." : "Follow-up marked active.");
         }}
         canEdit={true}
+        canManage={perspective === "master" && user.role === "master"}
       />
       <AddPartnerModal
         isOpen={isAddPartnerOpen}

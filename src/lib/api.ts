@@ -27,6 +27,7 @@ export interface FollowUpReminder {
   comment: string;
   dueDate: string;
   dueTime?: string;
+  dueAt?: string;
   completed: boolean;
   createdAt: string;
 }
@@ -51,12 +52,14 @@ export interface Deal {
     | "Application received"
     | "Declined / withdrawn";
   lastActivity: string;
-  commission: string;
-  commissionStatus: "Estimated" | "Confirmed" | "Paid";
+  commission?: string;
+  commissionStatus?: "Estimated" | "Confirmed" | "Paid";
   code: string;
   submittedDate: string;
   lostReason?: string;
   lender?: string;
+  financedAmount?: number;
+  statusSeenAt?: string;
   statusUpdatedAt?: string;
   diaryNotes?: DiaryNote[];
   followUpReminders?: FollowUpReminder[];
@@ -71,8 +74,8 @@ export interface DashboardData {
     closedLost: number;
     totalReferralValue?: string;
     convertedAccounts?: number;
-    totalCommissionsEarned: string;
-    estimatedCommission: string;
+    totalCommissionsEarned?: string;
+    estimatedCommission?: string;
   };
   deals: Deal[];
   referralCode: string;
@@ -121,6 +124,7 @@ export interface MasterPipelineDeal {
   commission: string;
   lostReason?: string;
   diaryNotes?: DiaryNote[];
+  followUpReminders?: FollowUpReminder[];
 }
 
 export interface PipelineStageCounts {
