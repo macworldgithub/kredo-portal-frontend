@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { Eye, LogOut, Menu } from "lucide-react";
+import { Eye, LogOut, Menu, PlusCircle } from "lucide-react";
 
 interface HeaderProps {
   partnerName: string;
@@ -10,6 +10,7 @@ interface HeaderProps {
   onOpenMobileSidebar: () => void;
   canSwitchPerspective: boolean;
   onLogout: () => void;
+  onSubmitReferral?: () => void;
 }
 
 export const Header: React.FC<HeaderProps> = ({
@@ -19,6 +20,7 @@ export const Header: React.FC<HeaderProps> = ({
   onOpenMobileSidebar,
   canSwitchPerspective,
   onLogout,
+  onSubmitReferral,
 }) => {
   return (
     <header className="sticky top-0 z-30 bg-[#f7f9fa]/90 backdrop-blur-md px-4 sm:px-8 py-3.5 border-b border-slate-200/80 flex items-center justify-between">
@@ -42,6 +44,18 @@ export const Header: React.FC<HeaderProps> = ({
       </div>
 
       <div className="flex items-center gap-2 sm:gap-3">
+        {/* Submit Referral Button for Agent Portal (Change #1) */}
+        {perspective === 'partner' && onSubmitReferral && (
+          <button
+            onClick={onSubmitReferral}
+            className="flex items-center gap-1.5 px-3 sm:px-4 py-1.5 rounded-full bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold shadow-xs transition-colors cursor-pointer"
+            title="Submit a new client referral"
+          >
+            <PlusCircle className="w-3.5 h-3.5 stroke-[2.5]" />
+            <span>Submit Referral</span>
+          </button>
+        )}
+
         {/* LIVE DEMO Pill */}
       <div className="hidden sm:flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#f4faee] border border-[#d6f0be] text-[11px] font-semibold text-[#3b7c1e] shadow-2xs">
           <span className="w-2 h-2 rounded-full bg-[#52a42b] animate-pulse"></span>

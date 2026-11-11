@@ -5,6 +5,7 @@ import {
   Building,
   CreditCard,
   Save,
+  Bell,
   CheckCircle,
 } from "lucide-react";
 import { PartnerProfile } from "../data/mockData";
@@ -182,6 +183,65 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
                 placeholder="48 192 847 219"
               />
             </div>
+          </div>
+        </div>
+
+                {/* Notification Preferences (Change #3) */}
+        <div className="bg-white p-6 rounded-2xl border border-slate-200/90 shadow-2xs space-y-4">
+          <div className="flex items-center gap-2 pb-3 border-b border-slate-100">
+            <Bell className="w-4 h-4 text-slate-700" />
+            <h3 className="text-sm font-bold text-slate-900">Email Notification Preferences</h3>
+          </div>
+
+          <p className="text-xs text-slate-500">
+            Stay informed on deals without needing to log into the portal daily.
+          </p>
+
+          <div className="space-y-3">
+            <label className="flex items-start gap-3 p-3 rounded-xl border border-slate-100 hover:bg-slate-50/70 transition-colors cursor-pointer">
+              <input
+                type="checkbox"
+                checked={formData.statusUpdateAlerts ?? formData.notificationsEnabled ?? true}
+                onChange={(e) =>
+                  setFormData({
+                    ...formData,
+                    statusUpdateAlerts: e.target.checked,
+                    notificationsEnabled: e.target.checked,
+                  })
+                }
+                className="mt-0.5 rounded border-slate-300 text-[#0a1926] focus:ring-sky-500"
+              />
+              <div>
+                <div className="text-xs font-bold text-slate-900">
+                  Application Status Updates
+                </div>
+                <div className="text-[11px] text-slate-500 mt-0.5">
+                  Receive an immediate email notification whenever a referred client's deal changes stage (e.g., moves to "Waiting on Customer", "Approved", or "Settled").
+                </div>
+              </div>
+            </label>
+
+            <label className="flex items-start gap-3 p-3 rounded-xl border border-slate-100 hover:bg-slate-50/70 transition-colors cursor-pointer">
+              <input
+                type="checkbox"
+                checked={formData.settlementAlerts ?? true}
+                onChange={(e) =>
+                  setFormData({
+                    ...formData,
+                    settlementAlerts: e.target.checked,
+                  })
+                }
+                className="mt-0.5 rounded border-slate-300 text-[#0a1926] focus:ring-sky-500"
+              />
+              <div>
+                <div className="text-xs font-bold text-slate-900">
+                  Settlement & Remittance Alerts
+                </div>
+                <div className="text-[11px] text-slate-500 mt-0.5">
+                  Receive an email notification when a deal has settled and remittance is processed.
+                </div>
+              </div>
+            </label>
           </div>
         </div>
 

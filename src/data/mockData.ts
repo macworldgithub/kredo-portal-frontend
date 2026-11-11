@@ -34,10 +34,12 @@ export interface PartnerProfile {
   phone: string;
   bankAccount: string;
   bsb: string;
+  accountName?: string;
   abn: string;
   referralLink: string;
   notificationsEnabled: boolean;
   settlementAlerts: boolean;
+  statusUpdateAlerts?: boolean;
   marketingEmails: boolean;
 }
 
@@ -53,6 +55,7 @@ export const INITIAL_PARTNER: PartnerProfile = {
   referralLink: "kredo.au/apply?ref=HAYES01",
   notificationsEnabled: true,
   settlementAlerts: true,
+  statusUpdateAlerts: true,
   marketingEmails: false,
 };
 

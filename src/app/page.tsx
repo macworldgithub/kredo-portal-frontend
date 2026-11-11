@@ -6,6 +6,7 @@ import { Header } from "@/components/Header";
 import { HomeView } from "@/components/HomeView";
 import { DealsView } from "@/components/DealsView";
 import { CommissionsView } from "@/components/CommissionsView";
+import { SalesReportingView } from "@/components/SalesReportingView";
 import { ShareView } from "@/components/ShareView";
 import { HeroPage } from "@/components/HeroPage";
 import { ApplicationForm } from "@/components/ApplicationForm";
@@ -20,7 +21,7 @@ import { DealDetailModal } from "@/components/DealDetailModal";
 import { AddPartnerModal } from "@/components/AddPartnerModal";
 import { LoginView } from "@/components/LoginView";
 import { ContactWidget } from "@/components/ContactWidget";
-import { BarChart3, Briefcase, Check, Home, Percent, QrCode, Users, GitBranch, X } from "lucide-react";
+import { BarChart3, Briefcase, Check, Home, Percent, QrCode, Users, GitBranch, X, TrendingUp } from "lucide-react";
 import { PartnerProfile, CommissionItem } from "@/data/mockData";
 import { PartnerDeal } from "@/data/netlifyData";
 import {
@@ -421,6 +422,7 @@ export default function App() {
           onOpenMobileSidebar={() => setMobileSidebarOpen(true)}
           onLogout={logout}
           canSwitchPerspective={canSwitchPerspective}
+          onSubmitReferral={() => setActiveFlow("apply-form")}
         />
         <main className="flex-1 p-4 sm:p-6 lg:p-8 max-w-7xl w-full mx-auto pb-40 lg:pb-8">
           {apiError && (
@@ -470,7 +472,11 @@ export default function App() {
                   onSelectDeal={(deal) => void selectDeal(deal.id)}
                 />
               )}
-              {currentPartnerTab === "commissions" && <CommissionsView commissions={commissions} />}
+              {currentPartnerTab === "commissions" && (
+                <SalesReportingView
+                  deals={deals}
+                />
+              )}
               {currentPartnerTab === "share" && (
                 <ShareView
                   onOpenHeroDemo={() => setActiveFlow("hero-page")}
@@ -596,8 +602,8 @@ export default function App() {
                 { label: "Home", icon: Home, active: currentPartnerTab === "home", select: () => setCurrentPartnerTab("home") },
                 { label: "Deals", icon: Briefcase, active: currentPartnerTab === "deals", select: () => setCurrentPartnerTab("deals") },
                 {
-                  label: "Commissions",
-                  icon: Percent,
+                  label: "Sales",
+                  icon: TrendingUp,
                   active: currentPartnerTab === "commissions",
                   select: () => setCurrentPartnerTab("commissions"),
                 },
@@ -648,6 +654,24 @@ export default function App() {
         onUpdateStatus={handleUpdateDealStatus}
         onUpdateDeal={handleUpdateDeal}
         onAddNote={handleAddDiaryNote}
+        onAddReminder={async (dealId, reminder) => {
+          const updated = await apiRequest<Deal>(`/portal/deals/${encodeURIComponent(dealId)}/reminders`, {
+            method: "POST",
+            body: JSON.stringify(reminder),
+          });
+          setSelectedDeal(updated);
+          await loadData();
+          notify("Follow-up scheduled", `Reminder set for ${reminder.dueDate}.`);
+        }}
+        onToggleReminder={async (dealId, reminderId, completed) => {
+          const updated = await apiRequest<Deal>(`/portal/deals/${encodeURIComponent(dealId)}/reminders/${encodeURIComponent(reminderId)}`, {
+            method: "PATCH",
+            body: JSON.stringify({ completed }),
+          });
+          setSelectedDeal(updated);
+          await loadData();
+          notify("Follow-up updated", completed ? "Follow-up marked completed." : "Follow-up marked active.");
+        }}
         canEdit={true}
       />
       <AddPartnerModal

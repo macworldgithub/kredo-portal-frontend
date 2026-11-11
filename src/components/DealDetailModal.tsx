@@ -16,7 +16,9 @@ import {
   Lock,
 
   Edit3,
-  Check
+  Check,
+  Building,
+  Bell
 } from "lucide-react";
 import { Deal, DiaryNote } from "@/lib/api";
 
@@ -25,8 +27,10 @@ interface DealDetailModalProps {
   isOpen: boolean;
   onClose: () => void;
   onUpdateStatus?: (dealId: string, newStatus: Deal['status'], lostReason?: string) => Promise<void> | void;
-  onUpdateDeal?: (dealId: string, updates: { name?: string; applicant?: string; amount?: string; type?: string }) => Promise<void> | void;
-  onAddNote?: (dealId: string, note: { content: string; nextSteps?: string; isInternal?: boolean }) => Promise<void> | void;
+  onUpdateDeal?: (dealId: string, updates: { name?: string; applicant?: string; amount?: string; type?: string; lender?: string }) => Promise<void> | void;
+  onAddNote?: (dealId: string, note: { content: string; nextSteps?: string; isInternal?: boolean; author?: string }) => Promise<void> | void;
+  onAddReminder?: (dealId: string, reminder: { author: string; comment: string; dueDate: string; dueTime?: string }) => Promise<void> | void;
+  onToggleReminder?: (dealId: string, reminderId: string, completed: boolean) => Promise<void> | void;
   canEdit?: boolean;
 }
 
@@ -37,22 +41,35 @@ export const DealDetailModal: React.FC<DealDetailModalProps> = ({
   onUpdateStatus,
   onUpdateDeal,
   onAddNote,
+  onAddReminder,
+  onToggleReminder,
   canEdit = true,
 }) => {
-  const [activeTab, setActiveTab] = useState<"details" | "notes">("details");
+  const [activeTab, setActiveTab] = useState<"details" | "notes" | "reminders">("details");
+  const [noteAuthor, setNoteAuthor] = useState("Craig");
   const [newNoteContent, setNewNoteContent] = useState("");
   const [newNextSteps, setNewNextSteps] = useState("");
   const [isInternal, setIsInternal] = useState(true);
   const [savingNote, setSavingNote] = useState(false);
 
-  // Edit Lead State (Issue #5)
+  // Edit Lead State (Issue #5 & Change #5: Lender)
   const [isEditingLead, setIsEditingLead] = useState(false);
   const [editName, setEditName] = useState("");
   const [editApplicant, setEditApplicant] = useState("");
   const [editAmount, setEditAmount] = useState("");
   const [editType, setEditType] = useState("");
+  const [editLender, setEditLender] = useState("");
+  const [customLender, setCustomLender] = useState("");
   const [savingLead, setSavingLead] = useState(false);
   const [leadEditError, setLeadEditError] = useState("");
+
+  // Follow-up Reminder State (Change #7)
+  const [reminderAuthor, setReminderAuthor] = useState("Craig");
+  const [reminderDueDate, setReminderDueDate] = useState("");
+  const [reminderDueTime, setReminderDueTime] = useState("");
+  const [reminderComment, setReminderComment] = useState("");
+  const [savingReminder, setSavingReminder] = useState(false);
+  const [reminderError, setReminderError] = useState("");
 
   // Lost modal state
   const [showLostPrompt, setShowLostPrompt] = useState(false);
@@ -64,8 +81,20 @@ export const DealDetailModal: React.FC<DealDetailModalProps> = ({
       setEditApplicant(deal.applicant || "");
       setEditAmount(deal.amount || "");
       setEditType(deal.type || "Asset & Equipment");
+      const currentLender = deal.lender || "";
+      if (['Shift', 'Lumi', 'Dynamoney', 'Moneytech', 'Banjo', 'Prospa', 'Bizcap', 'Capify'].includes(currentLender)) {
+        setEditLender(currentLender);
+        setCustomLender("");
+      } else if (currentLender) {
+        setEditLender("Other");
+        setCustomLender(currentLender);
+      } else {
+        setEditLender("");
+        setCustomLender("");
+      }
       setIsEditingLead(false);
       setLeadEditError("");
+      setReminderError("");
     }
   }, [deal]);
 
@@ -102,6 +131,29 @@ export const DealDetailModal: React.FC<DealDetailModalProps> = ({
     { label: "Docs / settlement", active: ['Docs / settlement', 'Settled'].includes(deal.status) },
     { label: "Settled", active: deal.status === 'Settled' },
   ];
+
+  
+  const handleAddReminderSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!onAddReminder || !deal || !reminderDueDate || !reminderComment.trim()) return;
+    setSavingReminder(true);
+    setReminderError("");
+    try {
+      await onAddReminder(deal.id, {
+        author: reminderAuthor,
+        dueDate: reminderDueDate,
+        dueTime: reminderDueTime || undefined,
+        comment: reminderComment.trim(),
+      });
+      setReminderComment("");
+      setReminderDueDate("");
+      setReminderDueTime("");
+    } catch (err) {
+      setReminderError(err instanceof Error ? err.message : "Failed to schedule follow-up reminder");
+    } finally {
+      setSavingReminder(false);
+    }
+  };
 
   const handleAddNoteSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -225,6 +277,16 @@ export const DealDetailModal: React.FC<DealDetailModalProps> = ({
             <MessageSquare className="w-3.5 h-3.5" />
             <span>Diary Notes ({notes.length})</span>
           </button>
+          <button
+            onClick={() => setActiveTab("reminders")}
+            className={`py-3 text-xs font-bold border-b-2 transition-all cursor-pointer flex items-center gap-1.5 ${activeTab === "reminders"
+                ? "border-[#0a1926] text-[#0a1926]"
+                : "border-transparent text-slate-400 hover:text-slate-600"
+              }`}
+          >
+            <Bell className="w-3.5 h-3.5" />
+            <span>Follow-ups ({deal.followUpReminders?.length || 0})</span>
+          </button>
         </div>
 
         {/* Modal Body */}
@@ -296,6 +358,42 @@ export const DealDetailModal: React.FC<DealDetailModalProps> = ({
                         <option value="Machinery Line">Machinery Line</option>
                       </select>
                     </div>
+                  </div>
+
+                  {/* Lender selection (Change #5) */}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+                    <div>
+                      <label className="block text-[11px] font-bold text-slate-600 mb-1">Lender / Funder</label>
+                      <select
+                        value={editLender}
+                        onChange={(e) => setEditLender(e.target.value)}
+                        className="w-full px-3 py-2 text-xs border border-slate-200 rounded-xl bg-white focus:outline-hidden focus:ring-2 focus:ring-sky-500/20 font-medium"
+                      >
+                        <option value="">-- Select Lender --</option>
+                        <option value="Shift">Shift</option>
+                        <option value="Lumi">Lumi</option>
+                        <option value="Dynamoney">Dynamoney</option>
+                        <option value="Moneytech">Moneytech</option>
+                        <option value="Banjo">Banjo</option>
+                        <option value="Prospa">Prospa</option>
+                        <option value="Bizcap">Bizcap</option>
+                        <option value="Capify">Capify</option>
+                        <option value="Other">Other (Specify funder)</option>
+                      </select>
+                    </div>
+                    {editLender === "Other" && (
+                      <div>
+                        <label className="block text-[11px] font-bold text-slate-600 mb-1">Specify Lender Name *</label>
+                        <input
+                          type="text"
+                          required
+                          value={customLender}
+                          onChange={(e) => setCustomLender(e.target.value)}
+                          placeholder="e.g. Liberty Financial"
+                          className="w-full px-3 py-2 text-xs border border-slate-200 rounded-xl bg-white focus:outline-hidden focus:ring-2 focus:ring-sky-500/20 font-medium"
+                        />
+                      </div>
+                    )}
                   </div>
 
                   <div className="flex items-center justify-end gap-2 pt-2 border-t border-sky-100">
@@ -382,6 +480,21 @@ export const DealDetailModal: React.FC<DealDetailModalProps> = ({
                 </div>
                 <div className="flex items-center justify-between py-2 border-b border-slate-100 text-xs">
                   <span className="text-slate-500 flex items-center gap-2">
+                    <Building className="w-4 h-4 text-slate-400" />
+                    Lender / Funder
+                  </span>
+                  <span className="font-semibold text-slate-800">
+                    {deal.lender ? (
+                      <span className="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-sky-50 text-sky-800 border border-sky-200">
+                        {deal.lender}
+                      </span>
+                    ) : (
+                      <span className="text-slate-400 italic">Not assigned</span>
+                    )}
+                  </span>
+                </div>
+                <div className="flex items-center justify-between py-2 border-b border-slate-100 text-xs">
+                  <span className="text-slate-500 flex items-center gap-2">
                     <Calendar className="w-4 h-4 text-slate-400" />
                     Submitted Date
                   </span>
@@ -429,7 +542,7 @@ export const DealDetailModal: React.FC<DealDetailModalProps> = ({
                 </div>
               )}
             </>
-          ) : (
+          ) : activeTab === "notes" ? (
             /* Diary Notes Section */
             <div className="space-y-5">
               {/* Add Note Form */}
@@ -437,6 +550,23 @@ export const DealDetailModal: React.FC<DealDetailModalProps> = ({
                 <div className="text-xs font-bold text-slate-800 uppercase tracking-wider flex items-center gap-1.5">
                   <MessageSquare className="w-3.5 h-3.5 text-sky-600" />
                   <span>Add Timestamped Diary Note</span>
+                </div>
+
+                <div className="w-full sm:w-1/2">
+                  <label className="block text-[11px] font-bold text-slate-700 mb-1">
+                    Author / Team Member *
+                  </label>
+                  <select
+                    value={noteAuthor}
+                    onChange={(e) => setNoteAuthor(e.target.value)}
+                    className="w-full px-3 py-1.5 text-xs border border-slate-200 rounded-xl bg-white focus:outline-hidden focus:ring-2 focus:ring-[#0a1926]/10 font-bold text-slate-900"
+                  >
+                    <option value="Craig">Craig</option>
+                    <option value="Martin">Martin</option>
+                    <option value="George">George</option>
+                    <option value="Anderson">Anderson</option>
+                    <option value="Elin">Elin</option>
+                  </select>
                 </div>
 
                 <div>
@@ -525,6 +655,140 @@ export const DealDetailModal: React.FC<DealDetailModalProps> = ({
                           <strong>Next step:</strong> {note.nextSteps}
                         </div>
                       )}
+                    </div>
+                  ))
+                )}
+              </div>
+            </div>
+          ) : (
+            /* Follow-up Reminders Section (Change #7) */
+            <div className="space-y-5">
+              {/* Add Follow-up Form */}
+              <form onSubmit={handleAddReminderSubmit} className="p-4 bg-sky-50/50 rounded-2xl border border-sky-200 space-y-3">
+                <div className="text-xs font-bold text-sky-950 uppercase tracking-wider flex items-center gap-1.5">
+                  <Bell className="w-3.5 h-3.5 text-sky-700" />
+                  <span>Schedule Follow-up Reminder</span>
+                </div>
+
+                {reminderError && (
+                  <p className="text-xs text-rose-700 bg-rose-50 p-2 rounded-lg border border-rose-200">{reminderError}</p>
+                )}
+
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                  <div>
+                    <label className="block text-[11px] font-bold text-slate-700 mb-1">
+                      Assigned To *
+                    </label>
+                    <select
+                      value={reminderAuthor}
+                      onChange={(e) => setReminderAuthor(e.target.value)}
+                      className="w-full px-3 py-1.5 text-xs border border-slate-200 rounded-xl bg-white focus:outline-hidden font-bold"
+                    >
+                      <option value="Craig">Craig</option>
+                      <option value="Martin">Martin</option>
+                      <option value="George">George</option>
+                      <option value="Anderson">Anderson</option>
+                      <option value="Elin">Elin</option>
+                    </select>
+                  </div>
+
+                  <div>
+                    <label className="block text-[11px] font-bold text-slate-700 mb-1">
+                      Follow-up Date *
+                    </label>
+                    <input
+                      type="date"
+                      required
+                      value={reminderDueDate}
+                      onChange={(e) => setReminderDueDate(e.target.value)}
+                      className="w-full px-3 py-1.5 text-xs border border-slate-200 rounded-xl bg-white focus:outline-hidden"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-[11px] font-bold text-slate-700 mb-1">
+                      Time (Optional)
+                    </label>
+                    <input
+                      type="time"
+                      value={reminderDueTime}
+                      onChange={(e) => setReminderDueTime(e.target.value)}
+                      className="w-full px-3 py-1.5 text-xs border border-slate-200 rounded-xl bg-white focus:outline-hidden"
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-[11px] font-bold text-slate-700 mb-1">
+                    Action Required / Comment *
+                  </label>
+                  <textarea
+                    required
+                    rows={2}
+                    value={reminderComment}
+                    onChange={(e) => setReminderComment(e.target.value)}
+                    placeholder="e.g. Bank statement follow up. Call John and remind him to upload 2026 BAS."
+                    className="w-full p-2.5 text-xs border border-slate-200 rounded-xl bg-white focus:outline-hidden focus:ring-2 focus:ring-sky-500/20"
+                  />
+                </div>
+
+                <div className="flex justify-end pt-1">
+                  <button
+                    type="submit"
+                    disabled={savingReminder || !reminderComment.trim() || !reminderDueDate}
+                    className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-[#0a1926] hover:bg-slate-800 text-white text-xs font-bold shadow-xs transition-colors cursor-pointer disabled:opacity-50"
+                  >
+                    <Bell className="w-3 h-3 text-sky-400" />
+                    <span>{savingReminder ? "Saving..." : "Schedule Reminder"}</span>
+                  </button>
+                </div>
+              </form>
+
+              {/* Reminders List */}
+              <div className="space-y-3">
+                <div className="text-xs font-bold text-slate-400 uppercase tracking-wider">
+                  Active & Scheduled Follow-ups ({deal.followUpReminders?.length || 0})
+                </div>
+
+                {(!deal.followUpReminders || deal.followUpReminders.length === 0) ? (
+                  <div className="p-8 text-center text-xs text-slate-400 bg-slate-50 rounded-2xl border border-slate-200/60">
+                    No follow-up reminders scheduled for this lead. Use the form above to schedule return actions.
+                  </div>
+                ) : (
+                  deal.followUpReminders.map((rem) => (
+                    <div
+                      key={rem.id}
+                      className={`p-4 rounded-2xl border transition-all ${
+                        rem.completed
+                          ? 'bg-slate-50/80 border-slate-200 opacity-70'
+                          : 'bg-white border-sky-200 shadow-2xs'
+                      }`}
+                    >
+                      <div className="flex items-center justify-between text-[11px] border-b border-slate-100 pb-2 mb-2">
+                        <div className="flex items-center gap-2">
+                          <span className="font-bold text-[#0a1926]">{rem.author}</span>
+                          <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-sky-100 text-sky-800 border border-sky-200 flex items-center gap-1">
+                            <Clock className="w-2.5 h-2.5" />
+                            Due: {rem.dueDate} {rem.dueTime ? `at ${rem.dueTime}` : ''}
+                          </span>
+                        </div>
+                        {onToggleReminder && (
+                          <button
+                            type="button"
+                            onClick={() => onToggleReminder(deal.id, rem.id, !rem.completed)}
+                            className={`px-2.5 py-1 rounded-lg text-[10px] font-bold transition-colors cursor-pointer ${
+                              rem.completed
+                                ? 'bg-slate-200 text-slate-700 hover:bg-slate-300'
+                                : 'bg-emerald-600 text-white hover:bg-emerald-700'
+                            }`}
+                          >
+                            {rem.completed ? "Mark Incomplete" : "✓ Mark Done"}
+                          </button>
+                        )}
+                      </div>
+                      <p className={`text-xs leading-relaxed ${rem.completed ? 'line-through text-slate-400' : 'text-slate-800'}`}>
+                        {rem.comment}
+                      </p>
                     </div>
                   ))
                 )}

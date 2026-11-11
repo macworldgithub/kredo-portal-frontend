@@ -97,49 +97,51 @@ export const MasterOverviewView: React.FC<MasterOverviewViewProps> = ({
           </div>
         </div>
 
-        {/* Card 3: SETTLED THIS MONTH */}
+        {/* Card 3: AMOUNT FINANCED ($) (Change #4) */}
         <div
           onClick={() => onNavigateToPipeline("Settled")}
-          className="bg-white border border-slate-200/90 rounded-2xl p-5 relative overflow-hidden shadow-2xs hover:shadow-md transition-all cursor-pointer group"
-          title="Click to view Settled deals"
+          className="bg-white border border-emerald-200/90 rounded-2xl p-5 relative overflow-hidden shadow-2xs hover:shadow-md transition-all cursor-pointer group"
+          title="Click to view Settled / Financed deals"
         >
           <div className="flex items-start justify-between">
-            <span className="text-[11px] font-bold uppercase tracking-wider text-slate-500 group-hover:text-slate-900 transition-colors">
-              SETTLED
+            <span className="text-[11px] font-bold uppercase tracking-wider text-emerald-800">
+              AMOUNT FINANCED ($)
             </span>
             <div className="w-8 h-8 rounded-full bg-emerald-50 text-emerald-600 flex items-center justify-center">
               <TrendingUp className="w-4 h-4" />
             </div>
           </div>
           <div className="mt-4">
-            <div className="text-xl sm:text-2xl font-bold text-[#0a1926] tracking-tight">{data.stats.settledThisMonth}</div>
-            <div className="text-xs font-medium text-slate-500 mt-2 flex items-center justify-between">
-              <span>Settled referrals</span>
+            <div className="text-xl sm:text-2xl font-bold text-[#0a1926] tracking-tight truncate">
+              {data.stats.totalAmountFinanced || "$0"}
+            </div>
+            <div className="text-xs font-medium text-emerald-700 mt-2 flex items-center justify-between">
+              <span>Total volume financed</span>
               <ChevronRight className="w-3.5 h-3.5 opacity-60 group-hover:opacity-100 group-hover:translate-x-0.5 transition-all" />
             </div>
           </div>
         </div>
 
-        {/* Card 4: CLOSED LOST */}
+        {/* Card 4: ACCOUNTS FINANCED (Change #4) */}
         <div
-          onClick={() => onNavigateToPipeline("Closed Lost")}
-          className="bg-white border border-rose-100 rounded-2xl p-5 relative overflow-hidden shadow-2xs hover:shadow-md transition-all cursor-pointer group"
-          title="Click to view Closed Lost / Declined deals"
+          onClick={() => onNavigateToPipeline("Settled")}
+          className="bg-white border border-slate-200/90 rounded-2xl p-5 relative overflow-hidden shadow-2xs hover:shadow-md transition-all cursor-pointer group"
+          title="Click to view Settled accounts"
         >
           <div className="flex items-start justify-between">
-            <span className="text-[11px] font-bold uppercase tracking-wider text-rose-600">
-              CLOSED LOST
+            <span className="text-[11px] font-bold uppercase tracking-wider text-slate-500 group-hover:text-slate-900 transition-colors">
+              ACCOUNTS FINANCED
             </span>
-            <div className="w-8 h-8 rounded-full bg-rose-50 text-rose-600 flex items-center justify-center">
-              <XCircle className="w-4 h-4" />
+            <div className="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center text-slate-600">
+              <Users className="w-4 h-4" />
             </div>
           </div>
           <div className="mt-4">
             <div className="text-xl sm:text-2xl font-bold text-slate-900 tracking-tight">
-              {data.stats.closedLostDeals ?? data.funnel.lost ?? 0}
+              {data.stats.totalAccountsFinanced ?? data.stats.settledThisMonth ?? 0}
             </div>
             <div className="text-xs font-medium text-slate-500 mt-2 flex items-center justify-between">
-              <span>Lost / declined deals</span>
+              <span>Settled client volume</span>
               <ChevronRight className="w-3.5 h-3.5 opacity-60 group-hover:opacity-100 group-hover:translate-x-0.5 transition-all" />
             </div>
           </div>

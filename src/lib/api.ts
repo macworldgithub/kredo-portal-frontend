@@ -21,6 +21,16 @@ export interface DiaryNote {
   createdAt: string;
 }
 
+export interface FollowUpReminder {
+  id: string;
+  author: string;
+  comment: string;
+  dueDate: string;
+  dueTime?: string;
+  completed: boolean;
+  createdAt: string;
+}
+
 export interface Deal {
   id: string;
   name: string;
@@ -46,7 +56,10 @@ export interface Deal {
   code: string;
   submittedDate: string;
   lostReason?: string;
+  lender?: string;
+  statusUpdatedAt?: string;
   diaryNotes?: DiaryNote[];
+  followUpReminders?: FollowUpReminder[];
 }
 
 export interface DashboardData {
@@ -56,6 +69,8 @@ export interface DashboardData {
     inFlight: number;
     settled: number;
     closedLost: number;
+    totalReferralValue?: string;
+    convertedAccounts?: number;
     totalCommissionsEarned: string;
     estimatedCommission: string;
   };
@@ -71,6 +86,8 @@ export interface MasterOverviewData {
     settledThisMonth: number;
     closedLostDeals: number;
     commissionAccrued: string;
+    totalAmountFinanced?: string;
+    totalAccountsFinanced?: number;
   };
   funnel: {
     referred: number;

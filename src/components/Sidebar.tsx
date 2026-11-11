@@ -50,7 +50,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
   const partnerNavItems = [
     { id: 'home' as PartnerNavTab, label: 'Home', icon: Home },
     { id: 'deals' as PartnerNavTab, label: 'Deals', icon: Briefcase },
-    { id: 'commissions' as PartnerNavTab, label: 'Commissions', icon: Percent },
+    { id: 'commissions' as PartnerNavTab, label: 'Sales Reporting', icon: BarChart3 },
     { id: 'share' as PartnerNavTab, label: 'Share & QR', icon: QrCode },
   ];
 

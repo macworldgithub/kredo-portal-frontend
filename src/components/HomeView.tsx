@@ -28,6 +28,8 @@ interface HomeViewProps {
     inFlight: number;
     settled: number;
     closedLost?: number;
+    totalReferralValue?: string;
+    convertedAccounts?: number;
     totalCommissionsEarned?: string;
     estimatedCommission?: string;
   };
@@ -96,7 +98,7 @@ export const HomeView: React.FC<HomeViewProps> = ({
             Your referrals, at a glance.
           </h1>
           <p className="text-slate-500 text-sm mt-1 max-w-xl">
-            Track every introduction from first application to settlement — with the commission trail kept clear.
+            Track every introduction from first application to settlement with live stage visibility.
           </p>
         </div>
 
@@ -203,26 +205,31 @@ export const HomeView: React.FC<HomeViewProps> = ({
           </div>
         </div>
 
-        {/* Card 5: Total commissions earned (Section 4.1 - Renamed per scope) */}
+                {/* Card 5: Completed Referrals / Sales Reporting (Change #2) */}
         <div
           onClick={onNavigateToCommissions}
           className="bg-[#0a1926] text-white border border-[#162f49] rounded-2xl p-5 relative overflow-hidden shadow-md hover:shadow-lg transition-all cursor-pointer group"
-          title="Click to view Commission Ledger"
+          title="Click to view Sales Reporting"
         >
           <div className="flex items-start justify-between">
             <span className="text-[11px] font-bold uppercase tracking-wider text-slate-300">
-              Total commissions earned
+              Completed Referrals
             </span>
-            <div className="w-8 h-8 rounded-full bg-[#1b344d] flex items-center justify-center text-sky-300">
-              <DollarSign className="w-4 h-4" />
+            <div className="w-8 h-8 rounded-full bg-[#1b344d] flex items-center justify-center text-emerald-400">
+              <TrendingUp className="w-4 h-4" />
             </div>
           </div>
           <div className="mt-4">
             <div className="text-lg sm:text-xl font-bold text-white tracking-tight truncate">
-              {stats.totalCommissionsEarned || stats.estimatedCommission || "$0"}
+              {stats.totalReferralValue || (() => {
+                const settledAmount = deals
+                  .filter((d) => d.status === 'Settled')
+                  .reduce((sum, d) => sum + (Number(String(d.amount).replace(/[^\d.-]/g, '')) || 0), 0);
+                return `${settledAmount.toLocaleString()}`;
+              })()}
             </div>
-            <div className="text-[11px] font-medium text-slate-300 mt-2 flex items-center justify-between">
-              <span>Est: {stats.estimatedCommission || "$0"}</span>
+            <div className="text-[11px] font-medium text-emerald-300 mt-2 flex items-center justify-between">
+              <span>{stats.convertedAccounts ?? stats.settled ?? 0} accounts converted</span>
               <ChevronRight className="w-3.5 h-3.5 opacity-60 group-hover:opacity-100 group-hover:translate-x-0.5 transition-all" />
             </div>
           </div>
