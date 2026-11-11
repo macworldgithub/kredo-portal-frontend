@@ -12,17 +12,20 @@ import {
   Check
 } from "lucide-react";
 import { TalkToSomeoneModal } from "./TalkToSomeoneModal";
+import { SubmitReferralButton } from "./SubmitReferralButton";
 
 interface HeroPageProps {
   onBackToDemo: () => void;
   onApplyNow: () => void;
   referralCode: string;
+  onSubmitReferral?: () => void;
 }
 
 export const HeroPage: React.FC<HeroPageProps> = ({
   onBackToDemo,
   onApplyNow,
   referralCode,
+  onSubmitReferral,
 }) => {
   const [talkModalOpen, setTalkModalOpen] = useState(false);
 
@@ -43,7 +46,7 @@ export const HeroPage: React.FC<HeroPageProps> = ({
       </div>
 
       {/* Header Bar with Official Logo */}
-      <header className="px-6 sm:px-12 py-1.5 flex items-center justify-between border-b border-slate-100 bg-white sticky top-0 z-30">
+      <header className="px-6 sm:px-12 py-1.5 flex flex-wrap items-center justify-between gap-3 border-b border-slate-100 bg-white sticky top-0 z-30">
         <div className="flex items-center">
           <button onClick={onBackToDemo} className="cursor-pointer" title="Back to Kredo">
             <img
@@ -55,7 +58,7 @@ export const HeroPage: React.FC<HeroPageProps> = ({
           </button>
         </div>
 
-        <div className="flex items-center gap-4">
+        <div className="ml-auto flex flex-wrap items-center justify-end gap-3 sm:gap-4">
           <button
             onClick={() => setTalkModalOpen(true)}
             className="hidden sm:flex items-center gap-1.5 text-xs font-bold text-slate-700 hover:text-sky-800 transition-colors cursor-pointer"
@@ -79,6 +82,7 @@ export const HeroPage: React.FC<HeroPageProps> = ({
             <span>Apply now</span>
             <ArrowRight className="w-3.5 h-3.5 text-sky-400" />
           </button>
+          {onSubmitReferral && <SubmitReferralButton onClick={onSubmitReferral} />}
         </div>
       </header>
 

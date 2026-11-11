@@ -336,36 +336,6 @@ export default function App() {
     );
   }
 
-  if (activeFlow === "hero-page") {
-    return (
-      <HeroPage
-        onBackToDemo={() => setActiveFlow("dashboard")}
-        onApplyNow={() => setActiveFlow("apply-form")}
-        referralCode={partner?.code || user.partnerCode || "SPUD"}
-      />
-    );
-  }
-
-  if (activeFlow === "apply-form") {
-    return (
-      <ApplicationForm
-        onBackToDemo={() => setActiveFlow("dashboard")}
-        referralCode={partner?.code || "SPUD"}
-        onSubmitApplication={async (application) => {
-          await apiRequest(
-            "/portal/applications",
-            {
-              method: "POST",
-              body: JSON.stringify(application),
-            },
-            false,
-          );
-          void loadData();
-        }}
-      />
-    );
-  }
-
   if (!partner) {
     return (
       <main className="min-h-screen grid place-items-center p-6 text-center">
@@ -393,6 +363,68 @@ export default function App() {
     );
   }
 
+  const openDirectReferral = () => {
+    setShareModalTab("direct");
+    setIsShareModalOpen(true);
+  };
+
+  const shareReferralModal = (
+    <ShareReferralModal
+      key={`${isShareModalOpen}-${shareModalTab}`}
+      initialTab={shareModalTab}
+      isOpen={isShareModalOpen}
+      onClose={() => setIsShareModalOpen(false)}
+      referralCode={partner.code}
+      referralLink={partner.referralLink}
+      onCreateReferral={async (referral) => {
+        const created = await apiRequest<Deal>("/portal/deals/direct", {
+          method: "POST",
+          body: JSON.stringify(referral),
+        });
+        setDeals((current) => [created, ...current]);
+        await loadData();
+        return created;
+      }}
+    />
+  );
+
+  if (activeFlow === "hero-page") {
+    return (
+      <>
+        <HeroPage
+          onSubmitReferral={perspective === "partner" ? openDirectReferral : undefined}
+          onBackToDemo={() => setActiveFlow("dashboard")}
+          onApplyNow={() => setActiveFlow("apply-form")}
+          referralCode={partner.code}
+        />
+        {shareReferralModal}
+      </>
+    );
+  }
+
+  if (activeFlow === "apply-form") {
+    return (
+      <>
+        <ApplicationForm
+          onSubmitReferral={perspective === "partner" ? openDirectReferral : undefined}
+          onBackToDemo={() => setActiveFlow("dashboard")}
+          referralCode={partner.code}
+          onSubmitApplication={async (application) => {
+            await apiRequest(
+              "/portal/applications",
+              {
+                method: "POST",
+                body: JSON.stringify(application),
+              },
+              false,
+            );
+            void loadData();
+          }}
+        />
+        {shareReferralModal}
+      </>
+    );
+  }
   return (
     <div className="min-h-screen bg-[#f7f9fa] flex flex-col font-sans relative">
       {toastMessage && (
@@ -438,7 +470,7 @@ export default function App() {
           onOpenMobileSidebar={() => setMobileSidebarOpen(true)}
           onLogout={logout}
           canSwitchPerspective={canSwitchPerspective}
-          onSubmitReferral={() => { setShareModalTab("direct"); setIsShareModalOpen(true); }}
+          onSubmitReferral={openDirectReferral}
         />
         <main className="flex-1 p-4 sm:p-6 lg:p-8 max-w-7xl w-full mx-auto pb-40 lg:pb-8">
           {apiError && (
@@ -668,23 +700,7 @@ export default function App() {
         </nav>
       </div>
 
-      <ShareReferralModal
-        key={`${isShareModalOpen}-${shareModalTab}`}
-        initialTab={shareModalTab}
-        isOpen={isShareModalOpen}
-        onClose={() => setIsShareModalOpen(false)}
-        referralCode={partner.code}
-        referralLink={partner.referralLink}
-        onCreateReferral={async (referral) => {
-          const created = await apiRequest<Deal>("/portal/deals/direct", {
-            method: "POST",
-            body: JSON.stringify(referral),
-          });
-          setDeals((current) => [created, ...current]);
-          await loadData();
-          return created;
-        }}
-      />
+      {shareReferralModal}
       <DealDetailModal
         key={selectedDeal?.id || "closed"}
         deal={selectedDeal}

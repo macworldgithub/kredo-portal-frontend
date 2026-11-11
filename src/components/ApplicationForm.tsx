@@ -15,6 +15,7 @@ import {
   Sparkles
 } from "lucide-react";
 import { TalkToSomeoneModal } from "./TalkToSomeoneModal";
+import { SubmitReferralButton } from "./SubmitReferralButton";
 
 /**
  * Validates an Australian Business Number (ABN).
@@ -43,6 +44,7 @@ export interface DirectorItem {
 
 interface ApplicationFormProps {
   onBackToDemo: () => void;
+  onSubmitReferral?: () => void;
   referralCode?: string;
   onSubmitApplication: (application: {
     tradingName: string;
@@ -59,6 +61,7 @@ interface ApplicationFormProps {
 
 export const ApplicationForm: React.FC<ApplicationFormProps> = ({
   onBackToDemo,
+  onSubmitReferral,
   referralCode = "SPUD",
   onSubmitApplication,
 }) => {
@@ -217,7 +220,7 @@ export const ApplicationForm: React.FC<ApplicationFormProps> = ({
   return (
     <div className="min-h-screen bg-[#f7f9fa] flex flex-col font-sans">
       {/* Top Header with official logo that links back to homepage (Section 3.4) */}
-      <header className="px-6 sm:px-12 py-3.5 flex items-center justify-between border-b border-slate-200/80 bg-white">
+      <header className="px-6 sm:px-12 py-3.5 flex flex-wrap items-center justify-between gap-3 border-b border-slate-200/80 bg-white">
         <div className="flex items-center gap-4">
           <button
             onClick={onBackToDemo}
@@ -234,7 +237,7 @@ export const ApplicationForm: React.FC<ApplicationFormProps> = ({
           </button>
         </div>
 
-        <div className="flex items-center gap-3">
+        <div className="ml-auto flex flex-wrap items-center justify-end gap-3">
           <a
             href="tel:1300457336"
             className="hidden sm:flex items-center gap-1.5 text-xs font-bold text-sky-700 bg-sky-50 px-3 py-1.5 rounded-full border border-sky-100"
@@ -250,6 +253,7 @@ export const ApplicationForm: React.FC<ApplicationFormProps> = ({
             <ArrowLeft className="w-3.5 h-3.5" />
             <span>Back to demo</span>
           </button>
+          {onSubmitReferral && <SubmitReferralButton onClick={onSubmitReferral} />}
         </div>
       </header>
 

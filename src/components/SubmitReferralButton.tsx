@@ -1,0 +1,16 @@
+"use client";
+
+import { PlusCircle } from "lucide-react";
+
+export function SubmitReferralButton({ onClick }: { onClick: () => void }) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className="order-last flex shrink-0 items-center gap-1.5 whitespace-nowrap rounded-full bg-emerald-600 px-3 py-2 text-xs font-bold text-white shadow-xs transition-colors hover:bg-emerald-700 sm:px-4"
+    >
+      <PlusCircle className="h-3.5 w-3.5" aria-hidden="true" />
+      <span>Submit Referral</span>
+    </button>
+  );
+}
