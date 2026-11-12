@@ -164,7 +164,7 @@ export const MasterOverviewView: React.FC<MasterOverviewViewProps> = ({
           <div className="mt-4">
             <div className="text-lg sm:text-xl font-bold text-white tracking-tight truncate">{data.stats.commissionAccrued}</div>
             <div className="text-xs font-medium text-slate-300 mt-2 flex items-center justify-between">
-              <span>Total accrued payout</span>
+              <span>Confirmed, unpaid commissions</span>
               <ChevronRight className="w-3.5 h-3.5 opacity-60 group-hover:opacity-100 group-hover:translate-x-0.5 transition-all" />
             </div>
           </div>

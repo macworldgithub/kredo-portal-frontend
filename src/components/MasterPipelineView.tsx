@@ -9,6 +9,7 @@ interface MasterPipelineViewProps {
   searchTerm: string;
   onSearchChange: (value: string) => void;
   onSelectDeal: (dealId: string) => void;
+  initialStageFilter?: string;
   stageCounts?: PipelineStageCounts;
 }
 
@@ -17,6 +18,7 @@ export const MasterPipelineView: React.FC<MasterPipelineViewProps> = ({
   searchTerm,
   onSearchChange,
   onSelectDeal,
+  initialStageFilter = "All stages",
   stageCounts = {
     leadReceived: 0,
     customerInvited: 0,
@@ -24,7 +26,7 @@ export const MasterPipelineView: React.FC<MasterPipelineViewProps> = ({
     waitingOnCustomer: 0,
   },
 }) => {
-  const [stageFilter, setStageFilter] = useState("All stages");
+  const [stageFilter, setStageFilter] = useState(initialStageFilter);
 
   const stages = [
     "All stages",

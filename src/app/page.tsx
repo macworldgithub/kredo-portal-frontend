@@ -82,6 +82,7 @@ export default function App() {
     waitingOnCustomer: 0,
   });
   const [pipelineSearchTerm, setPipelineSearchTerm] = useState("");
+  const [initialPipelineStageFilter, setInitialPipelineStageFilter] = useState("All stages");
   const [initialDealsStageFilter, setInitialDealsStageFilter] = useState("All stages");
   const [partners, setPartners] = useState<PartnerDirectoryItem[]>([]);
   const [masterReports, setMasterReports] = useState<MasterReportData | null>(null);
@@ -452,7 +453,10 @@ export default function App() {
         }}
         onSelectMasterTab={(tab) => {
           if (tab === "hero") setActiveFlow("hero-page");
-          else setCurrentMasterTab(tab);
+          else {
+            if (tab === "pipeline") setInitialPipelineStageFilter("All stages");
+            setCurrentMasterTab(tab);
+          }
         }}
         onTogglePerspective={togglePerspective}
         isOpenMobile={mobileSidebarOpen}
@@ -588,13 +592,15 @@ export default function App() {
                   data={masterOverview}
                   onNavigateToPartners={() => setCurrentMasterTab("partners")}
                   onNavigateToPipeline={(filter) => {
-                    if (filter) setPipelineSearchTerm(filter === "Closed Lost" ? "Closed Lost" : "");
+                    setPipelineSearchTerm("");
+                    setInitialPipelineStageFilter(filter || "All stages");
                     setCurrentMasterTab("pipeline");
                   }}
                   onNavigateToReports={() => setCurrentMasterTab("reports")}
                   onNavigateToCommissions={() => setCurrentMasterTab("commissions")}
                   onViewPartnerBook={(partnerCode) => {
                     setPipelineSearchTerm(partnerCode);
+                    setInitialPipelineStageFilter("All stages");
                     setCurrentMasterTab("pipeline");
                   }}
                   onOpenAddPartner={() => setIsAddPartnerOpen(true)}
@@ -606,6 +612,7 @@ export default function App() {
                   onOpenAddPartner={() => setIsAddPartnerOpen(true)}
                   onViewPartnerBook={(partnerCode) => {
                     setPipelineSearchTerm(partnerCode);
+                    setInitialPipelineStageFilter("All stages");
                     setCurrentMasterTab("pipeline");
                   }}
                   onUpdatePartner={handleUpdatePartner}
@@ -616,6 +623,7 @@ export default function App() {
                 <MasterPipelineView
                   deals={masterPipeline}
                   stageCounts={pipelineStageCounts}
+                  initialStageFilter={initialPipelineStageFilter}
                   searchTerm={pipelineSearchTerm}
                   onSearchChange={setPipelineSearchTerm}
                   onSelectDeal={(dealId) => void selectDeal(dealId)}
@@ -680,7 +688,15 @@ export default function App() {
             : [
                 { label: "Overview", icon: Home, active: currentMasterTab === "overview", select: () => setCurrentMasterTab("overview") },
                 { label: "Partners", icon: Users, active: currentMasterTab === "partners", select: () => setCurrentMasterTab("partners") },
-                { label: "Pipeline", icon: GitBranch, active: currentMasterTab === "pipeline", select: () => setCurrentMasterTab("pipeline") },
+                {
+                  label: "Pipeline",
+                  icon: GitBranch,
+                  active: currentMasterTab === "pipeline",
+                  select: () => {
+                    setInitialPipelineStageFilter("All stages");
+                    setCurrentMasterTab("pipeline");
+                  },
+                },
                 { label: "Reports", icon: BarChart3, active: currentMasterTab === "reports", select: () => setCurrentMasterTab("reports") },
               ]
           ).map(({ label, icon: Icon, active, select }) => (
