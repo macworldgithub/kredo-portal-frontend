@@ -86,7 +86,7 @@ export const HomeView: React.FC<HomeViewProps> = ({
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-5 sm:space-y-6">
       {/* Date and Header Title */}
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
         <div>
@@ -112,24 +112,24 @@ export const HomeView: React.FC<HomeViewProps> = ({
       </div>
 
       {/* 5 Interactive Drill-down Stat Cards (Section 4.1, 4.2 & 4.3) */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+      <div className="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-5">
         {/* Card 1: Referred this month (Clickable drilldown) */}
         <div
           onClick={() => onNavigateToDeals("All stages")}
-          className="bg-[#d4eaf7] border border-[#bedcf0] rounded-2xl p-5 relative overflow-hidden shadow-2xs hover:shadow-md transition-all cursor-pointer group"
+          className="bg-[#d4eaf7] border border-[#bedcf0] rounded-2xl min-w-0 p-4 sm:p-5 relative overflow-hidden shadow-2xs hover:shadow-md transition-all cursor-pointer group"
           title="Click to view all referrals"
         >
-          <div className="flex items-start justify-between">
-            <span className="text-[11px] font-bold uppercase tracking-wider text-[#2d5573] group-hover:text-[#0a1926] transition-colors">
+          <div className="flex items-start justify-between gap-2">
+            <span className="text-[10px] sm:text-[11px] font-bold uppercase tracking-wider text-[#2d5573] group-hover:text-[#0a1926] transition-colors">
               Referred this month
             </span>
-            <div className="w-8 h-8 rounded-full bg-white/70 flex items-center justify-center text-[#1c4b70]">
+            <div className="w-7 h-7 sm:w-8 sm:h-8 shrink-0 rounded-full bg-white/70 flex items-center justify-center text-[#1c4b70]">
               <Send className="w-4 h-4" />
             </div>
           </div>
-          <div className="mt-4">
+          <div className="mt-3 sm:mt-4">
             <div className="text-xl sm:text-2xl font-bold text-[#0a1926] tracking-tight">{stats.referredThisMonth}</div>
-            <div className="text-xs font-medium text-[#2d5573] mt-2 flex items-center justify-between">
+            <div className="text-[11px] sm:text-xs leading-relaxed font-medium text-[#2d5573] mt-2 flex items-center justify-between">
               <span>Referrals this month</span>
               <ChevronRight className="w-3.5 h-3.5 opacity-60 group-hover:opacity-100 group-hover:translate-x-0.5 transition-all" />
             </div>
@@ -139,20 +139,20 @@ export const HomeView: React.FC<HomeViewProps> = ({
         {/* Card 2: In Flight (Clickable drilldown) */}
         <div
           onClick={() => onNavigateToDeals("In flight")}
-          className="bg-white border border-slate-200/90 rounded-2xl p-5 relative overflow-hidden shadow-2xs hover:shadow-md transition-all cursor-pointer group"
+          className="bg-white border border-slate-200/90 rounded-2xl min-w-0 p-4 sm:p-5 relative overflow-hidden shadow-2xs hover:shadow-md transition-all cursor-pointer group"
           title="Click to filter In Flight deals"
         >
-          <div className="flex items-start justify-between">
-            <span className="text-[11px] font-bold uppercase tracking-wider text-slate-500 group-hover:text-slate-900 transition-colors">
+          <div className="flex items-start justify-between gap-2">
+            <span className="text-[10px] sm:text-[11px] font-bold uppercase tracking-wider text-slate-500 group-hover:text-slate-900 transition-colors">
               In flight
             </span>
-            <div className="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center text-slate-700">
+            <div className="w-7 h-7 sm:w-8 sm:h-8 shrink-0 rounded-full bg-slate-100 flex items-center justify-center text-slate-700">
               <Activity className="w-4 h-4" />
             </div>
           </div>
-          <div className="mt-4">
+          <div className="mt-3 sm:mt-4">
             <div className="text-xl sm:text-2xl font-bold text-[#0a1926] tracking-tight">{stats.inFlight}</div>
-            <div className="text-xs font-medium text-slate-500 mt-2 flex items-center justify-between">
+            <div className="text-[11px] sm:text-xs leading-relaxed font-medium text-slate-500 mt-2 flex items-center justify-between">
               <span>In assessment & pipeline</span>
               <ChevronRight className="w-3.5 h-3.5 opacity-60 group-hover:opacity-100 group-hover:translate-x-0.5 transition-all" />
             </div>
@@ -162,20 +162,20 @@ export const HomeView: React.FC<HomeViewProps> = ({
         {/* Card 3: Settled (Clickable drilldown) */}
         <div
           onClick={() => onNavigateToDeals("Settled")}
-          className="bg-white border border-slate-200/90 rounded-2xl p-5 relative overflow-hidden shadow-2xs hover:shadow-md transition-all cursor-pointer group"
+          className="bg-white border border-slate-200/90 rounded-2xl min-w-0 p-4 sm:p-5 relative overflow-hidden shadow-2xs hover:shadow-md transition-all cursor-pointer group"
           title="Click to filter Settled deals"
         >
-          <div className="flex items-start justify-between">
-            <span className="text-[11px] font-bold uppercase tracking-wider text-slate-500 group-hover:text-slate-900 transition-colors">
+          <div className="flex items-start justify-between gap-2">
+            <span className="text-[10px] sm:text-[11px] font-bold uppercase tracking-wider text-slate-500 group-hover:text-slate-900 transition-colors">
               Settled
             </span>
-            <div className="w-8 h-8 rounded-full bg-emerald-50 text-emerald-700 flex items-center justify-center">
+            <div className="w-7 h-7 sm:w-8 sm:h-8 shrink-0 rounded-full bg-emerald-50 text-emerald-700 flex items-center justify-center">
               <CheckCircle className="w-4 h-4" />
             </div>
           </div>
-          <div className="mt-4">
+          <div className="mt-3 sm:mt-4">
             <div className="text-xl sm:text-2xl font-bold text-[#0a1926] tracking-tight">{stats.settled}</div>
-            <div className="text-xs font-medium text-slate-500 mt-2 flex items-center justify-between">
+            <div className="text-[11px] sm:text-xs leading-relaxed font-medium text-slate-500 mt-2 flex items-center justify-between">
               <span>Settled referrals</span>
               <ChevronRight className="w-3.5 h-3.5 opacity-60 group-hover:opacity-100 group-hover:translate-x-0.5 transition-all" />
             </div>
@@ -185,20 +185,20 @@ export const HomeView: React.FC<HomeViewProps> = ({
         {/* Card 4: Closed Lost (Section 4.2) */}
         <div
           onClick={() => onNavigateToDeals("Closed Lost")}
-          className="bg-white border border-rose-100 rounded-2xl p-5 relative overflow-hidden shadow-2xs hover:shadow-md transition-all cursor-pointer group"
+          className="bg-white border border-rose-100 rounded-2xl min-w-0 p-4 sm:p-5 relative overflow-hidden shadow-2xs hover:shadow-md transition-all cursor-pointer group"
           title="Click to filter Closed Lost deals"
         >
-          <div className="flex items-start justify-between">
-            <span className="text-[11px] font-bold uppercase tracking-wider text-rose-600">
+          <div className="flex items-start justify-between gap-2">
+            <span className="text-[10px] sm:text-[11px] font-bold uppercase tracking-wider text-rose-600">
               Closed Lost
             </span>
-            <div className="w-8 h-8 rounded-full bg-rose-50 text-rose-600 flex items-center justify-center">
+            <div className="w-7 h-7 sm:w-8 sm:h-8 shrink-0 rounded-full bg-rose-50 text-rose-600 flex items-center justify-center">
               <XCircle className="w-4 h-4" />
             </div>
           </div>
-          <div className="mt-4">
+          <div className="mt-3 sm:mt-4">
             <div className="text-xl sm:text-2xl font-bold text-slate-900 tracking-tight">{stats.closedLost ?? 0}</div>
-            <div className="text-xs font-medium text-slate-500 mt-2 flex items-center justify-between">
+            <div className="text-[11px] sm:text-xs leading-relaxed font-medium text-slate-500 mt-2 flex items-center justify-between">
               <span>Lost / declined deals</span>
               <ChevronRight className="w-3.5 h-3.5 opacity-60 group-hover:opacity-100 group-hover:translate-x-0.5 transition-all" />
             </div>
@@ -208,18 +208,18 @@ export const HomeView: React.FC<HomeViewProps> = ({
                 {/* Card 5: Completed Referrals / Sales Reporting (Change #2) */}
         <div
           onClick={onNavigateToCommissions}
-          className="bg-[#0a1926] text-white border border-[#162f49] rounded-2xl p-5 relative overflow-hidden shadow-md hover:shadow-lg transition-all cursor-pointer group"
+          className="col-span-2 lg:col-span-1 bg-[#0a1926] text-white border border-[#162f49] rounded-2xl min-w-0 p-4 sm:p-5 relative overflow-hidden shadow-md hover:shadow-lg transition-all cursor-pointer group"
           title="Click to view Sales Reporting"
         >
-          <div className="flex items-start justify-between">
-            <span className="text-[11px] font-bold uppercase tracking-wider text-slate-300">
+          <div className="flex items-start justify-between gap-2">
+            <span className="text-[10px] sm:text-[11px] font-bold uppercase tracking-wider text-slate-300">
               Completed Referrals
             </span>
-            <div className="w-8 h-8 rounded-full bg-[#1b344d] flex items-center justify-center text-emerald-400">
+            <div className="w-7 h-7 sm:w-8 sm:h-8 shrink-0 rounded-full bg-[#1b344d] flex items-center justify-center text-emerald-400">
               <TrendingUp className="w-4 h-4" />
             </div>
           </div>
-          <div className="mt-4">
+          <div className="mt-3 sm:mt-4">
             <div className="text-lg sm:text-xl font-bold text-white tracking-tight truncate">
               {stats.totalReferralValue || (() => {
                 const settledAmount = deals
@@ -239,9 +239,9 @@ export const HomeView: React.FC<HomeViewProps> = ({
       {/* Main Content Split: Recent Deals (Left) & Your Referral Code (Right) */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
         {/* Left Column: Recent deals list */}
-        <div className="lg:col-span-7 bg-white rounded-2xl border border-slate-200/90 p-6 shadow-2xs flex flex-col justify-between">
+        <div className="lg:col-span-7 min-w-0 bg-white rounded-2xl border border-slate-200/90 p-4 sm:p-6 shadow-2xs flex flex-col justify-between">
           <div>
-            <div className="flex items-center justify-between mb-4">
+            <div className="flex flex-wrap items-start justify-between gap-3 mb-4">
               <div>
                 <h3 className="text-lg font-bold text-[#0a1926]">Recent deals</h3>
                 <p className="text-xs text-slate-500">Your latest referral activity with stage tracking</p>
@@ -266,14 +266,14 @@ export const HomeView: React.FC<HomeViewProps> = ({
                   <div
                     key={deal.id}
                     onClick={() => onSelectDeal(deal)}
-                    className="flex items-center justify-between p-3.5 rounded-xl border border-slate-100 hover:border-slate-200 hover:bg-slate-50/70 transition-all cursor-pointer group"
+                    className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between p-3 sm:p-3.5 rounded-xl border border-slate-100 hover:border-slate-200 hover:bg-slate-50/70 transition-all cursor-pointer group"
                   >
-                    <div className="flex items-center gap-3.5">
-                      <div className="w-10 h-10 rounded-xl bg-slate-100 group-hover:bg-white text-slate-600 flex items-center justify-center border border-slate-200/60 shadow-2xs">
+                    <div className="flex min-w-0 flex-1 items-center gap-3.5">
+                      <div className="w-10 h-10 shrink-0 rounded-xl bg-slate-100 group-hover:bg-white text-slate-600 flex items-center justify-center border border-slate-200/60 shadow-2xs">
                         <Briefcase className="w-4 h-4" />
                       </div>
-                      <div>
-                        <div className="text-sm font-bold text-[#0a1926] group-hover:text-sky-700 transition-colors">
+                      <div className="min-w-0">
+                        <div className="break-words text-sm font-bold text-[#0a1926] group-hover:text-sky-700 transition-colors">
                           {deal.name}
                         </div>
                         <div className="text-[11px] text-slate-500 font-medium">
@@ -287,7 +287,7 @@ export const HomeView: React.FC<HomeViewProps> = ({
                       </div>
                     </div>
 
-                    <div className="flex items-center gap-3">
+                    <div className="flex items-center justify-between gap-3 pl-[3.375rem] sm:shrink-0 sm:pl-0">
                       <span className={`px-2.5 py-1 rounded-full text-[11px] font-semibold border ${getStatusBadge(deal.status)}`}>
                         {deal.status}
                       </span>
@@ -301,20 +301,20 @@ export const HomeView: React.FC<HomeViewProps> = ({
         </div>
 
         {/* Right Column: Your Referral Code Card */}
-        <div className="lg:col-span-5 bg-[#cde4f5] border border-[#b2d6ef] rounded-2xl p-6 shadow-2xs flex flex-col justify-between">
+        <div className="lg:col-span-5 min-w-0 bg-[#cde4f5] border border-[#b2d6ef] rounded-2xl p-4 sm:p-6 shadow-2xs flex flex-col justify-between">
           <div>
-            <div className="flex items-start justify-between">
+            <div className="flex min-w-0 items-start justify-between gap-3">
               <div>
                 <span className="text-[11px] font-bold uppercase tracking-wider text-[#1e4868]">
                   Your Referral Code
                 </span>
-                <h2 className="text-3xl font-mono font-black tracking-wider text-[#0a1926] mt-2">
+                <h2 className="break-all text-2xl sm:text-3xl font-mono font-black tracking-wider text-[#0a1926] mt-2">
                   {partnerCode}
                 </h2>
               </div>
 
               {/* Stylized QR Code */}
-              <div className="bg-white p-2.5 rounded-xl shadow-xs border border-white/80">
+              <div className="shrink-0 bg-white p-2.5 rounded-xl shadow-xs border border-white/80">
                 <svg className="w-16 h-16" viewBox="0 0 100 100" fill="currentColor">
                   <rect x="0" y="0" width="30" height="30" rx="4" fill="#0a1926" />
                   <rect x="6" y="6" width="18" height="18" rx="2" fill="white" />
@@ -344,7 +344,7 @@ export const HomeView: React.FC<HomeViewProps> = ({
             </p>
 
             <div className="mt-4 p-3 bg-white/70 backdrop-blur-xs rounded-xl border border-white/60 flex items-center justify-between text-xs font-mono text-slate-700">
-              <span className="truncate">{referralLink}</span>
+              <span className="min-w-0 truncate">{referralLink}</span>
               <button
                 onClick={handleCopyLink}
                 className="ml-2 flex items-center gap-1 text-[11px] font-sans font-bold text-[#0a1926] hover:text-sky-700 transition-colors shrink-0"

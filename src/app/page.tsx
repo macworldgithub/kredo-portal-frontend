@@ -476,7 +476,7 @@ export default function App() {
           canSwitchPerspective={canSwitchPerspective}
           onSubmitReferral={openDirectReferral}
         />
-        <main className="flex-1 p-4 sm:p-6 lg:p-8 max-w-7xl w-full mx-auto pb-40 lg:pb-8">
+        <main className="portal-main min-w-0 flex-1 p-3 sm:p-6 lg:p-8 max-w-7xl w-full mx-auto">
           {apiError && (
             <div
               role="alert"
@@ -671,7 +671,7 @@ export default function App() {
         </main>
         <nav
           aria-label="Primary navigation"
-          className="mobile-bottom-nav fixed inset-x-3 bottom-3 z-30 grid grid-cols-4 rounded-2xl border border-slate-200/80 bg-white/95 p-1.5 shadow-xl backdrop-blur-lg lg:hidden"
+          className="mobile-bottom-nav fixed inset-x-3 z-30 grid grid-cols-4 rounded-2xl border border-slate-200/80 bg-white/95 p-1.5 shadow-xl backdrop-blur-lg lg:hidden"
         >
           {(perspective === "partner"
             ? [
@@ -705,7 +705,7 @@ export default function App() {
               type="button"
               onClick={select}
               aria-current={active ? "page" : undefined}
-              className={`flex min-h-14 flex-col items-center justify-center gap-1 rounded-xl px-1 py-2 text-[clamp(0.5625rem,2.5vw,0.875rem)] font-semibold transition-colors cursor-pointer ${
+              className={`flex min-h-14 min-w-0 flex-col items-center justify-center gap-1 rounded-xl px-1 py-2 text-xs font-semibold transition-colors cursor-pointer ${
                 active ? "bg-[#0a1926] text-white" : "text-slate-500 hover:bg-slate-100"
               }`}
             >
