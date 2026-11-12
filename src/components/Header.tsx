@@ -68,7 +68,7 @@ export const Header: React.FC<HeaderProps> = ({
         </div>
 
         {/* Perspective Toggle Pill */}
-        {canSwitchPerspective && (
+        {/* {canSwitchPerspective && (
           <button
             onClick={onTogglePerspective}
             className="hidden sm:flex items-center gap-2 px-3 sm:px-3.5 py-1.5 rounded-full bg-[#0a1926] hover:bg-[#13273c] text-white text-xs font-semibold shadow-xs transition-colors cursor-pointer"
@@ -77,7 +77,7 @@ export const Header: React.FC<HeaderProps> = ({
             <Eye className="w-3.5 h-3.5 text-sky-400" />
             <span className="hidden md:inline">{perspective === 'partner' ? 'Kredo Master' : 'Partner View'}</span>
           </button>
-        )}
+        )} */}
 
         {perspective === 'partner' && onNotificationSelect && (
           <NotificationBell deals={notificationDeals} onSelectDeal={onNotificationSelect} />
