@@ -488,7 +488,7 @@ export default function App() {
               </button>
             </div>
           )}
-          {perspective === "partner" && deals.some((deal) => deal.statusUpdatedAt && deal.statusUpdatedAt !== deal.statusSeenAt) && (
+          {perspective === "partner" && currentPartnerTab !== "home" && deals.some((deal) => deal.statusUpdatedAt && deal.statusUpdatedAt !== deal.statusSeenAt) && (
             <section aria-label="Application status updates" className="mb-5 rounded-xl border border-sky-200 bg-sky-50 p-4">
               <h2 className="text-sm font-bold text-sky-950">Application status updates</h2>
               {deals.filter((deal) => deal.statusUpdatedAt && deal.statusUpdatedAt !== deal.statusSeenAt).map((deal) => (
