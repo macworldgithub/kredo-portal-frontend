@@ -3,6 +3,8 @@
 import React from "react";
 import { Eye, LogOut, Menu } from "lucide-react";
 import { SubmitReferralButton } from "./SubmitReferralButton";
+import { NotificationBell } from "./NotificationBell";
+import type { Deal } from "@/lib/api";
 
 interface HeaderProps {
   partnerName: string;
@@ -12,6 +14,8 @@ interface HeaderProps {
   canSwitchPerspective: boolean;
   onLogout: () => void;
   onSubmitReferral?: () => void;
+  notificationDeals?: Deal[];
+  onNotificationSelect?: (dealId: string) => Promise<boolean>;
 }
 
 export const Header: React.FC<HeaderProps> = ({
@@ -22,6 +26,8 @@ export const Header: React.FC<HeaderProps> = ({
   canSwitchPerspective,
   onLogout,
   onSubmitReferral,
+  notificationDeals = [],
+  onNotificationSelect,
 }) => {
   return (
     <header className="sticky top-0 z-30 bg-[#f7f9fa]/90 backdrop-blur-md px-3 sm:px-8 py-3 sm:py-3.5 border-b border-slate-200/80 flex items-center justify-between gap-2 sm:gap-3">
@@ -60,6 +66,9 @@ export const Header: React.FC<HeaderProps> = ({
           <Eye className="w-3.5 h-3.5 text-sky-400" />
           <span className="hidden sm:inline">{perspective === 'partner' ? 'Kredo Master' : 'Partner View'}</span>
         </button>}
+        {perspective === 'partner' && onNotificationSelect && (
+          <NotificationBell deals={notificationDeals} onSelectDeal={onNotificationSelect} />
+        )}
         {perspective === 'partner' && onSubmitReferral && (
           <SubmitReferralButton onClick={onSubmitReferral} />
         )}

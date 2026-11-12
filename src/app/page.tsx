@@ -195,13 +195,15 @@ export default function App() {
     setApiError("");
     try {
       const detail = await apiRequest<Deal>(`/portal/deals/${encodeURIComponent(dealId)}`);
-      if (perspective === "partner" && user?.role === "partner" && detail.statusUpdatedAt) {
+      if (perspective === "partner" && detail.statusUpdatedAt) {
         const seen = await apiRequest<Deal>(`/portal/deals/${encodeURIComponent(dealId)}/status-seen`, { method: "PATCH" });
         setSelectedDeal(seen);
         setDeals((current) => current.map((deal) => deal.id === dealId ? seen : deal));
       } else setSelectedDeal(detail);
+      return true;
     } catch (error) {
       setApiError(error instanceof Error ? error.message : "Could not load deal.");
+      return false;
     }
   };
 
@@ -475,6 +477,8 @@ export default function App() {
           onLogout={logout}
           canSwitchPerspective={canSwitchPerspective}
           onSubmitReferral={openDirectReferral}
+          notificationDeals={deals}
+          onNotificationSelect={selectDeal}
         />
         <main className="portal-main min-w-0 flex-1 p-3 sm:p-6 lg:p-8 max-w-7xl w-full mx-auto">
           {apiError && (
@@ -487,16 +491,6 @@ export default function App() {
                 Retry
               </button>
             </div>
-          )}
-          {perspective === "partner" && currentPartnerTab !== "home" && deals.some((deal) => deal.statusUpdatedAt && deal.statusUpdatedAt !== deal.statusSeenAt) && (
-            <section aria-label="Application status updates" className="mb-5 rounded-xl border border-sky-200 bg-sky-50 p-4">
-              <h2 className="text-sm font-bold text-sky-950">Application status updates</h2>
-              {deals.filter((deal) => deal.statusUpdatedAt && deal.statusUpdatedAt !== deal.statusSeenAt).map((deal) => (
-                <button key={deal.id} onClick={() => void selectDeal(deal.id)} className="mt-2 block text-left text-xs text-sky-900 underline">
-                  {deal.name}: {deal.status} - review update
-                </button>
-              ))}
-            </section>
           )}
           {perspective === "master" && masterPipeline.some((deal) => deal.followUpReminders?.some((reminder) => !reminder.completed && new Date(reminder.dueAt || `${reminder.dueDate}T${reminder.dueTime || "00:00"}`).getTime() <= now)) && (
             <section aria-label="Due follow-up reminders" className="mb-5 rounded-xl border border-amber-200 bg-amber-50 p-4">
