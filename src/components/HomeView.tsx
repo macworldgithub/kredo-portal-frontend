@@ -20,6 +20,7 @@ import {
   FileText
 } from "lucide-react";
 import { Deal } from "@/lib/api";
+import { QRCodeDisplay } from "./QRCodeDisplay";
 
 interface HomeViewProps {
   deals: Deal[];
@@ -54,9 +55,13 @@ export const HomeView: React.FC<HomeViewProps> = ({
   referralLink,
 }) => {
   const [copiedLink, setCopiedLink] = useState(false);
+  const fullReferralUrl = referralLink?.startsWith('http://') || referralLink?.startsWith('https://')
+    ? referralLink
+    : `https://${referralLink || ''}`;
+
 
   const handleCopyLink = () => {
-    navigator.clipboard.writeText(`https://${referralLink}`);
+    navigator.clipboard.writeText(fullReferralUrl);
     setCopiedLink(true);
     setTimeout(() => setCopiedLink(false), 2000);
   };
@@ -313,29 +318,9 @@ export const HomeView: React.FC<HomeViewProps> = ({
                 </h2>
               </div>
 
-              {/* Stylized QR Code */}
-              <div className="shrink-0 bg-white p-2.5 rounded-xl shadow-xs border border-white/80">
-                <svg className="w-16 h-16" viewBox="0 0 100 100" fill="currentColor">
-                  <rect x="0" y="0" width="30" height="30" rx="4" fill="#0a1926" />
-                  <rect x="6" y="6" width="18" height="18" rx="2" fill="white" />
-                  <rect x="10" y="10" width="10" height="10" fill="#0a1926" />
-
-                  <rect x="70" y="0" width="30" height="30" rx="4" fill="#0a1926" />
-                  <rect x="76" y="6" width="18" height="18" rx="2" fill="white" />
-                  <rect x="80" y="10" width="10" height="10" fill="#0a1926" />
-
-                  <rect x="0" y="70" width="30" height="30" rx="4" fill="#0a1926" />
-                  <rect x="6" y="76" width="18" height="18" rx="2" fill="white" />
-                  <rect x="10" y="80" width="10" height="10" fill="#0a1926" />
-
-                  <circle cx="45" cy="15" r="4" fill="#0a1926" />
-                  <circle cx="55" cy="25" r="3" fill="#0a1926" />
-                  <circle cx="50" cy="50" r="5" fill="#0a1926" />
-                  <circle cx="25" cy="45" r="3" fill="#0a1926" />
-                  <circle cx="75" cy="45" r="3.5" fill="#0a1926" />
-                  <circle cx="45" cy="75" r="4" fill="#0a1926" />
-                  <circle cx="65" cy="75" r="3" fill="#0a1926" />
-                </svg>
+              {/* Functional QR Code */}
+              <div className="shrink-0 bg-white p-2 rounded-xl shadow-xs border border-white/80 flex items-center justify-center">
+                <QRCodeDisplay value={fullReferralUrl} size={64} className="w-16 h-16" />
               </div>
             </div>
 

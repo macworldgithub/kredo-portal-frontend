@@ -2,6 +2,7 @@
 
 import React, { useState } from "react";
 import { Copy, Check, Download, ExternalLink, Mail } from "lucide-react";
+import { QRCodeDisplay } from "./QRCodeDisplay";
 
 interface ShareViewProps {
   onOpenHeroDemo: () => void;
@@ -35,7 +36,11 @@ export const ShareView: React.FC<ShareViewProps> = ({
     }
   };
 
-  const shareMessage = `Hi — Kredo can help with business funding from $5,000 to $2 million. You can check eligibility and apply here: ${referralLink}`;
+  const fullReferralUrl = referralLink.startsWith('http://') || referralLink.startsWith('https://')
+    ? referralLink
+    : `https://${referralLink}`;
+
+  const shareMessage = `Hi — Kredo can help with business funding from $5,000 to $2 million. You can check eligibility and apply here: ${fullReferralUrl}`;
 
   const handleCopyLink = () => {
     navigator.clipboard.writeText(`https://${referralLink}`);
@@ -115,29 +120,8 @@ export const ShareView: React.FC<ShareViewProps> = ({
 
           {/* Right QR Card Box */}
           <div className="bg-white text-slate-900 rounded-3xl p-6 shadow-xl flex flex-col items-center shrink-0 w-64 text-center">
-            <div className="p-2 bg-white rounded-2xl">
-              <svg id="share-qr-svg" className="w-40 h-40" viewBox="0 0 100 100" fill="currentColor">
-                <rect x="0" y="0" width="30" height="30" rx="3" fill="#0a1926" />
-                <rect x="6" y="6" width="18" height="18" rx="2" fill="white" />
-                <rect x="10" y="10" width="10" height="10" fill="#0a1926" />
-
-                <rect x="70" y="0" width="30" height="30" rx="3" fill="#0a1926" />
-                <rect x="76" y="6" width="18" height="18" rx="2" fill="white" />
-                <rect x="80" y="10" width="10" height="10" fill="#0a1926" />
-
-                <rect x="0" y="70" width="30" height="30" rx="3" fill="#0a1926" />
-                <rect x="6" y="76" width="18" height="18" rx="2" fill="white" />
-                <rect x="10" y="80" width="10" height="10" fill="#0a1926" />
-
-                <circle cx="45" cy="15" r="4" fill="#0a1926" />
-                <circle cx="55" cy="25" r="3" fill="#0a1926" />
-                <rect x="40" y="40" width="20" height="20" rx="3" fill="#0a1926" />
-                <circle cx="85" cy="55" r="4" fill="#0a1926" />
-                <rect x="70" y="70" width="12" height="12" rx="2" fill="#0a1926" />
-                <rect x="88" y="78" width="8" height="8" fill="#0a1926" />
-                <rect x="45" y="75" width="14" height="8" rx="2" fill="#0a1926" />
-                <rect x="15" y="45" width="10" height="10" fill="#0a1926" />
-              </svg>
+            <div className="p-2 bg-white rounded-2xl flex items-center justify-center">
+              <QRCodeDisplay id="share-qr-code" value={fullReferralUrl} size={160} />
             </div>
 
             <button
