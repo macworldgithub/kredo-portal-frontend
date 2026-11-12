@@ -65,11 +65,11 @@ export function NotificationBell({ deals, onSelectDeal }: NotificationBellProps)
         aria-expanded={isOpen}
         aria-controls={panelId}
         aria-haspopup="dialog"
-        className="relative flex h-10 w-10 items-center justify-center rounded-full border border-slate-200 bg-white text-slate-600 transition-colors hover:border-sky-200 hover:text-sky-800 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-600"
+        className="relative flex h-8 w-8 sm:h-10 sm:w-10 items-center justify-center rounded-full border border-slate-200 bg-white text-slate-600 transition-colors hover:border-sky-200 hover:text-sky-800 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-600"
       >
-        <Bell className="h-4 w-4" aria-hidden="true" />
+        <Bell className="h-3.5 w-3.5 sm:h-4 sm:w-4" aria-hidden="true" />
         {unreadCount > 0 && (
-          <span aria-hidden="true" className="absolute -right-1 -top-1 flex h-5 min-w-5 items-center justify-center rounded-full bg-rose-600 px-1 text-[10px] font-bold text-white ring-2 ring-[#f7f9fa]">
+          <span aria-hidden="true" className="absolute -right-0.5 -top-0.5 sm:-right-1 sm:-top-1 flex h-4 min-w-4 sm:h-5 sm:min-w-5 items-center justify-center rounded-full bg-rose-600 px-0.5 sm:px-1 text-[9px] sm:text-[10px] font-bold text-white ring-2 ring-[#f7f9fa]">
             {unreadCount > 99 ? "99+" : unreadCount}
           </span>
         )}
