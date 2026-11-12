@@ -3,7 +3,8 @@
 import React, { useState } from "react";
 import { 
   Send, 
-  Activity, 
+  Activity,
+  Bell, 
   CheckCircle, 
   DollarSign, 
   Briefcase, 
@@ -110,6 +111,44 @@ export const HomeView: React.FC<HomeViewProps> = ({
           <span>Share referral</span>
         </button>
       </div>
+
+            {/* Application Status Notification Banner (Issue #3) */}
+      {(() => {
+        const waitingDeals = deals.filter((d) => d.status === "Waiting on customer" || d.statusUpdatedAt);
+        if (waitingDeals.length === 0) return null;
+        const primeDeal = waitingDeals.find((d) => d.status === "Waiting on customer") || waitingDeals[0];
+        const isWaiting = primeDeal.status === "Waiting on customer";
+        return (
+          <div className="bg-[#fffbeb] border border-[#fef3c7] rounded-2xl p-4 sm:p-5 shadow-2xs flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 animate-in fade-in duration-200">
+            <div className="flex items-start gap-3.5">
+              <div className="w-10 h-10 rounded-xl bg-amber-100 text-amber-800 flex items-center justify-center shrink-0 mt-0.5 border border-amber-200">
+                <Bell className="w-5 h-5 text-amber-700 animate-pulse" />
+              </div>
+              <div>
+                <div className="flex items-center gap-2 flex-wrap">
+                  <span className="text-xs font-bold text-amber-950 uppercase tracking-wider">
+                    Application Status Notification
+                  </span>
+                  <span className="px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-amber-200 text-amber-900">
+                    {waitingDeals.length} Update{waitingDeals.length > 1 ? 's' : ''}
+                  </span>
+                </div>
+                <p className="text-xs text-amber-900 mt-1">
+                  <strong>{primeDeal.name}</strong> ({primeDeal.applicant}) moved to <strong className="underline">{primeDeal.status}</strong>.
+                  {isWaiting ? " Please follow up with the customer to upload required documents or complete their review." : " Review the latest progress in your portal."}
+                </p>
+              </div>
+            </div>
+            <button
+              onClick={() => onSelectDeal(primeDeal)}
+              className="px-4 py-2 bg-[#0a1926] hover:bg-slate-800 text-white text-xs font-bold rounded-xl shadow-xs transition-colors shrink-0 flex items-center gap-1.5 cursor-pointer"
+            >
+              <span>Review Application</span>
+              <ChevronRight className="w-3.5 h-3.5" />
+            </button>
+          </div>
+        );
+      })()}
 
       {/* 5 Interactive Drill-down Stat Cards (Section 4.1, 4.2 & 4.3) */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
