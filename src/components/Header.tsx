@@ -45,10 +45,6 @@ export const Header: React.FC<HeaderProps> = ({
       </div>
 
       <div className="ml-auto flex shrink-0 items-center gap-1.5 sm:gap-3">
-        {perspective === 'partner' && onSubmitReferral && (
-          <SubmitReferralButton onClick={onSubmitReferral} />
-        )}
-
         {/* LIVE DEMO Pill */}
       <div className="hidden sm:flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#f4faee] border border-[#d6f0be] text-[11px] font-semibold text-[#3b7c1e] shadow-2xs">
           <span className="w-2 h-2 rounded-full bg-[#52a42b] animate-pulse"></span>
@@ -64,6 +60,9 @@ export const Header: React.FC<HeaderProps> = ({
           <Eye className="w-3.5 h-3.5 text-sky-400" />
           <span className="hidden sm:inline">{perspective === 'partner' ? 'Kredo Master' : 'Partner View'}</span>
         </button>}
+        {perspective === 'partner' && onSubmitReferral && (
+          <SubmitReferralButton onClick={onSubmitReferral} />
+        )}
         <button
           onClick={onLogout}
           className="flex h-10 w-10 shrink-0 items-center justify-center sm:h-auto sm:w-auto sm:p-2 rounded-full bg-white border border-slate-200 text-slate-600 hover:text-rose-700 hover:border-rose-200 shadow-2xs transition-colors"
