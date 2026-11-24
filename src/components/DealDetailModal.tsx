@@ -19,6 +19,7 @@ import {
   Bell
 } from "lucide-react";
 import { Deal, DiaryNote } from "@/lib/api";
+import { LenderFields, LENDER_OPTIONS } from "./LenderFields";
 
 interface DealDetailModalProps {
   deal: Deal | null;
@@ -88,7 +89,7 @@ export const DealDetailModal: React.FC<DealDetailModalProps> = ({
       setEditAmount(deal.amount || "");
       setEditType(deal.type || "Asset & Equipment");
       const currentLender = deal.lender || "";
-      if (['Shift', 'Lumi', 'Dynamoney', 'Moneytech', 'Banjo', 'Prospa', 'Bizcap', 'Capify'].includes(currentLender)) {
+      if (LENDER_OPTIONS.includes(currentLender)) {
         setEditLender(currentLender);
         setCustomLender("");
       } else if (currentLender) {
@@ -188,6 +189,10 @@ export const DealDetailModal: React.FC<DealDetailModalProps> = ({
   const handleSaveLead = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!onUpdateDeal) return;
+    if (editLender === "Other" && !customLender.trim()) {
+      setLeadEditError("Please specify the lender / funder name.");
+      return;
+    }
     setSavingLead(true);
     setLeadEditError("");
     try {
@@ -196,8 +201,8 @@ export const DealDetailModal: React.FC<DealDetailModalProps> = ({
         applicant: editApplicant.trim(),
         amount: editAmount.trim(),
         type: editType.trim(),
+        lender: editLender === "Other" ? customLender.trim() : editLender,
         ...(canManage ? {
-          lender: editLender === "Other" ? (customLender.trim() || "Other") : editLender,
           financedAmount: editFinancedAmount === "" ? undefined : Number(editFinancedAmount),
         } : {}),
       });
@@ -382,43 +387,13 @@ export const DealDetailModal: React.FC<DealDetailModalProps> = ({
                     <input type="number" min="0" step="0.01" value={editFinancedAmount} onChange={(event) => setEditFinancedAmount(event.target.value)} className="mt-1 block w-full rounded-xl border border-slate-200 bg-white px-3 py-2" />
                     <span className="text-xs font-normal">Enter the actual funded value. Older records use the facility amount until updated.</span>
                   </label>}
-                  {/* Lender selection (Change #5) */}
-                  {canManage && <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
-                    <div>
-                      <label htmlFor="lead-lender" className="block text-[11px] font-bold text-slate-600 mb-1">Lender / Funder</label>
-                      <select
-                        id="lead-lender"
-                        value={editLender}
-                        onChange={(e) => setEditLender(e.target.value)}
-                        className="w-full px-3 py-2 text-xs border border-slate-200 rounded-xl bg-white focus:outline-hidden focus:ring-2 focus:ring-sky-500/20 font-medium"
-                      >
-                        <option value="">-- Select Lender --</option>
-                        <option value="Shift">Shift</option>
-                        <option value="Lumi">Lumi</option>
-                        <option value="Dynamoney">Dynamoney</option>
-                        <option value="Moneytech">Moneytech</option>
-                        <option value="Banjo">Banjo</option>
-                        <option value="Prospa">Prospa</option>
-                        <option value="Bizcap">Bizcap</option>
-                        <option value="Capify">Capify</option>
-                        <option value="Other">Other (Specify funder)</option>
-                      </select>
-                    </div>
-                    {editLender === "Other" && (
-                      <div>
-                        <label htmlFor="lead-custom-lender" className="block text-[11px] font-bold text-slate-600 mb-1">Specify Lender Name *</label>
-                        <input
-                          id="lead-custom-lender"
-                          type="text"
-                          required
-                          value={customLender}
-                          onChange={(e) => setCustomLender(e.target.value)}
-                          placeholder="e.g. Liberty Financial"
-                          className="w-full px-3 py-2 text-xs border border-slate-200 rounded-xl bg-white focus:outline-hidden focus:ring-2 focus:ring-sky-500/20 font-medium"
-                        />
-                      </div>
-                    )}
-                  </div>}
+                  <LenderFields
+                    idPrefix="lead"
+                    lender={editLender}
+                    customLender={customLender}
+                    onLenderChange={setEditLender}
+                    onCustomLenderChange={setCustomLender}
+                  />
 
                   <div className="flex items-center justify-end gap-2 pt-2 border-t border-sky-100">
                     <button

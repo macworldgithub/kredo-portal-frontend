@@ -1,8 +1,20 @@
 "use client";
 
 import React, { useState } from "react";
-import { X, Copy, Check, Send, Sparkles, Building, User, DollarSign, Mail, Phone } from "lucide-react";
+import {
+  X,
+  Copy,
+  Check,
+  Send,
+  Sparkles,
+  Building,
+  User,
+  DollarSign,
+  Mail,
+  Phone,
+} from "lucide-react";
 import { Deal } from "@/lib/api";
+import { LenderFields } from "./LenderFields";
 
 interface ShareReferralModalProps {
   initialTab?: "link" | "direct";
@@ -17,6 +29,7 @@ interface ShareReferralModalProps {
     phone: string;
     amount: string;
     facilityType: string;
+    lender?: string;
     comments?: string;
     referralCode: string;
   }) => Promise<Deal>;
@@ -28,9 +41,9 @@ export const ShareReferralModal: React.FC<ShareReferralModalProps> = ({
   onClose,
   referralCode,
   referralLink,
-  onCreateReferral
+  onCreateReferral,
 }) => {
-  const [activeTab, setActiveTab] = useState<'link' | 'direct'>(initialTab);
+  const [activeTab, setActiveTab] = useState<"link" | "direct">(initialTab);
   const [copiedLink, setCopiedLink] = useState(false);
   const [copiedCode, setCopiedCode] = useState(false);
 
@@ -42,6 +55,8 @@ export const ShareReferralModal: React.FC<ShareReferralModalProps> = ({
   const [amount, setAmount] = useState("");
   const [facilityType, setFacilityType] = useState("Asset & Equipment");
   const [comments, setComments] = useState("");
+  const [lender, setLender] = useState("");
+  const [customLender, setCustomLender] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
   const [submitError, setSubmitError] = useState("");
@@ -67,6 +82,11 @@ export const ShareReferralModal: React.FC<ShareReferralModalProps> = ({
       return;
     }
 
+    if (lender === "Other" && !customLender.trim()) {
+      setSubmitError("Please specify the lender / funder name.");
+      return;
+    }
+
     setIsSubmitting(true);
     setSubmitError("");
     try {
@@ -77,6 +97,8 @@ export const ShareReferralModal: React.FC<ShareReferralModalProps> = ({
         phone: phone || "Not provided",
         amount: amount || "$0",
         facilityType,
+        lender:
+          (lender === "Other" ? customLender.trim() : lender) || undefined,
         comments: comments.trim() || undefined,
         referralCode,
       });
@@ -91,9 +113,13 @@ export const ShareReferralModal: React.FC<ShareReferralModalProps> = ({
         setPhone("");
         setAmount("");
         setComments("");
+        setLender("");
+        setCustomLender("");
       }, 1500);
     } catch (error) {
-      setSubmitError(error instanceof Error ? error.message : "Could not submit referral.");
+      setSubmitError(
+        error instanceof Error ? error.message : "Could not submit referral.",
+      );
     } finally {
       setIsSubmitting(false);
     }
@@ -101,7 +127,7 @@ export const ShareReferralModal: React.FC<ShareReferralModalProps> = ({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs animate-in fade-in duration-150">
-      <div 
+      <div
         className="bg-white rounded-2xl shadow-2xl border border-slate-200 max-w-lg w-full max-h-[calc(100dvh-2rem)] overflow-y-auto transition-all transform scale-100"
         onClick={(e) => e.stopPropagation()}
       >
@@ -112,13 +138,16 @@ export const ShareReferralModal: React.FC<ShareReferralModalProps> = ({
               <span className="p-1.5 rounded-lg bg-sky-100 text-sky-800">
                 <Sparkles className="w-4 h-4" />
               </span>
-              <h3 className="text-lg font-bold text-slate-900">Share or Submit a Referral</h3>
+              <h3 className="text-lg font-bold text-slate-900">
+                Share or Submit a Referral
+              </h3>
             </div>
             <p className="text-xs text-slate-500 mt-1">
-              Send your unique client link or introduce a deal directly for immediate assessment.
+              Send your unique client link or introduce a deal directly for
+              immediate assessment.
             </p>
           </div>
-          <button 
+          <button
             onClick={onClose}
             className="p-1.5 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors"
           >
@@ -129,21 +158,21 @@ export const ShareReferralModal: React.FC<ShareReferralModalProps> = ({
         {/* Tab switch */}
         <div className="flex border-b border-slate-100 bg-slate-50 px-6 pt-3 gap-2">
           <button
-            onClick={() => setActiveTab('link')}
+            onClick={() => setActiveTab("link")}
             className={`pb-3 text-xs font-semibold border-b-2 transition-all ${
-              activeTab === 'link'
-                ? 'border-[#0a1926] text-[#0a1926]'
-                : 'border-transparent text-slate-500 hover:text-slate-800'
+              activeTab === "link"
+                ? "border-[#0a1926] text-[#0a1926]"
+                : "border-transparent text-slate-500 hover:text-slate-800"
             }`}
           >
             Referral Link & Code
           </button>
           <button
-            onClick={() => setActiveTab('direct')}
+            onClick={() => setActiveTab("direct")}
             className={`pb-3 text-xs font-semibold border-b-2 transition-all ${
-              activeTab === 'direct'
-                ? 'border-[#0a1926] text-[#0a1926]'
-                : 'border-transparent text-slate-500 hover:text-slate-800'
+              activeTab === "direct"
+                ? "border-[#0a1926] text-[#0a1926]"
+                : "border-transparent text-slate-500 hover:text-slate-800"
             }`}
           >
             Direct Introduction Form
@@ -152,7 +181,7 @@ export const ShareReferralModal: React.FC<ShareReferralModalProps> = ({
 
         {/* Body content */}
         <div className="p-6">
-          {activeTab === 'link' ? (
+          {activeTab === "link" ? (
             <div className="space-y-5">
               <div>
                 <label className="block text-xs font-semibold text-slate-700 mb-1.5">
@@ -166,12 +195,17 @@ export const ShareReferralModal: React.FC<ShareReferralModalProps> = ({
                     onClick={handleCopyLink}
                     className="flex items-center gap-1.5 px-4 py-2.5 rounded-xl bg-[#0a1926] hover:bg-[#152e46] text-white text-xs font-semibold transition-colors shrink-0"
                   >
-                    {copiedLink ? <Check className="w-4 h-4 text-emerald-400" /> : <Copy className="w-4 h-4" />}
-                    <span>{copiedLink ? 'Copied' : 'Copy'}</span>
+                    {copiedLink ? (
+                      <Check className="w-4 h-4 text-emerald-400" />
+                    ) : (
+                      <Copy className="w-4 h-4" />
+                    )}
+                    <span>{copiedLink ? "Copied" : "Copy"}</span>
                   </button>
                 </div>
                 <p className="text-[11px] text-slate-500 mt-1.5">
-                  All loans submitted via this link are tracked to your partner account for 90 days.
+                  All loans submitted via this link are tracked to your partner
+                  account for 90 days.
                 </p>
               </div>
 
@@ -181,38 +215,62 @@ export const ShareReferralModal: React.FC<ShareReferralModalProps> = ({
                 </label>
                 <div className="flex items-center justify-between p-3.5 bg-slate-50 border border-dashed border-slate-300 rounded-xl">
                   <div>
-                    <span className="text-xl font-mono font-bold tracking-wider text-slate-900">{referralCode}</span>
-                    <p className="text-[11px] text-slate-500">Clients can enter this in any application step</p>
+                    <span className="text-xl font-mono font-bold tracking-wider text-slate-900">
+                      {referralCode}
+                    </span>
+                    <p className="text-[11px] text-slate-500">
+                      Clients can enter this in any application step
+                    </p>
                   </div>
                   <button
                     onClick={handleCopyCode}
                     className="p-2 rounded-lg bg-white border border-slate-200 text-slate-700 hover:bg-slate-100 shadow-2xs transition-colors"
                     title="Copy code"
                   >
-                    {copiedCode ? <Check className="w-4 h-4 text-emerald-600" /> : <Copy className="w-4 h-4" />}
+                    {copiedCode ? (
+                      <Check className="w-4 h-4 text-emerald-600" />
+                    ) : (
+                      <Copy className="w-4 h-4" />
+                    )}
                   </button>
                 </div>
               </div>
 
               <div className="p-3.5 rounded-xl bg-amber-50/80 border border-amber-200/60 text-xs text-amber-900 leading-relaxed">
-                <span>Your referral code links this client to your business for progress tracking.</span>
+                <span>
+                  Your referral code links this client to your business for
+                  progress tracking.
+                </span>
               </div>
             </div>
           ) : (
             <form onSubmit={handleSubmitReferral} className="space-y-3.5">
-              {submitError && <p role="alert" className="rounded-lg bg-rose-50 px-3 py-2 text-xs text-rose-700">{submitError}</p>}
+              {submitError && (
+                <p
+                  role="alert"
+                  className="rounded-lg bg-rose-50 px-3 py-2 text-xs text-rose-700"
+                >
+                  {submitError}
+                </p>
+              )}
               {isSuccess ? (
                 <div className="py-8 text-center space-y-2 animate-in zoom-in-95 duration-200">
                   <div className="w-12 h-12 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center mx-auto">
                     <Check className="w-6 h-6" />
                   </div>
-                  <h4 className="text-base font-bold text-slate-900">Referral Lodged Successfully!</h4>
-                  <p className="text-xs text-slate-500">KRD deal created. Our credit team will begin assessment.</p>
+                  <h4 className="text-base font-bold text-slate-900">
+                    Referral Lodged Successfully!
+                  </h4>
+                  <p className="text-xs text-slate-500">
+                    KRD deal created. Our credit team will begin assessment.
+                  </p>
                 </div>
               ) : (
                 <>
                   <div>
-                    <label className="block text-xs font-semibold text-slate-700 mb-1">Business Name *</label>
+                    <label className="block text-xs font-semibold text-slate-700 mb-1">
+                      Business Name *
+                    </label>
                     <div className="relative">
                       <Building className="w-4 h-4 absolute left-3 top-3 text-slate-400" />
                       <input
@@ -228,7 +286,9 @@ export const ShareReferralModal: React.FC<ShareReferralModalProps> = ({
 
                   <div className="grid grid-cols-2 gap-3">
                     <div>
-                      <label className="block text-xs font-semibold text-slate-700 mb-1">Contact Name *</label>
+                      <label className="block text-xs font-semibold text-slate-700 mb-1">
+                        Contact Name *
+                      </label>
                       <div className="relative">
                         <User className="w-4 h-4 absolute left-3 top-3 text-slate-400" />
                         <input
@@ -242,7 +302,9 @@ export const ShareReferralModal: React.FC<ShareReferralModalProps> = ({
                       </div>
                     </div>
                     <div>
-                      <label className="block text-xs font-semibold text-slate-700 mb-1">Requested Amount ($)</label>
+                      <label className="block text-xs font-semibold text-slate-700 mb-1">
+                        Requested Amount ($)
+                      </label>
                       <div className="relative">
                         <DollarSign className="w-4 h-4 absolute left-3 top-3 text-slate-400" />
                         <input
@@ -258,7 +320,9 @@ export const ShareReferralModal: React.FC<ShareReferralModalProps> = ({
 
                   <div className="grid grid-cols-2 gap-3">
                     <div>
-                      <label className="block text-xs font-semibold text-slate-700 mb-1">Email</label>
+                      <label className="block text-xs font-semibold text-slate-700 mb-1">
+                        Email
+                      </label>
                       <div className="relative">
                         <Mail className="w-4 h-4 absolute left-3 top-3 text-slate-400" />
                         <input
@@ -271,7 +335,9 @@ export const ShareReferralModal: React.FC<ShareReferralModalProps> = ({
                       </div>
                     </div>
                     <div>
-                      <label className="block text-xs font-semibold text-slate-700 mb-1">Phone</label>
+                      <label className="block text-xs font-semibold text-slate-700 mb-1">
+                        Phone
+                      </label>
                       <div className="relative">
                         <Phone className="w-4 h-4 absolute left-3 top-3 text-slate-400" />
                         <input
@@ -286,7 +352,9 @@ export const ShareReferralModal: React.FC<ShareReferralModalProps> = ({
                   </div>
 
                   <div>
-                    <label className="block text-xs font-semibold text-slate-700 mb-1">Facility Type</label>
+                    <label className="block text-xs font-semibold text-slate-700 mb-1">
+                      Facility Type
+                    </label>
                     <select
                       value={facilityType}
                       onChange={(e) => setFacilityType(e.target.value)}
@@ -299,8 +367,19 @@ export const ShareReferralModal: React.FC<ShareReferralModalProps> = ({
                     </select>
                   </div>
 
+                  <LenderFields
+                    idPrefix="referral"
+                    lender={lender}
+                    customLender={customLender}
+                    onLenderChange={setLender}
+                    onCustomLenderChange={setCustomLender}
+                  />
+
                   <div>
-                    <label htmlFor="referral-comments" className="block text-xs font-semibold text-slate-700 mb-1">
+                    <label
+                      htmlFor="referral-comments"
+                      className="block text-xs font-semibold text-slate-700 mb-1"
+                    >
                       Tell us about the client
                     </label>
                     <textarea
@@ -308,7 +387,7 @@ export const ShareReferralModal: React.FC<ShareReferralModalProps> = ({
                       name="comments"
                       value={comments}
                       onChange={(e) => setComments(e.target.value)}
-                      placeholder="Share any helpful background or funding needs (optional)"
+                      placeholder="Share any helpful background or funding needs"
                       rows={3}
                       className="w-full px-3 py-2 text-xs border border-slate-200 rounded-lg resize-y focus:outline-hidden focus:ring-2 focus:ring-sky-500"
                     />
