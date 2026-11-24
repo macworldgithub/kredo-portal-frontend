@@ -385,8 +385,9 @@ export const DealDetailModal: React.FC<DealDetailModalProps> = ({
                   {/* Lender selection (Change #5) */}
                   {canManage && <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
                     <div>
-                      <label className="block text-[11px] font-bold text-slate-600 mb-1">Lender / Funder</label>
+                      <label htmlFor="lead-lender" className="block text-[11px] font-bold text-slate-600 mb-1">Lender / Funder</label>
                       <select
+                        id="lead-lender"
                         value={editLender}
                         onChange={(e) => setEditLender(e.target.value)}
                         className="w-full px-3 py-2 text-xs border border-slate-200 rounded-xl bg-white focus:outline-hidden focus:ring-2 focus:ring-sky-500/20 font-medium"
@@ -405,8 +406,9 @@ export const DealDetailModal: React.FC<DealDetailModalProps> = ({
                     </div>
                     {editLender === "Other" && (
                       <div>
-                        <label className="block text-[11px] font-bold text-slate-600 mb-1">Specify Lender Name *</label>
+                        <label htmlFor="lead-custom-lender" className="block text-[11px] font-bold text-slate-600 mb-1">Specify Lender Name *</label>
                         <input
+                          id="lead-custom-lender"
                           type="text"
                           required
                           value={customLender}
@@ -507,13 +509,7 @@ export const DealDetailModal: React.FC<DealDetailModalProps> = ({
                     Lender / Funder
                   </span>
                   <span className="font-semibold text-slate-800">
-                    {deal.lender ? (
-                      <span className="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-sky-50 text-sky-800 border border-sky-200">
-                        {deal.lender}
-                      </span>
-                    ) : (
-                      <span className="text-slate-400 italic">Not assigned</span>
-                    )}
+                    {deal.lender || "Not assigned"}
                   </span>
                 </div>
                 <div className="flex items-center justify-between py-2 border-b border-slate-100 text-xs">
