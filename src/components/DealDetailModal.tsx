@@ -189,7 +189,7 @@ export const DealDetailModal: React.FC<DealDetailModalProps> = ({
   const handleSaveLead = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!onUpdateDeal) return;
-    if (editLender === "Other" && !customLender.trim()) {
+    if (canManage && editLender === "Other" && !customLender.trim()) {
       setLeadEditError("Please specify the lender / funder name.");
       return;
     }
@@ -201,8 +201,8 @@ export const DealDetailModal: React.FC<DealDetailModalProps> = ({
         applicant: editApplicant.trim(),
         amount: editAmount.trim(),
         type: editType.trim(),
-        lender: editLender === "Other" ? customLender.trim() : editLender,
         ...(canManage ? {
+          lender: editLender === "Other" ? customLender.trim() : editLender,
           financedAmount: editFinancedAmount === "" ? undefined : Number(editFinancedAmount),
         } : {}),
       });
@@ -387,13 +387,13 @@ export const DealDetailModal: React.FC<DealDetailModalProps> = ({
                     <input type="number" min="0" step="0.01" value={editFinancedAmount} onChange={(event) => setEditFinancedAmount(event.target.value)} className="mt-1 block w-full rounded-xl border border-slate-200 bg-white px-3 py-2" />
                     <span className="text-xs font-normal">Enter the actual funded value. Older records use the facility amount until updated.</span>
                   </label>}
-                  <LenderFields
+                  {canManage && <LenderFields
                     idPrefix="lead"
                     lender={editLender}
                     customLender={customLender}
                     onLenderChange={setEditLender}
                     onCustomLenderChange={setCustomLender}
-                  />
+                  />}
 
                   <div className="flex items-center justify-end gap-2 pt-2 border-t border-sky-100">
                     <button

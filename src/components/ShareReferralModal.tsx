@@ -14,7 +14,6 @@ import {
   Phone,
 } from "lucide-react";
 import { Deal } from "@/lib/api";
-import { LenderFields } from "./LenderFields";
 
 interface ShareReferralModalProps {
   initialTab?: "link" | "direct";
@@ -29,7 +28,6 @@ interface ShareReferralModalProps {
     phone: string;
     amount: string;
     facilityType: string;
-    lender?: string;
     comments?: string;
     referralCode: string;
   }) => Promise<Deal>;
@@ -55,8 +53,6 @@ export const ShareReferralModal: React.FC<ShareReferralModalProps> = ({
   const [amount, setAmount] = useState("");
   const [facilityType, setFacilityType] = useState("Asset & Equipment");
   const [comments, setComments] = useState("");
-  const [lender, setLender] = useState("");
-  const [customLender, setCustomLender] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
   const [submitError, setSubmitError] = useState("");
@@ -82,11 +78,6 @@ export const ShareReferralModal: React.FC<ShareReferralModalProps> = ({
       return;
     }
 
-    if (lender === "Other" && !customLender.trim()) {
-      setSubmitError("Please specify the lender / funder name.");
-      return;
-    }
-
     setIsSubmitting(true);
     setSubmitError("");
     try {
@@ -97,8 +88,6 @@ export const ShareReferralModal: React.FC<ShareReferralModalProps> = ({
         phone: phone || "Not provided",
         amount: amount || "$0",
         facilityType,
-        lender:
-          (lender === "Other" ? customLender.trim() : lender) || undefined,
         comments: comments.trim() || undefined,
         referralCode,
       });
@@ -113,8 +102,6 @@ export const ShareReferralModal: React.FC<ShareReferralModalProps> = ({
         setPhone("");
         setAmount("");
         setComments("");
-        setLender("");
-        setCustomLender("");
       }, 1500);
     } catch (error) {
       setSubmitError(
@@ -366,14 +353,6 @@ export const ShareReferralModal: React.FC<ShareReferralModalProps> = ({
                       <option>Invoice Finance</option>
                     </select>
                   </div>
-
-                  <LenderFields
-                    idPrefix="referral"
-                    lender={lender}
-                    customLender={customLender}
-                    onLenderChange={setLender}
-                    onCustomLenderChange={setCustomLender}
-                  />
 
                   <div>
                     <label
